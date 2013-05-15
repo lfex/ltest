@@ -34,7 +34,7 @@ clean: clean-ebin clean-eunit
 check: TEST_MODS = $(wildcard $(TEST_OUT_DIR)/*.beam)
 check: compile compile-tests
 	@#rebar eunit verbose=1 skip_deps=true
-	for FILE in $(wildcard $(TEST_OUT_DIR)/*.beam); do \
+	@for FILE in $(wildcard $(TEST_OUT_DIR)/*.beam); do \
 	F1="$$(basename $$FILE)"; F2=$${F1%.*}; \
 	echo $$F2; done|sed -e :a -e '$$!N; s/\n/,/; ta' | \
 	ERL_LIBS=$(ERL_LIBS) \

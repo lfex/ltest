@@ -1,7 +1,47 @@
 lfeunit: eunit for LFE
 ======================
 
+*Caveat Emptor*: This is a new project with very little implementation done yet!
+
 Currently, when the Erlang eunit header file (`.hrl`) is `include-lib`ed in
 LFE, only a few macros make it over. Robert Virding is looking into this, but
 until the fix is ready, it would be a fun exercise to implement a subset of
 `eunit`'s functionality for LFE. Thus this project ;-)
+
+
+Making lfeunit a Dep in Your Project
+------------------------------------
+
+In your ``rebar.config`` file, simply add an extra line for ``lfeunit``
+
+.. code:: erlang
+
+    {deps, [
+        {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "develop"}},
+        {lfeunit, ".*", {git, "git://github.com/lfe/lfeunit.git", ""}}
+      ]}.
+
+And then do the usual:
+
+.. code:: bash
+
+    $ rebar get-deps
+    $ rebar compile
+
+
+Using lfeunit
+-------------
+
+You use ``lfeunit`` like any other LFE or Erlang library. Here's a simple
+example:
+
+.. code:: cl
+
+    (defmodule mymod_tests
+      (export all)
+      (import (from lfeunit (assert-equal 2))))
+
+    (defun check-mymod-function_test ()
+      (assert-equal expected-value some-expression))
+
+More soon!

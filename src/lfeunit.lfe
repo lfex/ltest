@@ -11,11 +11,21 @@
 
 (defun assert-equal (expected, expression)
   ""
-  'true)
+  'ok)
 
 (defun assert-not-equal (expected, expression)
   ""
-  'true)
+  (funcall (lambda (__x)
+
+  (: erlang error
+    (tuple 'assert-not-equal_failed
+      (list (tuple 'module 'x)
+            (tuple 'line 'x)
+            (tuple 'expression 'x)
+            (tuple 'expected 'x)
+            (tuple 'value 'x')))))
+
+    ) expected)
 
 (defun assert-exception (class term expression)
   ""

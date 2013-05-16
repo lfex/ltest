@@ -9,11 +9,11 @@
   "takes an expression that returns a boolean value"
   'true)
 
-(defun assert-equal (expected, expression)
+(defun assert-equal (expected expression)
   ""
   'ok)
 
-(defun assert-not-equal (expected, expression)
+(defun assert-not-equal (expected expression)
   ""
   (funcall (lambda (__x)
 
@@ -35,10 +35,10 @@
   ""
   'true)
 
-(defun assert-match ()
+(defun assert-match (guard expression)
   ""
   'true)
 
-(defun assert-not-match ()
+(defun assert-not-match (guard expression)
   ""
   'true)

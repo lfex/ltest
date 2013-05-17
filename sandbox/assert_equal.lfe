@@ -1,5 +1,14 @@
-(defmodule assert_equal
+(defmodule ae
   (export all))
+
+;(include-file "macro_play.lfm")
+
+(defmacro backq (expr)
+  (backq-expand expr))
+
+(eval-when-compile
+  (defun backq-expand (expr)
+    (: io format '"expr: ~p~n" (list expr))))
 
 ; assertEqual(Expect, Expr) ->
 ;     ((fun (__X) ->
@@ -24,13 +33,10 @@
 
 (defun assert-equal2 (expected expression)
   (: io format '"expected: ~p~nexpression: ~p~n~n" (list expected expression))
-  (: io format '"expected: ~p~nexpression: ~p~n~n" (list expected expression))
   (case expression
     (expected 'ok)
     (v (: erlang error 'oops))))
 
-(defmacro xxx (y z)
-  `(list y z ,y ,z))
-
-(defun xx (y z)
-  (xxx y z))
+(defun ae3 (expected expression)
+  (backq expected)
+  (backq expression))

@@ -21,14 +21,14 @@ clean-eunit:
 compile: get-deps clean-ebin
 	rebar compile
 	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(OUT_DIR) $(SOURCE_DIR)/*.lfe
-	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(SANDBOX) $(SANDBOX)/*.lfe
+	@#ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(SANDBOX) $(SANDBOX)/*.lfe
 
 compile-tests: clean-eunit
 	mkdir -p $(TEST_OUT_DIR)
 	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_OUT_DIR) $(TEST_DIR)/*_tests.lfe
 
 shell: compile
-	ERL_LIBS=$(ERL_LIBS) $(LFE) -pa $(TEST_OUT_DIR) -pa $(SANDBOX)
+	ERL_LIBS=$(ERL_LIBS) $(LFE) -pa $(TEST_OUT_DIR) #-pa $(SANDBOX)
 
 clean: clean-ebin clean-eunit
 	rebar clean

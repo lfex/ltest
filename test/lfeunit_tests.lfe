@@ -6,10 +6,26 @@
       (assert-not 1)
       (assert-equal 2)
       (assert-not-equal 2)
-      (assert-exception 3)
-      (assert-not-exception 3)
+      (assert-error 2)
+      (assert-not-error 2)
       (assert-match 2)
       (assert-not-match 2))))
+
+;(defun assert-error-fail_test ()
+;  (assert-not-error 'badarith (+ 1 1)))
+
+(defun assert-error-succeed_test ()
+  (assert-error 'badarith (/ 1 0)))
+
+(defun assert-error-wrong-type_test ()
+  (assert-error 'undef (/ 1 0)))
+
+;(defun assert-fail_test ()
+;  (assert-error XXX (assert 'false))
+
+(defun assert-succeed_test ()
+  (assert 'true)
+  (assert (not (not 'true))))
 
 (defun assert-equal-false_test ()
   (assert-equal 1 2))

@@ -29,19 +29,20 @@
 
 (defun assert-exception (class term expression)
   ""
-;  (let ((name 'assert-exception_failed)
-;        (data (list (tuple 'module '"module")
-;                    (tuple 'line '"line")
-;                    (tuple 'expression '"expression")
-;                    (tuple 'pattern '"pattern")
-;                    (tuple 'unexpected_success '"X"))))
-;    (try (eval expression)
-;      (list 'oops)
-;      (catch
-;        ((tuple type value ignore;)
-;         (: io format '"type: ~p; value: ;~p; ignore: ~p~n"
-;           (list type value ignore))))))
- 'ok)
+  (let ((name 'assert-exception_failed)
+        (data (list (tuple 'module '"module")
+                    (tuple 'line '"line")
+                    (tuple 'expression '"expression")
+                    (tuple 'pattern '"pattern")
+                    (tuple 'unexpected_success '"X"))))
+    (try (progn
+      (eval expression)
+      (list 'oops))
+      (catch
+        ((tuple type value ignore)
+         (: io format '"type: ~p; value: ;~p; ignore: ~p~n"
+           (list type value ignore)))))))
+; 'ok)
 
 (defun assert-not-exception (class term expression)
   ""

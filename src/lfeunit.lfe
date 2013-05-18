@@ -1,5 +1,9 @@
 (defmodule lfeunit
-  (export all))
+  (export all)
+  (import (from erlang (atom_to_list 1))))
+
+(defun add-data (key value data-1)
+  (++ data-1 (list (tuple key value))))
 
 (defun assert (bool-expression)
   "takes an expression that returns a boolean value"
@@ -29,20 +33,37 @@
 
 (defun assert-exception (class term expression)
   ""
-  (let ((name 'assert-exception_failed)
-        (data (list (tuple 'module '"module")
-                    (tuple 'line '"line")
-                    (tuple 'expression '"expression")
-                    (tuple 'pattern '"pattern")
-                    (tuple 'unexpected_success '"X"))))
-    (try (progn
-      (eval expression)
-      (list 'oops))
+  (let* ((fail 'assert-exception_failed)
+         (succeed 'unexpected-success)
+         (pattern (++ '"{ " (atom_to_list class)
+                    '" , " (atom_to_list term) '" , [...] }"))
+         (data (list (tuple 'module '"module")
+                     (tuple 'line '"line")
+                     (tuple 'expression expression)
+                     (tuple 'pattern pattern))))
+    (try
+      (progn
+        (eval expression)
+        (: erlang error succeed))
       (catch
         ((tuple type value ignore)
-         (: io format '"type: ~p; value: ;~p; ignore: ~p~n"
-           (list type value ignore)))))))
-; 'ok)
+          (cond
+            ((and (== type class) (== value term))
+              'ok)
+            ((== value succeed)
+              (: erlang error
+                (tuple fail
+                  (add-data succeed (eval expression) data))))
+            ((/= type class)
+              (: erlang error
+                (tuple fail
+                  (add-data 'unexpected-exception-type
+                    (tuple class term (: erlang get_stacktrace)) data))))
+            ((/= value term)
+              (: erlang error
+                (tuple fail
+                  (add-data 'unexpected-error-type
+                    (tuple class term (: erlang get_stacktrace)) data))))))))))
 
 (defun assert-not-exception (class term expression)
   ""

@@ -1,33 +1,30 @@
 (defmodule lfeunit_tests
-  (export all)
-  (import
-    (from lfeunit
-      (assert 1)
-      (assert-not 1)
-      (assert-equal 2)
-      (assert-not-equal 2)
-      (assert-exception 3)
-      (assert-not-exception 3)
-      (assert-error 2)
-      (assert-not-error 2)
-      (assert-match 2)
-      (assert-not-match 2)
-      (check-wrong-assert-exception 2))))
+  (export all))
 
-(defun assert-succeed_test ()
-  (assert 'true)
-  (assert (not (not 'true))))
+(defmacro MODULE () `'lfeunit_tests)
 
-;(defun assert-equal-false_test ()
-;  (assert-equal 1 2))
+(include-lib "src/lfeunit.lfe")
 
-(defun assert-equal-true_test ()
+(defun assert_test ()
+  (assert `'true)
+  (assert '(not 'false))
+  (assert '(not (not 'true))))
+
+(defun assert-not_test ()
+  (assert-not `'false)
+  (assert-not '(not 'true))
+  (assert-not '(not (not 'false))))
+
+(defun assert-equal_test ()
   (assert-equal 1 1))
 
-;(defun assert-not-equal-false_test ()
+(defun assert-equal-fail_test ()
+  (assert-equal 1 2))
+
+;(defun assert-not-equal-fail_test ()
 ;  (assert-equal 1 1))
 
-;(defun assert-not-equal-true_test ()
+;(defun assert-not-equal_test ()
 ;  (assert-equal 1 2))
 
 (defun assert-exception-succeed_test ()

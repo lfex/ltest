@@ -1,4 +1,5 @@
-LFE_DIR = ./deps/lfe
+DEPS = ./deps
+LFE_DIR = $(DEPS)/lfe
 LFE_EBIN = $(LFE_DIR)/ebin
 LFE = $(LFE_DIR)/bin/lfe
 LFEC = $(LFE_DIR)/bin/lfec
@@ -11,6 +12,8 @@ SANDBOX = ./sandbox
 
 get-deps:
 	rebar get-deps
+	for DIR in $(wildcard $(DEPS)/*); do \
+	cd $$DIR; git pull; cd - ; done
 
 clean-ebin:
 	-rm $(OUT_DIR)/*.beam

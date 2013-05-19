@@ -25,6 +25,17 @@
   "A utility function for appending to assert* result data."
   (++ data-1 (list (tuple key value))))
 
+(defun check-failed-assert (data expected)
+  "
+  This function
+    1) unwraps the data held in the error result returned by a failed
+       assertion, and
+    2) checks the buried failure type against an expected value, asserting
+       that they are the same.
+  "
+  (let (((tuple failure-type _) data))
+    (assert-equal failure-type expected)))
+
 (defun check-wrong-assert-exception (data expected)
   "
   This function
@@ -91,20 +102,19 @@
 
 ; XXX this function needs to be finished, returning the appropriate data
 ; structures
-(defun assert-equal (expected expression)
+(defun assert-equal (value expression)
   "
-  This function checks the equality between an expected value and a passed
+  This function checks the equality between a passed value and a quoated
   expression.
   "
-  (let ((value (eval expression))
-        (data (get-failure-data expected expression)))
+  (let ((evaled-expr (eval expression))
+        (data (get-failure-data value expression)))
     (cond
-      ((== expected value)
+      ((== value evaled-expr)
        'ok)
-      ((/= expected value)
-        (: erlang error (tuple 'assert-equal_failed data))))))
+      ('true (: erlang error (tuple 'assert-equal_failed data))))))
 
-(defun assert-not-equal (expected expression)
+(defun assert-not-equal (value expression)
   "
   This function checks the inequality between an expected value and a passed
   expression.

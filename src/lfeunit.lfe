@@ -7,6 +7,17 @@
 ;;;; ERL_LIBS environment variable or that lfeunit is installed system-wide.
 
 
+;; Utility macros
+
+
+;  This macro returns the boilerplate needed for every assertion's failure
+;  cases.
+(defmacro DEFAULT-DATA ()
+  `(list
+     (tuple 'module (MODULE))
+     (tuple 'line '"line")))
+
+
 ;; Utility functions
 
 
@@ -26,30 +37,21 @@
     (list _ _ _ _ (tuple fail-type _))) data))
     (assert-equal fail-type expected)))
 
-(defun get-default-data ()
-  "
-  This function returns the boilerplate needed for every assertion's failure
-  cases.
-  "
-  (list
-    (tuple 'module (MODULE))
-    (tuple 'line '"line")))
-
 (defun get-failure-data (expected expression)
   "
-  Building upon the boilerplate data returned from get-default-data, this
-  function gets the rest of the data needed when returning results for a failed
+  Building upon the boilerplate data returned from DEFAULT-DATA, this function
+  gets the rest of the data needed when returning results for a failed
   assertion.
   "
   (let* ((value (eval expression))
-         (expr-data (add-data 'expression expression (get-default-data)))
+         (expr-data (add-data 'expression expression (DEFAULT-DATA)))
          (expt-data (add-data 'expected expected expr-data)))
     (add-data 'value value expt-data)))
 
 (defun get-exception-data (expected-class expected-term expression)
   "
-  Building upon the boilerplate data returned from get-default-data, this
-  function gets the rest of the data needed when returning results for a failed
+  Building upon the boilerplate data returned from DEFAULT-DATA, this function
+  gets the rest of the data needed when returning results for a failed
   exception assertion.
   "
   (let ((pattern
@@ -57,7 +59,7 @@
             '"{ " (atom_to_list expected-class)
             '" , " (atom_to_list expected-term)
             '" , [...] }"))
-       (expr-data (add-data 'expression expression (get-default-data))))
+       (expr-data (add-data 'expression expression (DEFAULT-DATA))))
     (add-data 'pattern pattern expr-data)))
 
 
@@ -94,11 +96,13 @@
   This function checks the equality between an expected value and a passed
   expression.
   "
-  (cond
-    ((== expected (eval expression))
-     'ok)
-    ((/= expected (eval expression))
-      (: erlang error '"oops"))))
+  (let ((value (eval expression))
+        (data (get-failure-data expected expression)))
+    (cond
+      ((== expected value)
+       'ok)
+      ((/= expected value)
+        (: erlang error (tuple 'assert-equal_failed data))))))
 
 (defun assert-not-equal (expected expression)
   "

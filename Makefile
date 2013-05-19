@@ -36,6 +36,9 @@ shell: compile
 clean: clean-ebin clean-eunit
 	rebar clean
 
+# XXX if a unit test fails, erl ... "eunit:test..." still exits with status code
+# 0 and thus the next command that may depend upon the check target will
+# execute. This is not good.
 check: TEST_MODS = $(wildcard $(TEST_OUT_DIR)/*.beam)
 check: compile compile-tests
 	@#rebar eunit verbose=1 skip_deps=true
@@ -53,3 +56,7 @@ push:
 
 push-all: push
 	git push --all
+
+commit: check
+	@echo
+	@echo "git commit ..."

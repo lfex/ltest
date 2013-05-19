@@ -1,6 +1,10 @@
-(defmodule lfeunit
-  (export all)
-  (import (from erlang (atom_to_list 1))))
+;;;; This file is intended to be used via inclusion, not as a module (thus
+;;;; there is no module definition). To use these functions to power your unit
+;;;; tests, simply include the source file:
+;;;;    (include-lib "src/lfeunit.lfe")
+;;;;
+;;;; This assumes that you have the lfeunit source code directory in your
+;;;; ERL_LIBS environment variable or that lfeunit is installed system-wide.
 
 ;; Utility functions
 
@@ -14,7 +18,7 @@
     1) unwraps the data held in the error result returned by
        assert-exception when an unexpected error occurs, and
     2) checks the buried failure type against an expected value, asserting
-       that they are the same
+       that they are the same.
   "
   (let (((tuple 'assert-exception_failed
     (list _ _ _ _ (tuple fail-type _))) data))
@@ -29,13 +33,14 @@
   This function takes an expression that returns a boolean value. If the
   expression does not evaluate as a truth value, an error is returned.
   "
-  (let ((check (not (not bool-expression)))
-        (name 'assert-equal_failed)
-        (data (list (tuple 'module '"module")
+  (let* ((value (eval bool-expression))
+        (check (not (not value)))
+        (name 'assert_failed)
+        (data (list (tuple 'module (MODULE))
                     (tuple 'line '"line")
-                    (tuple 'expression '"expression")
+                    (tuple 'expression bool-expression)
                     (tuple 'expected 'true)
-                    (tuple 'value bool-expression))))
+                    (tuple 'value value))))
     (case check
       ('true 'ok)
       ('false (: erlang error (tuple name data))))))
@@ -46,7 +51,17 @@
   This function takes an expression that returns a boolean value. If the
   expression does not evaluate as false value, an error is returned.
   "
-  'true)
+  (let* ((value (eval bool-expression))
+        (check (not (not value)))
+        (name 'assert-not_failed)
+        (data (list (tuple 'module (MODULE))
+                    (tuple 'line '"line")
+                    (tuple 'expression bool-expression)
+                    (tuple 'expected 'false)
+                    (tuple 'value value))))
+    (case check
+      ('false 'ok)
+      ('true (: erlang error (tuple name data))))))
 
 ; XXX this function needs to be finished, returning the appropriate data
 ; structures
@@ -79,7 +94,7 @@
          (succeed 'unexpected-success)
          (pattern (++ '"{ " (atom_to_list expected-class)
                     '" , " (atom_to_list expected-term) '" , [...] }"))
-         (data (list (tuple 'module '"module")
+         (data (list (tuple 'module (MODULE))
                      (tuple 'line '"line")
                      (tuple 'expression expression)
                      (tuple 'pattern pattern))))

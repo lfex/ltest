@@ -1,9 +1,7 @@
 (defmodule lfeunit_include_tests
   (export all))
 
-; Define some macro/constants to make up for LFE's lack of ?MODULE and ?LINE
-; support.
-(defmacro MODULE () `'lfeunit_tests)
+; Define a macro/constants to make up for LFE's lack of ?LINE support.
 (defmacro LINE () `'unknown)
 
 (include-lib "include/lfeunit.lfe")
@@ -88,7 +86,7 @@
       (check-wrong-assert-exception value `'unexpected-success)))))
 
 ; XXX add test: assert-exception-fail_test
-(defun assert-exception_test ()
+(defun assert-exception-fail_test ()
   (assert-exception 'error 'badarith '(/ 1 0)))
 
 ; XXX add test: assert-not-exception_test

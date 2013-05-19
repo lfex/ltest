@@ -36,7 +36,7 @@
 ;(defun assert-not-equal_test ()
 ;  (assert-equal 1 2))
 
-(defun assert-exception-succeed_test ()
+(defun assert-exception_test ()
   (assert-exception 'error 'badarith '(/ 1 0)))
 
 (defun assert-exception-wrong-class_test ()
@@ -60,8 +60,9 @@
     (catch ((tuple type value _)
       (check-wrong-assert-exception value `'unexpected-success)))))
 
-;(defun assert-error-fail_test ()
-;  (assert-not-error 'badarith '(+ 1 1)))
+; XXX add test: assert-exception-fail_test
+
+; XXX add test: assert-not-exception_test
 
 (defun assert-error_test ()
   (assert-error 'badarith '(/ 1 0)))
@@ -72,3 +73,27 @@
       (assert-error 'undef '(/ 1 0)))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value `'unexpected-exception-term)))))
+
+; XXX add test: assert-error-unexpected-success_test
+; XXX add test: assert-error-fail_test
+;(defun assert-error-fail_test ()
+;  (assert-not-error 'badarith '(+ 1 1)))
+
+; XXX add test: assert-not-error_test
+
+; XXX add test: assert-throw_test
+; XXX add test: assert-throw-wrong-term_test
+; XXX add test: assert-throw-unexpected-success_test
+; XXX add test: assert-throw-fail_test
+
+; XXX add test: assert-not-throw_test
+
+; XXX add test: assert-exit_test
+; XXX add test: assert-exit-wrong-term_test
+; XXX add test: assert-exit-unexpected-success_test
+; XXX add test: assert-exit-fail_test
+
+; XXX add test: assert-not-exit_test
+
+; XXX add test: assert-match_test
+; XXX add test: assert-match-fail_test

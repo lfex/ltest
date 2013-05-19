@@ -16,7 +16,7 @@ get-deps:
 	cd $$DIR; git pull; cd - ; done
 
 clean-ebin:
-	-rm $(OUT_DIR)/*.beam
+	-rm -f $(OUT_DIR)/*.beam
 
 clean-eunit:
 	-rm -rf $(TEST_OUT_DIR)

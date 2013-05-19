@@ -112,7 +112,6 @@
        'ok)
       ('true (: erlang error (tuple 'assert-equal_failed data))))))
 
-; XXX add implementation for this function
 (defun assert-not-equal (value expression)
   "
   This function checks the inequality between an expected value and a passed

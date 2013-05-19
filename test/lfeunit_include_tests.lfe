@@ -88,6 +88,8 @@
       (check-wrong-assert-exception value `'unexpected-success)))))
 
 ; XXX add test: assert-exception-fail_test
+(defun assert-exception_test ()
+  (assert-exception 'error 'badarith '(/ 1 0)))
 
 ; XXX add test: assert-not-exception_test
 

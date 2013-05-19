@@ -31,20 +31,43 @@ And then do the usual:
 
 Using lfeunit
 -------------
-
-You use ``lfeunit`` like any other LFE or Erlang library. Here's a simple
-example:
+We encourage you to use ``lfeunit`` in a way that is similar to ``eunit``: via
+library inclusion:
 
 .. code:: cl
 
-    (defmodule mymod_tests
+    (defmodule mymodule_tests
+      (export all))
+
+    ; Define some macro/constants to make up for LFE's lack of
+    ; ?MODULE and ?LINE support.
+    (defmacro MODULE () `'lfeunit_tests)
+    (defmacro LINE () `'unknown)
+
+    (include-lib "include/lfeunit.lfe")
+
+    (defun assert_test ()
+      (assert `'true)
+      (assert '(not 'false))
+      (assert '(not (not 'true))))
+
+However, you also have the option of using ``lfeunit`` like any other LFE or
+Erlang library:
+
+.. code:: cl
+
+    (defmodule mymodule_tests
       (export all)
-      (import (from lfeunit (assert-equal 2))))
+      (import (from lfeunit (assert 1) (assert-not 1) (assert-equal 2))))
 
-    (defun check-mymod-function_test ()
-      (assert-equal expected-value some-expression))
+    (defun assert_test ()
+      (assert `'true)
+      (assert '(not 'false))
+      (assert '(not (not 'true))))
 
-More soon!
+However, when you do it this way, the data in the failed results will not
+accurately reflect your current module (e.g., ``(MODULE)`` will return the
+``lfeunit`` library module, not your module).
 
 
 Running Your Tests

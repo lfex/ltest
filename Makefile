@@ -49,4 +49,7 @@ check: compile compile-tests
 	-s init stop
 
 push:
-	git push --all && git push oubiwann master
+	git push oubiwann master
+
+push-all: push
+	git push --all

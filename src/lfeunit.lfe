@@ -100,8 +100,6 @@
       ('false 'ok)
       ('true (: erlang error (tuple 'assert-not_failed data))))))
 
-; XXX this function needs to be finished, returning the appropriate data
-; structures
 (defun assert-equal (value expression)
   "
   This function checks the equality between a passed value and a quoated
@@ -114,6 +112,7 @@
        'ok)
       ('true (: erlang error (tuple 'assert-equal_failed data))))))
 
+; XXX add implementation for this function
 (defun assert-not-equal (value expression)
   "
   This function checks the inequality between an expected value and a passed
@@ -160,6 +159,7 @@
                     (tuple expected-class expected-term
                       (: erlang get_stacktrace)) data))))))))))
 
+; XXX add implementation for this function
 (defun assert-not-exception (expected-class expected-term expression)
   "
   This function check that the passeed expression does not raise the expected
@@ -210,10 +210,12 @@
   "
   (assert-not-exception 'throw expected-term expression))
 
+; XXX add implementation for this function
 (defun assert-match (guard expression)
   ""
   'true)
 
+; XXX add implementation for this function
 (defun assert-not-match (guard expression)
   ""
   'true)

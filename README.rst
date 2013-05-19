@@ -39,9 +39,7 @@ library inclusion:
     (defmodule mymodule_tests
       (export all))
 
-    ; Define some macro/constants to make up for LFE's lack of
-    ; ?MODULE and ?LINE support.
-    (defmacro MODULE () `'lfeunit_tests)
+    ; Define a macro/constants to make up for LFE's lack of ?LINE support.
     (defmacro LINE () `'unknown)
 
     (include-lib "include/lfeunit.lfe")

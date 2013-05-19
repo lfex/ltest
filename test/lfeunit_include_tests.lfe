@@ -1,7 +1,7 @@
 (defmodule lfeunit_include_tests
   (export all))
 
-; Define a macro/constants to make up for LFE's lack of ?LINE support.
+; Define a macro/constant to make up for LFE's lack of ?LINE support.
 (defmacro LINE () `'unknown)
 
 (include-lib "include/lfeunit.lfe")

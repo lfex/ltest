@@ -1,9 +1,12 @@
-(defmodule lfeunit_tests
+(defmodule lfeunit_include_tests
   (export all))
 
+; Define some macro/constants to make up for LFE's lack of ?MODULE and ?LINE
+; support.
 (defmacro MODULE () `'lfeunit_tests)
+(defmacro LINE () `'unknown)
 
-(include-lib "src/lfeunit.lfe")
+(include-lib "include/lfeunit.lfe")
 
 (defun assert_test ()
   (assert `'true)

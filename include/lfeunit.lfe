@@ -15,7 +15,7 @@
 (defmacro DEFAULT-DATA ()
   `(list
      (tuple 'module (MODULE))
-     (tuple 'line '"line")))
+     (tuple 'line (LINE))))
 
 
 ;; Utility functions

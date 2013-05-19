@@ -47,3 +47,6 @@ check: compile compile-tests
 	xargs -I % erl -W0 -pa $(TEST_OUT_DIR) -noshell \
 	-eval "eunit:test([%], [verbose])" \
 	-s init stop
+
+push:
+	git push --all && git push oubiwann master

@@ -13,13 +13,24 @@
   (assert '(not 'false))
   (assert '(not (not 'true))))
 
-;(defun assert-fail_test ()
-;  (assert-error XXX (assert 'false))
+(defun assert-fail_test ()
+  (try
+    (progn
+     (assert `'false))
+    (catch ((tuple type value _)
+      (check-failed-assert value `'assert_failed)))))
 
 (defun assert-not_test ()
   (assert-not `'false)
   (assert-not '(not 'true))
   (assert-not '(not (not 'false))))
+
+(defun assert-not-fail_test ()
+  (try
+    (progn
+     (assert-not `'true))
+    (catch ((tuple type value _)
+      (check-failed-assert value `'assert-not_failed)))))
 
 (defun assert-equal_test ()
   (assert-equal 1 1)
@@ -33,11 +44,11 @@
     (catch ((tuple type value _)
       (check-failed-assert value `'assert-equal_failed)))))
 
-;(defun assert-not-equal-fail_test ()
-;  (assert-equal 1 1))
-
 ;(defun assert-not-equal_test ()
 ;  (assert-equal 1 2))
+
+;(defun assert-not-equal-fail_test ()
+;  (assert-equal 1 1))
 
 (defun assert-exception_test ()
   (assert-exception 'error 'badarith '(/ 1 0)))

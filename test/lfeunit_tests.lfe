@@ -11,7 +11,8 @@
       (assert-error 2)
       (assert-not-error 2)
       (assert-match 2)
-      (assert-not-match 2))))
+      (assert-not-match 2)
+      (check-wrong-assert-exception 2))))
 
 (defun assert-exception-succeed_test ()
   (assert-exception 'error 'badarith '(/ 1 0)))
@@ -20,31 +21,22 @@
   (try
     (progn
       (assert-exception 'throw 'badarith '(/ 1 0)))
-    (catch
-      ((tuple _
-        (tuple 'assert-exception_failed
-          (list _ _ _ _ (tuple exception-type _))) _)
-        (assert-equal exception-type `'unexpected-exception-class)))))
+    (catch ((tuple type value _)
+      (check-wrong-assert-exception value `'unexpected-exception-class)))))
 
 (defun assert-exception-wrong-term_test ()
   (try
     (progn
       (assert-exception 'error 'undef '(/ 1 0)))
-    (catch
-      ((tuple _
-        (tuple 'assert-exception_failed
-          (list _ _ _ _ (tuple error-type _))) _)
-        (assert-equal error-type `'unexpected-exception-term)))))
+    (catch ((tuple type value _)
+      (check-wrong-assert-exception value `'unexpected-exception-term)))))
 
 (defun assert-exception-unexpected-success_test ()
   (try
     (progn
       (assert-exception 'error 'badarith '(+ 1 1)))
-    (catch
-      ((tuple _
-        (tuple 'assert-exception_failed
-          (list _ _ _ _ (tuple error-type _))) _)
-        (assert-equal error-type `'unexpected-success)))))
+    (catch ((tuple type value _)
+      (check-wrong-assert-exception value `'unexpected-success)))))
 
 ;(defun assert-error-fail_test ()
 ;  (assert-not-error 'badarith '(+ 1 1)))
@@ -56,11 +48,8 @@
   (try
     (progn
       (assert-error 'undef '(/ 1 0)))
-    (catch
-      ((tuple _
-        (tuple 'assert-exception_failed
-          (list _ _ _ _ (tuple error-type _))) _)
-        (assert-equal error-type `'unexpected-exception-term)))))
+    (catch ((tuple type value _)
+      (check-wrong-assert-exception value `'unexpected-exception-term)))))
 
 ;(defun assert-fail_test ()
 ;  (assert-error XXX (assert 'false))

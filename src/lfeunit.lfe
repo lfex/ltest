@@ -25,18 +25,22 @@
 
 (defun assert-equal (expected expression)
   ""
-  'ok)
+  (cond
+    ((== expected (eval expression))
+     'ok)
+    ((/= expected (eval expression))
+      (: erlang error '"oops"))))
 
 (defun assert-not-equal (expected expression)
   ""
   'ok)
 
-(defun assert-exception (class term expression)
+(defun assert-exception (expected-class expected-term expression)
   ""
   (let* ((fail 'assert-exception_failed)
          (succeed 'unexpected-success)
-         (pattern (++ '"{ " (atom_to_list class)
-                    '" , " (atom_to_list term) '" , [...] }"))
+         (pattern (++ '"{ " (atom_to_list expected-class)
+                    '" , " (atom_to_list expected-term) '" , [...] }"))
          (data (list (tuple 'module '"module")
                      (tuple 'line '"line")
                      (tuple 'expression expression)
@@ -46,52 +50,55 @@
         (eval expression)
         (: erlang error succeed))
       (catch
-        ((tuple type value ignore)
+        ((tuple actual-class actual-term ignore)
           (cond
-            ((and (== type class) (== value term))
+            ((and (== actual-class expected-class)
+                  (== actual-term expected-term))
               'ok)
-            ((== value succeed)
+            ((== actual-term succeed)
               (: erlang error
                 (tuple fail
                   (add-data succeed (eval expression) data))))
-            ((/= type class)
+            ((/= actual-class expected-class)
               (: erlang error
                 (tuple fail
-                  (add-data 'unexpected-exception-type
-                    (tuple class term (: erlang get_stacktrace)) data))))
-            ((/= value term)
+                  (add-data 'unexpected-exception-class
+                    (tuple expected-class expected-term
+                      (: erlang get_stacktrace)) data))))
+            ((/= actual-term expected-term)
               (: erlang error
                 (tuple fail
-                  (add-data 'unexpected-error-type
-                    (tuple class term (: erlang get_stacktrace)) data))))))))))
+                  (add-data 'unexpected-exception-term
+                    (tuple expected-class expected-term
+                      (: erlang get_stacktrace)) data))))))))))
 
-(defun assert-not-exception (class term expression)
+(defun assert-not-exception (expected-class expected-term expression)
   ""
   'true)
 
-(defun assert-error (term expression)
+(defun assert-error (expected-term expression)
   ""
-  (assert-exception 'error term expression))
+  (assert-exception 'error expected-term expression))
 
-(defun assert-not-error (term expression)
+(defun assert-not-error (expected-term expression)
   ""
-  (assert-not-exception 'error term expression))
+  (assert-not-exception 'error expected-term expression))
 
-(defun assert-exit (term expression)
+(defun assert-exit (expected-term expression)
   ""
-  (assert-exception 'exit term expression))
+  (assert-exception 'exit expected-term expression))
 
-(defun assert-not-exit (term expression)
+(defun assert-not-exit (expected-term expression)
   ""
-  (assert-not-exception 'exit term expression))
+  (assert-not-exception 'exit expected-term expression))
 
-(defun assert-throw (term expression)
+(defun assert-throw (expected-term expression)
   ""
-  (assert-exception 'throw term expression))
+  (assert-exception 'throw expected-term expression))
 
-(defun assert-not-throw (term expression)
+(defun assert-not-throw (expected-term expression)
   ""
-  (assert-not-exception 'throw term expression))
+  (assert-not-exception 'throw expected-term expression))
 
 (defun assert-match (guard expression)
   ""

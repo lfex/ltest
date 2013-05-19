@@ -10,16 +10,25 @@
   (assert '(not 'false))
   (assert '(not (not 'true))))
 
+;(defun assert-fail_test ()
+;  (assert-error XXX (assert 'false))
+
 (defun assert-not_test ()
   (assert-not `'false)
   (assert-not '(not 'true))
   (assert-not '(not (not 'false))))
 
 (defun assert-equal_test ()
-  (assert-equal 1 1))
+  (assert-equal 1 1)
+  (assert-equal 1 '(+ 1 0))
+  (assert-equal 1 '(- 2 1)))
 
 (defun assert-equal-fail_test ()
-  (assert-equal 1 2))
+  (try
+    (progn
+     (assert-equal 1 2))
+    (catch ((tuple type value _)
+      (check-failed-assert value `'assert-equal_failed)))))
 
 ;(defun assert-not-equal-fail_test ()
 ;  (assert-equal 1 1))
@@ -54,7 +63,7 @@
 ;(defun assert-error-fail_test ()
 ;  (assert-not-error 'badarith '(+ 1 1)))
 
-(defun assert-error-succeed_test ()
+(defun assert-error_test ()
   (assert-error 'badarith '(/ 1 0)))
 
 (defun assert-error-wrong-term_test ()
@@ -63,6 +72,3 @@
       (assert-error 'undef '(/ 1 0)))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value `'unexpected-exception-term)))))
-
-;(defun assert-fail_test ()
-;  (assert-error XXX (assert 'false))

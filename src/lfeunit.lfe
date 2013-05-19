@@ -6,7 +6,9 @@
 ;;;; This assumes that you have the lfeunit source code directory in your
 ;;;; ERL_LIBS environment variable or that lfeunit is installed system-wide.
 
+
 ;; Utility functions
+
 
 (defun add-data (key value data-1)
   "A utility function for appending to assert* result data."
@@ -24,26 +26,54 @@
     (list _ _ _ _ (tuple fail-type _))) data))
     (assert-equal fail-type expected)))
 
+(defun get-default-data ()
+  "
+  This function returns the boilerplate needed for every assertion's failure
+  cases.
+  "
+  (list
+    (tuple 'module (MODULE))
+    (tuple 'line '"line")))
+
+(defun get-failure-data (expected expression)
+  "
+  Building upon the boilerplate data returned from get-default-data, this
+  function gets the rest of the data needed when returning results for a failed
+  assertion.
+  "
+  (let* ((value (eval expression))
+         (expr-data (add-data 'expression expression (get-default-data)))
+         (expt-data (add-data 'expected expected expr-data)))
+    (add-data 'value value expt-data)))
+
+(defun get-exception-data (expected-class expected-term expression)
+  "
+  Building upon the boilerplate data returned from get-default-data, this
+  function gets the rest of the data needed when returning results for a failed
+  exception assertion.
+  "
+  (let ((pattern
+          (++
+            '"{ " (atom_to_list expected-class)
+            '" , " (atom_to_list expected-term)
+            '" , [...] }"))
+       (expr-data (add-data 'expression expression (get-default-data))))
+    (add-data 'pattern pattern expr-data)))
+
+
 ;; LFE Unit-Testing Assert Functions
 
-; XXX let's break out default data here and put it in a function that returns it
-; or use a macro to set a constant...
+
 (defun assert (bool-expression)
   "
   This function takes an expression that returns a boolean value. If the
   expression does not evaluate as a truth value, an error is returned.
   "
-  (let* ((value (eval bool-expression))
-        (check (not (not value)))
-        (name 'assert_failed)
-        (data (list (tuple 'module (MODULE))
-                    (tuple 'line '"line")
-                    (tuple 'expression bool-expression)
-                    (tuple 'expected 'true)
-                    (tuple 'value value))))
+  (let* ((check (not (not (eval bool-expression))))
+         (data (get-failure-data 'true bool-expression)))
     (case check
       ('true 'ok)
-      ('false (: erlang error (tuple name data))))))
+      ('false (: erlang error (tuple 'assert_failed data))))))
 
 
 (defun assert-not (bool-expression)
@@ -51,17 +81,11 @@
   This function takes an expression that returns a boolean value. If the
   expression does not evaluate as false value, an error is returned.
   "
-  (let* ((value (eval bool-expression))
-        (check (not (not value)))
-        (name 'assert-not_failed)
-        (data (list (tuple 'module (MODULE))
-                    (tuple 'line '"line")
-                    (tuple 'expression bool-expression)
-                    (tuple 'expected 'false)
-                    (tuple 'value value))))
+  (let* ((check (not (not (eval bool-expression))))
+         (data (get-failure-data 'false bool-expression)))
     (case check
       ('false 'ok)
-      ('true (: erlang error (tuple name data))))))
+      ('true (: erlang error (tuple 'assert-not_failed data))))))
 
 ; XXX this function needs to be finished, returning the appropriate data
 ; structures
@@ -83,8 +107,6 @@
   "
   'ok)
 
-; XXX let's break out default data here and put it in a function that returns it
-; or use a macro to set a constant...
 (defun assert-exception (expected-class expected-term expression)
   "
   This function check that the passeed expression raises the expected exception
@@ -92,12 +114,7 @@
   "
   (let* ((fail 'assert-exception_failed)
          (succeed 'unexpected-success)
-         (pattern (++ '"{ " (atom_to_list expected-class)
-                    '" , " (atom_to_list expected-term) '" , [...] }"))
-         (data (list (tuple 'module (MODULE))
-                     (tuple 'line '"line")
-                     (tuple 'expression expression)
-                     (tuple 'pattern pattern))))
+         (data (get-exception-data expected-class expected-term expression)))
     (try
       (progn
         (eval expression)

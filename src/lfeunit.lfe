@@ -18,6 +18,8 @@
     (list _ _ _ _ (tuple fail-type _))) data))
     (assert-equal fail-type expected)))
 
+; XXX let's break out default data here and put it in a function that returns it
+; or use a macro to set a constant...
 (defun assert (bool-expression)
   "takes an expression that returns a boolean value"
   (let ((check (not (not bool-expression)))
@@ -36,6 +38,8 @@
   "takes an expression that returns a boolean value"
   'true)
 
+; XXX this function needs to be finished, returning the appropriate data
+; structures
 (defun assert-equal (expected expression)
   ""
   (cond
@@ -48,6 +52,8 @@
   ""
   'ok)
 
+; XXX let's break out default data here and put it in a function that returns it
+; or use a macro to set a constant...
 (defun assert-exception (expected-class expected-term expression)
   ""
   (let* ((fail 'assert-exception_failed)

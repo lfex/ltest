@@ -16,7 +16,8 @@
 (defun assert-fail_test ()
   (try
     (progn
-     (assert `'false))
+      (assert `'false)
+      (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
       (check-failed-assert value `'assert_failed)))))
 
@@ -28,7 +29,8 @@
 (defun assert-not-fail_test ()
   (try
     (progn
-     (assert-not `'true))
+      (assert-not `'true)
+      (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
       (check-failed-assert value `'assert-not_failed)))))
 
@@ -40,15 +42,23 @@
 (defun assert-equal-fail_test ()
   (try
     (progn
-     (assert-equal 1 2))
+      (assert-equal 1 2)
+      (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
       (check-failed-assert value `'assert-equal_failed)))))
 
-;(defun assert-not-equal_test ()
-;  (assert-equal 1 2))
+(defun assert-not-equal_test ()
+  (assert-not-equal 0 1)
+  (assert-not-equal 0 '(+ 1 0))
+  (assert-not-equal 0 '(- 2 1)))
 
-;(defun assert-not-equal-fail_test ()
-;  (assert-equal 1 1))
+(defun assert-not-equal-fail_test ()
+  (try
+    (progn
+      (assert-not-equal 1 '(+ 1 0))
+      (: erlang error 'unexpected-success))
+    (catch ((tuple type value _)
+      (check-failed-assert value `'assert-not-equal_failed)))))
 
 (defun assert-exception_test ()
   (assert-exception 'error 'badarith '(/ 1 0)))
@@ -56,21 +66,24 @@
 (defun assert-exception-wrong-class_test ()
   (try
     (progn
-      (assert-exception 'throw 'badarith '(/ 1 0)))
+      (assert-exception 'throw 'badarith '(/ 1 0))
+      (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value `'unexpected-exception-class)))))
 
 (defun assert-exception-wrong-term_test ()
   (try
     (progn
-      (assert-exception 'error 'undef '(/ 1 0)))
+      (assert-exception 'error 'undef '(/ 1 0))
+      (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value `'unexpected-exception-term)))))
 
 (defun assert-exception-unexpected-success_test ()
   (try
     (progn
-      (assert-exception 'error 'badarith '(+ 1 1)))
+      (assert-exception 'error 'badarith '(+ 1 1))
+      (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value `'unexpected-success)))))
 
@@ -84,7 +97,8 @@
 (defun assert-error-wrong-term_test ()
   (try
     (progn
-      (assert-error 'undef '(/ 1 0)))
+      (assert-error 'undef '(/ 1 0))
+      (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value `'unexpected-exception-term)))))
 

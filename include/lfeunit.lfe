@@ -118,7 +118,12 @@
   This function checks the inequality between an expected value and a passed
   expression.
   "
-  'ok)
+  (let ((evaled-expr (eval expression))
+        (data (get-failure-data value expression)))
+    (cond
+      ((/= value evaled-expr)
+       'ok)
+      ('true (: erlang error (tuple 'assert-not-equal_failed data))))))
 
 (defun assert-exception (expected-class expected-term expression)
   "

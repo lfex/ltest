@@ -32,7 +32,8 @@
 
   %% configuration parameters similar to those in the config file specified
   %% on the command line. can be fetched with gas:get_env
-  {env, []},
+  %{env, []},
+  {env, []}
 
   %% The Module and Args used to start this application.
   %{mod, {lfeunit_app, []}}

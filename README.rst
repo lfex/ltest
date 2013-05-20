@@ -111,6 +111,18 @@ Erlang library:
       (assert '(not (not 'true))))
 
 
+Structuring Your Unit Tests
+----------------------------
+
+We recommend *not* putting your unit tests directly in your modules, but rather
+creating a top-level directory in your project called ``test``. In ``test``,
+create a test cases module for every module your project has, e.g.,
+``test/myproj_base_tests.lfe`` and ``test/myproj_util_tests.lfe``.
+
+For a working example of such a structure, see the layout of the ``lfeunit``
+project itself: it uses just such a setup.
+
+
 Running Your Tests
 ------------------
 

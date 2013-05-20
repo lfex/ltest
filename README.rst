@@ -63,10 +63,6 @@ Erlang library:
       (assert '(not 'false))
       (assert '(not (not 'true))))
 
-However, when you do it this way, the data in the failed results will not
-accurately reflect your current module (e.g., ``(MODULE)`` will return the
-``lfeunit`` library module, not your module).
-
 
 Running Your Tests
 ------------------

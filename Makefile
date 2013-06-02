@@ -34,9 +34,6 @@ shell: compile
 clean: clean-ebin clean-eunit
 	rebar clean
 
-# XXX if a unit test fails, erl ... "eunit:test..." still exits with status code
-# 0 and thus the next command that may depend upon the check target will
-# execute. This is not good.
 check: compile compile-tests
 	@clear;
 	rebar eunit skip_deps=true verbose=1

@@ -23,37 +23,32 @@ Which will give you output similar to the following:
 
 .. code:: text
 
-    ======================== EUnit ========================
-    module 'lfeunit_include_tests'
-      lfeunit_include_tests: assert_test...[0.013 s] ok
-      lfeunit_include_tests: assert-fail_test...ok
-      lfeunit_include_tests: assert-not_test...ok
-      lfeunit_include_tests: assert-not-fail_test...ok
-      lfeunit_include_tests: assert-equal_test...ok
-      lfeunit_include_tests: assert-equal-fail_test...ok
-      lfeunit_include_tests: assert-not-equal_test...ok
-      lfeunit_include_tests: assert-not-equal-fail_test...ok
-      lfeunit_include_tests: assert-exception_test...ok
-      lfeunit_include_tests: assert-exception-wrong-class_test...ok
-      lfeunit_include_tests: assert-exception-wrong-term_test...ok
-      lfeunit_include_tests: assert-exception-unexpected-success_test...ok
-      lfeunit_include_tests: assert-error_test...ok
-      lfeunit_include_tests: assert-error-wrong-term_test...ok
-      lfeunit_include_tests: assert-error-unexpected-success_test...ok
-      lfeunit_include_tests: assert-throw_test...ok
-      lfeunit_include_tests: assert-throw-wrong-term_test...ok
-      lfeunit_include_tests: assert-throw-unexpected-success_test...ok
-      lfeunit_include_tests: assert-exit_test...ok
-      lfeunit_include_tests: assert-exit-wrong-term_test...ok
-      lfeunit_include_tests: assert-exit-unexpected-success_test...ok
-      [done in 0.077 s]
-    module 'lfeunit_tests'
-      lfeunit_tests: assert_test...[0.001 s] ok
-      lfeunit_tests: assert-not_test...ok
-      lfeunit_tests: assert-equal_test...ok
-      [done in 0.010 s]
-    =======================================================
-      All 24 tests passed.
+======================== EUnit ========================
+module 'lfeunit_tests'
+  lfeunit_tests: assert_test...[0.015 s] ok
+  lfeunit_tests: assert-fail_test...ok
+  lfeunit_tests: assert-not_test...ok
+  lfeunit_tests: assert-not-fail_test...ok
+  lfeunit_tests: assert-equal_test...ok
+  lfeunit_tests: assert-equal-fail_test...ok
+  lfeunit_tests: assert-not-equal_test...ok
+  lfeunit_tests: assert-not-equal-fail_test...ok
+  lfeunit_tests: assert-exception_test...ok
+  lfeunit_tests: assert-exception-wrong-class_test...ok
+  lfeunit_tests: assert-exception-wrong-term_test...ok
+  lfeunit_tests: assert-exception-unexpected-success_test...ok
+  lfeunit_tests: assert-error_test...ok
+  lfeunit_tests: assert-error-wrong-term_test...ok
+  lfeunit_tests: assert-error-unexpected-success_test...[0.001 s] ok
+  lfeunit_tests: assert-throw_test...ok
+  lfeunit_tests: assert-throw-wrong-term_test...ok
+  lfeunit_tests: assert-throw-unexpected-success_test...ok
+  lfeunit_tests: assert-exit_test...ok
+  lfeunit_tests: assert-exit-wrong-term_test...ok
+  lfeunit_tests: assert-exit-unexpected-success_test...ok
+  [done in 0.078 s]
+=======================================================
+  All 21 tests passed.
 
 
 Making lfeunit a Dep in Your Project
@@ -78,37 +73,32 @@ And then do the usual:
 
 Using lfeunit
 -------------
-We encourage you to use ``lfeunit`` in a way that is similar to ``eunit``: via
-library inclusion:
+Due to some current issues in LFE (supporting flexible include paths; see
+the `Google Groups discussion`_ and the `Github LFE ticket`_ for more info),
+lfeunit is only usable via module import (no include support, a la eunit).
 
-.. code:: cl
-
-    (defmodule mymodule_tests
-      (export all))
-
-    ; Define a macro/constant to make up for LFE's lack of ?LINE support.
-    (defmacro LINE () `'unknown)
-
-    (include-lib "include/lfeunit.lfe")
-
-    (defun assert_test ()
-      (assert `'true)
-      (assert '(not 'false))
-      (assert '(not (not 'true))))
-
-However, you also have the option of using ``lfeunit`` like any other LFE or
-Erlang library:
+As such, you use lfeunit like any other LFE or Erlang library:
 
 .. code:: cl
 
     (defmodule mymodule_tests
       (export all)
-      (import (from lfeunit (assert 1) (assert-not 1) (assert-equal 2))))
+      (import
+        (from lfeunit
+          (assert 1)
+          (assert-not 1)
+          (assert-equal 2))))
 
     (defun assert_test ()
       (assert `'true)
       (assert '(not 'false))
       (assert '(not (not 'true))))
+
+    (defun assert-not_test ()
+      (assert-not `'false'))
+
+    (defun assert-equal_test ()
+      (assert-equal 2 '(+ 1 1)))
 
 
 Structuring Your Unit Tests
@@ -147,3 +137,5 @@ For full context, see the `Makefile`_ for this project.
 .. Links
 .. -----
 .. _Makefile: Makefile
+.. _Google Groups discussion: https://groups.google.com/d/msg/lisp-flavoured-erlang/eJH2m7XK0dM/WFibzgrqP1AJ
+.. _Github LFE ticket: https://github.com/rvirding/lfe/issues/31

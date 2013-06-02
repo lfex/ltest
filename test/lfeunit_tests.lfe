@@ -1,10 +1,18 @@
-(defmodule lfeunit_include_tests
-  (export all))
-
-; Define a macro/constant to make up for LFE's lack of ?LINE support.
-(defmacro LINE () `'unknown)
-
-(include-lib "include/lfeunit.lfe")
+(defmodule lfeunit_tests
+  (export all)
+  (import
+    (from lfeunit-util
+      (check-failed-assert 2)
+      (check-wrong-assert-exception 2))
+    (from lfeunit
+      (assert 1)
+      (assert-not 1)
+      (assert-equal 2)
+      (assert-not-equal 2)
+      (assert-exception 3)
+      (assert-error 2)
+      (assert-throw 2)
+      (assert-exit 2))))
 
 (defun assert_test ()
   (assert `'true)

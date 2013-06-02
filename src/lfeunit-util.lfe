@@ -1,7 +1,10 @@
 ;;;; Utility functions
 ;;;;
 (defmodule lfeunit-util
-  export all))
+  (export all)
+  (import
+    (from lfeunit
+      (assert-equal 2))))
 
 ; Define a macro/constant to make up for LFE's lack of ?LINE support.
 (defmacro LINE () `'unknown)

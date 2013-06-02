@@ -7,7 +7,7 @@ ERL_LIBS = $(LFE_DIR):./
 SOURCE_DIR = ./src
 OUT_DIR = ./ebin
 TEST_DIR = ./test
-TEST_OUT_DIR = ./.eunit
+TEST_EBIN_DIR = ./.eunit
 SANDBOX = ./sandbox
 
 get-deps:
@@ -19,19 +19,17 @@ clean-ebin:
 	-rm -f $(OUT_DIR)/*.beam
 
 clean-eunit:
-	-rm -rf $(TEST_OUT_DIR)
+	-rm -rf $(TEST_EBIN_DIR)
 
 compile: get-deps clean-ebin
 	rebar compile
-	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(OUT_DIR) $(SOURCE_DIR)/*.lfe
-	@#ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(SANDBOX) $(SANDBOX)/*.lfe
 
 compile-tests: clean-eunit
-	mkdir -p $(TEST_OUT_DIR)
-	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_OUT_DIR) $(TEST_DIR)/*_tests.lfe
+	mkdir -p $(TEST_EBIN_DIR)
+	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*_tests.lfe
 
 shell: compile
-	ERL_LIBS=$(ERL_LIBS) $(LFE) -pa $(TEST_OUT_DIR) #-pa $(SANDBOX)
+	ERL_LIBS=$(ERL_LIBS) $(LFE) -pa $(TEST_EBIN_DIR)
 
 clean: clean-ebin clean-eunit
 	rebar clean
@@ -39,17 +37,9 @@ clean: clean-ebin clean-eunit
 # XXX if a unit test fails, erl ... "eunit:test..." still exits with status code
 # 0 and thus the next command that may depend upon the check target will
 # execute. This is not good.
-check: TEST_MODS = $(wildcard $(TEST_OUT_DIR)/*.beam)
 check: compile compile-tests
-	@#rebar eunit verbose=1 skip_deps=true
 	@clear;
-	@for FILE in $(TEST_MODS); do \
-	F1="$$(basename $$FILE)"; F2=$${F1%.*}; \
-	echo $$F2; done|sed -e :a -e '$$!N; s/\n/,/; ta' | \
-	ERL_LIBS=$(ERL_LIBS) \
-	xargs -I % erl -W0 -pa $(TEST_OUT_DIR) -noshell \
-	-eval "eunit:test([%], [verbose])" \
-	-s init stop
+	rebar eunit skip_deps=true verbose=1
 
 push:
 	git push oubiwann master

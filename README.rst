@@ -114,6 +114,22 @@ For a working example of such a structure, see the layout of the ``lfeunit``
 project itself: it uses just such a setup.
 
 
+Naming Rules
+------------
+
+Keep in mind that your tests will be compiled to ``.beam`` and then run with
+Erlang's eunit module. As such, your tests need to following the same
+conventions that eunit establishes:
+
+* Test module names need to end in ``_tests``.
+
+* Test module and filename need to be the same, minus the extension. For
+  example, ``test/my-module_tests.lfe`` needs to be declared as
+  ``(defmodule my-module_tests ...)``.
+
+* Unit tests need to be named with ``_test`` appended to them. For example,
+  ``(defun my-function-negagive-check_test () ...)``.
+
 Running Your Tests
 ------------------
 

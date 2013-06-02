@@ -73,6 +73,7 @@ And then do the usual:
 
 Using lfeunit
 -------------
+
 Due to some current issues in LFE (supporting flexible include paths; see
 the `Google Groups discussion`_ and the `Github LFE ticket`_ for more info),
 lfeunit is only usable via module import (no include support, a la eunit).

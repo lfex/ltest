@@ -4,10 +4,10 @@ lfeunit: eunit for LFE
 *Caveat Emptor*: This is a new project with **some** implementation done.
 Patches welcome!
 
-Currently, when the Erlang eunit header file (`.hrl`) is `include-lib`ed in
+Currently, when the Erlang eunit header file (``.hrl``) is ``include-lib``ed in
 LFE, only a few macros make it over. Robert Virding is looking into this, but
 until the fix is ready, it would be a fun exercise to implement a subset of
-`eunit`'s functionality for LFE. Thus this project ;-)
+``eunit``'s functionality for LFE. Thus this project ;-)
 
 Dogfood
 -------
@@ -23,32 +23,32 @@ Which will give you output similar to the following:
 
 .. code:: text
 
-======================== EUnit ========================
-module 'lfeunit_tests'
-  lfeunit_tests: assert_test...[0.015 s] ok
-  lfeunit_tests: assert-fail_test...ok
-  lfeunit_tests: assert-not_test...ok
-  lfeunit_tests: assert-not-fail_test...ok
-  lfeunit_tests: assert-equal_test...ok
-  lfeunit_tests: assert-equal-fail_test...ok
-  lfeunit_tests: assert-not-equal_test...ok
-  lfeunit_tests: assert-not-equal-fail_test...ok
-  lfeunit_tests: assert-exception_test...ok
-  lfeunit_tests: assert-exception-wrong-class_test...ok
-  lfeunit_tests: assert-exception-wrong-term_test...ok
-  lfeunit_tests: assert-exception-unexpected-success_test...ok
-  lfeunit_tests: assert-error_test...ok
-  lfeunit_tests: assert-error-wrong-term_test...ok
-  lfeunit_tests: assert-error-unexpected-success_test...[0.001 s] ok
-  lfeunit_tests: assert-throw_test...ok
-  lfeunit_tests: assert-throw-wrong-term_test...ok
-  lfeunit_tests: assert-throw-unexpected-success_test...ok
-  lfeunit_tests: assert-exit_test...ok
-  lfeunit_tests: assert-exit-wrong-term_test...ok
-  lfeunit_tests: assert-exit-unexpected-success_test...ok
-  [done in 0.078 s]
-=======================================================
-  All 21 tests passed.
+    ======================== EUnit ========================
+    module 'lfeunit_tests'
+      lfeunit_tests: assert_test...[0.015 s] ok
+      lfeunit_tests: assert-fail_test...ok
+      lfeunit_tests: assert-not_test...ok
+      lfeunit_tests: assert-not-fail_test...ok
+      lfeunit_tests: assert-equal_test...ok
+      lfeunit_tests: assert-equal-fail_test...ok
+      lfeunit_tests: assert-not-equal_test...ok
+      lfeunit_tests: assert-not-equal-fail_test...ok
+      lfeunit_tests: assert-exception_test...ok
+      lfeunit_tests: assert-exception-wrong-class_test...ok
+      lfeunit_tests: assert-exception-wrong-term_test...ok
+      lfeunit_tests: assert-exception-unexpected-success_test...ok
+      lfeunit_tests: assert-error_test...ok
+      lfeunit_tests: assert-error-wrong-term_test...ok
+      lfeunit_tests: assert-error-unexpected-success_test...[0.001 s] ok
+      lfeunit_tests: assert-throw_test...ok
+      lfeunit_tests: assert-throw-wrong-term_test...ok
+      lfeunit_tests: assert-throw-unexpected-success_test...ok
+      lfeunit_tests: assert-exit_test...ok
+      lfeunit_tests: assert-exit-wrong-term_test...ok
+      lfeunit_tests: assert-exit-unexpected-success_test...ok
+      [done in 0.078 s]
+    =======================================================
+      All 21 tests passed.
 
 
 Making lfeunit a Dep in Your Project

@@ -1,9 +1,21 @@
-;; Utility functions
+;;;; Utility functions
+;;;;
+(defmodule lfeunit-util
+  export all))
 
+; Define a macro/constant to make up for LFE's lack of ?LINE support.
+(defmacro LINE () `'unknown)
 
-(defun add-data (key value data-1)
+; This macro returns the boilerplate needed for every assertion's failure
+; cases.
+(defmacro DEFAULT-DATA ()
+  `(list
+     (tuple 'module (MODULE))
+     (tuple 'line (LINE))))
+
+(defun add-data (key value data)
   "A utility function for appending to assert* result data."
-  (++ data-1 (list (tuple key value))))
+  (++ data (list (tuple key value))))
 
 (defun check-failed-assert (data expected)
   "

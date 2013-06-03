@@ -1,5 +1,6 @@
+######################
 lfeunit: eunit for LFE
-======================
+######################
 
 *Caveat Emptor*: This is a new project with **some** implementation done.
 Patches welcome!
@@ -10,7 +11,7 @@ until the fix is ready, it would be a fun exercise to implement a subset of
 ``eunit`` 's functionality for LFE. Thus this project ;-)
 
 Dogfood
--------
+=======
 
 ``lfeunit`` writes its unit tests in ``lfeunit`` :-) You can run them from the
 project directory:
@@ -51,10 +52,14 @@ Which will give you output similar to the following:
       All 21 tests passed.
 
 
-Making lfeunit a Dep in Your Project
-------------------------------------
+Using lfeunit
+=============
 
-In your ``rebar.config`` file, simply add an extra line for ``lfeunit``
+Adding lfeunit to Your Project
+------------------------------
+
+In order to use lfeunit in your project, all you need to do is add a Rebar dep.
+In your ``rebar.config`` file, simply add an extra line for ``lfeunit``:
 
 .. code:: erlang
 
@@ -69,37 +74,6 @@ And then do the usual:
 
     $ rebar get-deps
     $ rebar compile
-
-
-Using lfeunit
--------------
-
-Due to some current issues in LFE (supporting flexible include paths; see
-the `Google Groups discussion`_ and the `Github LFE ticket`_ for more info),
-lfeunit is only usable via module import (no include support, a la eunit).
-
-As such, you use lfeunit like any other LFE or Erlang library:
-
-.. code:: cl
-
-    (defmodule mymodule_tests
-      (export all)
-      (import
-        (from lfeunit
-          (assert 1)
-          (assert-not 1)
-          (assert-equal 2))))
-
-    (defun assert_test ()
-      (assert `'true)
-      (assert '(not 'false))
-      (assert '(not (not 'true))))
-
-    (defun assert-not_test ()
-      (assert-not `'false'))
-
-    (defun assert-equal_test ()
-      (assert-equal 2 '(+ 1 1)))
 
 
 Structuring Your Unit Tests
@@ -130,29 +104,77 @@ conventions that eunit establishes:
 * Unit tests need to be named with ``_test`` appended to them. For example,
   ``(defun my-function-negagive-check_test () ...)``.
 
+
+Creating Unit Tests
+-------------------
+
+Due to some current issues in LFE (supporting flexible include paths; see
+the `Google Groups discussion`_ and the `Github LFE ticket`_ for more info),
+lfeunit is only usable via module import (no include support, a la eunit).
+
+As such, you use lfeunit like any other LFE or Erlang library:
+
+.. code:: cl
+
+    (defmodule mymodule_tests
+      (export all)
+      (import
+        (from lfeunit
+          (assert 1)
+          (assert-not 1)
+          (assert-equal 2))))
+
+    (defun assert_test ()
+      (assert `'true)
+      (assert '(not 'false))
+      (assert '(not (not 'true))))
+
+    (defun assert-not_test ()
+      (assert-not `'false'))
+
+    (defun assert-equal_test ()
+      (assert-equal 2 '(+ 1 1)))
+
+
 Running Your Tests
 ------------------
 
-I might add some sort of discovery support, but for now just add a crazy target
-in your ``Makefile``:
+Rebar doesn't seem to compile lfe unit tests right now (See the
+`Rebar discussion`_ for more information about this). As such, we have to do a
+little more work. I like to put this work in a Makefile:
 
 .. code:: Makefile
 
-    check: TEST_MODS = $(wildcard $(TEST_OUT_DIR)/*.beam)
+    TEST_DIR = ./test
+    TEST_EBIN_DIR = ./.eunit
+
+    clean-eunit:
+        -rm -rf $(TEST_EBIN_DIR)
+
+    compile-tests: clean-eunit
+        mkdir -p $(TEST_EBIN_DIR)
+        ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*_tests.lfe
+
     check: compile compile-tests
         @clear;
-        @for FILE in $(TEST_MODS); do \
-        F1="$$(basename $$FILE)"; F2=$${F1%.*}; \
-        echo $$F2; done|sed -e :a -e '$$!N; s/\n/,/; ta' | \
-        ERL_LIBS=$(ERL_LIBS) \
-        xargs -I % erl -W0 -pa $(TEST_OUT_DIR) -noshell \
-        -eval "eunit:test([%], [verbose])" \
-        -s init stop
+        rebar eunit skip_deps=true verbose=1
 
 For full context, see the `Makefile`_ for this project.
+
+Once this is updated for your project and in your ``Makefile``, you can simply
+execute the following to run your tests:
+
+.. code:: bash
+
+    $ make check
+
+At which point your ``.lfe`` test files will be compiled to ``.beam`` and placed
+in a directory where Rebar expects them (``.eunit``). Rebar will then run your
+unit tests.
 
 .. Links
 .. -----
 .. _Makefile: Makefile
 .. _Google Groups discussion: https://groups.google.com/d/msg/lisp-flavoured-erlang/eJH2m7XK0dM/WFibzgrqP1AJ
 .. _Github LFE ticket: https://github.com/rvirding/lfe/issues/31
+.. _Rebar discussion: http://lists.basho.com/pipermail/rebar_lists.basho.com/2011-January/000471.html

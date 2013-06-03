@@ -8,7 +8,7 @@
 
 (defmacro LINE ()
   "Define a macro/constant to make up for LFE's lack of ?LINE support."
-  `'unknown)
+  1)
 
 (defmacro DEFAULT-DATA ()
   "
@@ -18,6 +18,9 @@
   `(list
      (tuple 'module (MODULE))
      (tuple 'line (LINE))))
+
+(defmacro _test (expression)
+  (lambda () expression))
 
 (defun add-data (key value data)
   "A utility function for appending to assert* result data."

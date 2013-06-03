@@ -9,7 +9,8 @@
     (from lfeunit-util
       (add-data 3)
       (get-failure-data 2)
-      (get-exception-data 3))))
+      (get-exception-data 3)
+      (_test 1))))
 
 (defun assert (bool-expression)
   "
@@ -22,6 +23,11 @@
       ('true 'ok)
       ('false (: erlang error (tuple 'assert_failed data))))))
 
+(defmacro double (x)
+  `(+ ,x ,x))
+
+(defmacro _assert (bool-expression)
+  `(tuple -1 ,`'ok))
 
 (defun assert-not (bool-expression)
   "

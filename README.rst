@@ -148,18 +148,15 @@ little more work. I like to put this work in a Makefile:
     TEST_DIR = ./test
     TEST_EBIN_DIR = ./.eunit
 
-    clean-eunit:
-        -rm -rf $(TEST_EBIN_DIR)
-
-    compile-tests: clean-eunit
-        mkdir -p $(TEST_EBIN_DIR)
+    compile-tests:
         ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*_tests.lfe
 
-    check: compile compile-tests
+    check: compile-tests
         @clear;
         rebar eunit skip_deps=true verbose=1
 
-For full context, see the `Makefile`_ for this project.
+For full context and a more robust example, see the `Makefile`_ for this
+project.
 
 Once this is updated for your project and in your ``Makefile``, you can simply
 execute the following to run your tests:

@@ -6,12 +6,15 @@
     (from lfeunit
       (assert-equal 2))))
 
-; Define a macro/constant to make up for LFE's lack of ?LINE support.
-(defmacro LINE () `'unknown)
+(defmacro LINE ()
+  "Define a macro/constant to make up for LFE's lack of ?LINE support."
+  `'unknown)
 
-; This macro returns the boilerplate needed for every assertion's failure
-; cases.
 (defmacro DEFAULT-DATA ()
+  "
+  This macro returns the boilerplate needed for every assertion's failure
+  cases.
+  "
   `(list
      (tuple 'module (MODULE))
      (tuple 'line (LINE))))

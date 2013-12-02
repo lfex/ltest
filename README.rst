@@ -130,7 +130,7 @@ As such, you use lfeunit like any other LFE or Erlang library:
       (assert '(not (not 'true))))
 
     (defun assert-not_test ()
-      (assert-not `'false'))
+      (assert-not `'false))
 
     (defun assert-equal_test ()
       (assert-equal 2 (+ 1 1)))

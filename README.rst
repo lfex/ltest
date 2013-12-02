@@ -133,7 +133,7 @@ As such, you use lfeunit like any other LFE or Erlang library:
       (assert-not `'false'))
 
     (defun assert-equal_test ()
-      (assert-equal 2 '(+ 1 1)))
+      (assert-equal 2 (+ 1 1)))
 
 
 Running Your Tests

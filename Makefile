@@ -65,13 +65,14 @@ compile-tests: clean-eunit
 	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*_tests.lfe
 
 shell: compile
+	@clear
 	ERL_LIBS=$(ERL_LIBS) $(LFE) -pa $(TEST_EBIN_DIR)
 
 clean: clean-ebin clean-eunit
 	rebar clean
 
 check: compile compile-tests
-	@clear;
+	@clear
 	rebar eunit skip_deps=true verbose=1
 
 check-only: compile-only compile-tests

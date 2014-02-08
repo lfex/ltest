@@ -5,10 +5,16 @@ lfeunit: eunit for LFE
 *Caveat Emptor*: This is a new project with **some** implementation done.
 Patches welcome!
 
-Currently, when the Erlang eunit header file (``.hrl``) is ``include-lib`` ed in
-LFE, only a few macros make it over. Robert Virding is looking into this, but
-until the fix is ready, it would be a fun exercise to implement a subset of
-``eunit`` 's functionality for LFE. Thus this project ;-)
+The original implementation of lfeunit was made due to some difficulties in
+parsing the ``eunit.hrl`` file fully by LFE (it didn't convert all the Erlang
+macros). Robert has since made some enhancements to the LFE Erlang macro
+processing code, and it now pulls in everything.
+
+Is there still a need for lfeunit?
+
+Well, perhaps not *need*, but certainly a benefit :-) lfeunit is intended to be
+more Lisp-y than simply calling macros from eunit. Futhermore, we hope to
+define some macros that will make testing a pleasure in LFE.
 
 Dogfood
 =======
@@ -82,7 +88,9 @@ Structuring Your Unit Tests
 We recommend *not* putting your unit tests directly in your modules, but rather
 creating a top-level directory in your project called ``test``. In ``test``,
 create a test cases module for every module your project has, e.g.,
-``test/myproj_base_tests.lfe`` and ``test/myproj_util_tests.lfe``.
+``test/myproj_base_tests.lfe`` and ``test/myproj_util_tests.lfe``. Obviously,
+if it makes sense to break things up in a more fine-grained manner, feel free
+to do so :-)
 
 For a working example of such a structure, see the layout of the ``lfeunit``
 project itself: it uses just such a setup.

@@ -16,6 +16,7 @@ Well, perhaps not *need*, but certainly a benefit :-) lfeunit is intended to be
 more Lisp-y than simply calling macros from eunit. Futhermore, we hope to
 define some macros that will make testing a pleasure in LFE.
 
+
 Dogfood
 =======
 
@@ -60,6 +61,7 @@ Which will give you output similar to the following:
 
 Using lfeunit
 =============
+
 
 Adding lfeunit to Your Project
 ------------------------------
@@ -127,21 +129,23 @@ As such, you use lfeunit like any other LFE or Erlang library:
     (defmodule mymodule_tests
       (export all)
       (import
-        (from lfeunit
-          (assert 1)
-          (assert-not 1)
-          (assert-equal 2))))
+        (from lfeunit-util
+          (check-failed-assert 2)
+          (check-wrong-assert-exception 2))))
 
-    (defun assert_test ()
-      (assert `'true)
-      (assert '(not 'false))
-      (assert '(not (not 'true))))
+    (include-lib "deps/lfeunit/include/lfeunit-macros.lfe")
 
-    (defun assert-not_test ()
-      (assert-not `'false))
 
-    (defun assert-equal_test ()
-      (assert-equal 2 (+ 1 1)))
+    (defun is_test ()
+      (is 'true)
+      (is (not 'false))
+      (is (not (not 'true))))
+
+    (defun is-not_test ()
+      (is-not `'false))
+
+    (defun is-equal_test ()
+      (is-equal 2 (+ 1 1)))
 
 
 Running Your Tests
@@ -176,6 +180,7 @@ execute the following to run your tests:
 At which point your ``.lfe`` test files will be compiled to ``.beam`` and placed
 in a directory where Rebar expects them (``.eunit``). Rebar will then run your
 unit tests.
+
 
 .. Links
 .. -----

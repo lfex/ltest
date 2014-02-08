@@ -1,14 +1,14 @@
 ;;;; Utility functions
 ;;;;
 (defmodule lfeunit-util
-  (export all)
-  (import
-    (from lfeunit
-      (is-equal 2))))
+  (export all))
 
-(defmacro LINE ()
-  "Define a macro/constant to make up for LFE's lack of ?LINE support."
-  1)
+(include-lib "include/lfeunit-macros.lfe")
+
+
+;(defmacro LINE ()
+;  "Define a macro/constant to make up for LFE's lack of ?LINE support."
+;  1)
 
 (defmacro DEFAULT-DATA ()
   "

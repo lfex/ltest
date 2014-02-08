@@ -43,7 +43,7 @@ $(EXPM): $(BIN_DIR)
 	curl -o $(EXPM) http://expm.co/__download__/expm
 	chmod +x $(EXPM)
 
-get-deps: $(EXPM)
+get-deps:
 	rebar get-deps
 	for DIR in $(wildcard $(DEPS)/*); do \
 	cd $$DIR; git pull; cd - ; done
@@ -100,5 +100,5 @@ push-all:
 	git push --tags
 	git push upstream --tags
 
-upload:
+upload: $(EXPM)
 	$(EXPM) publish

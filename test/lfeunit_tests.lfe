@@ -5,161 +5,161 @@
       (check-failed-assert 2)
       (check-wrong-assert-exception 2))
     (from lfeunit
-      (assert 1)
-      (assert-not 1)
-      (assert-equal 2)
-      (assert-not-equal 2)
-      (assert-exception 3)
-      (assert-error 2)
-      (assert-throw 2)
-      (assert-exit 2))))
+      (is 1)
+      (is-not 1)
+      (is-equal 2)
+      (is-not-equal 2)
+      (is-exception 3)
+      (is-error 2)
+      (is-throw 2)
+      (is-exit 2))))
 
-(defun assert_test ()
-  (assert `'true)
-  (assert '(not 'false))
-  (assert '(not (not 'true))))
+(defun is_test ()
+  (is 'true)
+  (is (not 'false))
+  (is (not (not 'true))))
 
-(defun assert-fail_test ()
+(defun is-fail_test ()
   (try
     (progn
-      (assert `'false)
+      (is 'false)
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-failed-assert value `'assert_failed)))))
+      (check-failed-assert value 'assertion_failed)))))
 
-(defun assert-not_test ()
-  (assert-not `'false)
-  (assert-not '(not 'true))
-  (assert-not '(not (not 'false))))
+(defun is-not_test ()
+  (is-not 'false)
+  (is-not (not 'true))
+  (is-not (not (not 'false))))
 
-(defun assert-not-fail_test ()
+(defun is-not-fail_test ()
   (try
     (progn
-      (assert-not `'true)
+      (is-not 'true)
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-failed-assert value `'assert-not_failed)))))
+      (check-failed-assert value 'assertion_failed)))))
 
-(defun assert-equal_test ()
-  (assert-equal 1 1)
-  (assert-equal 1 '(+ 1 0))
-  (assert-equal 1 '(- 2 1)))
+(defun is-equal_test ()
+  (is-equal 1 1)
+  (is-equal 1 (+ 1 0))
+  (is-equal 1 (- 2 1)))
 
-(defun assert-equal-fail_test ()
+(defun is-equal-fail_test ()
   (try
     (progn
-      (assert-equal 1 2)
+      (is-equal 1 2)
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-failed-assert value `'assert-equal_failed)))))
+      (check-failed-assert value 'assertEqual_failed)))))
 
-(defun assert-not-equal_test ()
-  (assert-not-equal 0 1)
-  (assert-not-equal 0 '(+ 1 0))
-  (assert-not-equal 0 '(- 2 1)))
+(defun is-not-equal_test ()
+  (is-not-equal 0 1)
+  (is-not-equal 0 (+ 1 0))
+  (is-not-equal 0 (- 2 1)))
 
-(defun assert-not-equal-fail_test ()
+(defun is-not-equal-fail_test ()
   (try
     (progn
-      (assert-not-equal 1 '(+ 1 0))
+      (is-not-equal 1 (+ 1 0))
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-failed-assert value `'assert-not-equal_failed)))))
+      (check-failed-assert value 'assertNotEqual_failed)))))
 
-(defun assert-exception_test ()
-  (assert-exception 'error 'badarith '(/ 1 0)))
+(defun is-exception_test ()
+  (is-exception 'error 'badarith (/ 1 0)))
 
-(defun assert-exception-wrong-class_test ()
+(defun is-exception-wrong-class_test ()
   (try
     (progn
-      (assert-exception 'throw 'badarith '(/ 1 0))
+      (is-exception 'throw 'badarith (/ 1 0))
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-wrong-assert-exception value `'unexpected-exception-class)))))
+      (check-wrong-assert-exception value 'unexpected-exception-class)))))
 
-(defun assert-exception-wrong-term_test ()
+(defun is-exception-wrong-term_test ()
   (try
     (progn
-      (assert-exception 'error 'undef '(/ 1 0))
+      (is-exception 'error 'undef (/ 1 0))
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-wrong-assert-exception value `'unexpected-exception-term)))))
+      (check-wrong-assert-exception value 'unexpected-exception-term)))))
 
-(defun assert-exception-unexpected-success_test ()
+(defun is-exception-unexpected-success_test ()
   (try
     (progn
-      (assert-exception 'error 'badarith '(+ 1 1))
+      (is-exception 'error 'badarith (+ 1 1))
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-wrong-assert-exception value `'unexpected-success)))))
+      (check-wrong-assert-exception value 'unexpected-success)))))
 
-; XXX add test: assert-not-exception_test
+; XXX add test: is-not-exception_test
 
-(defun assert-error_test ()
-  (assert-error 'badarith '(/ 1 0)))
+(defun is-error_test ()
+  (is-error 'badarith (/ 1 0)))
 
-(defun assert-error-wrong-term_test ()
+(defun is-error-wrong-term_test ()
   (try
     (progn
-      (assert-error 'undef '(/ 1 0))
+      (is-error 'undef (/ 1 0))
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-wrong-assert-exception value `'unexpected-exception-term)))))
+      (check-wrong-assert-exception value 'unexpected-exception-term)))))
 
-(defun assert-error-unexpected-success_test ()
+(defun is-error-unexpected-success_test ()
   (try
     (progn
-      (assert-error 'badarith '(+ 1 1))
+      (is-error 'badarith (+ 1 1))
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-wrong-assert-exception value `'unexpected-success)))))
+      (check-wrong-assert-exception value 'unexpected-success)))))
 
-; XXX add test: assert-not-error_test
+; XXX add test: is-not-error_test
 
-(defun assert-throw_test ()
-  (assert-throw 'my-error '(: erlang throw 'my-error)))
+(defun is-throw_test ()
+  (is-throw 'my-error (: erlang throw 'my-error)))
 
-(defun assert-throw-wrong-term_test ()
+(defun is-throw-wrong-term_test ()
   (try
     (progn
-      (assert-throw 'my-error '(: erlang throw 'another-error))
-      (: erlang error 'unexpected-success))
-    (catch ((tuple type value _)
-      (check-wrong-assert-exception value `'unexpected-exception-term)))))
-
-(defun assert-throw-unexpected-success_test ()
-  (try
-    (progn
-      (assert-throw 'my-error '(list 'no 'problem 'here))
-      (: erlang error 'unexpected-success))
-    (catch ((tuple type value _)
-      (check-wrong-assert-exception value `'unexpected-success)))))
-
-; XXX add test: assert-not-throw_test
-
-(defun assert-exit_test ()
-  (assert-exit 'my-error '(: erlang exit 'my-error)))
-
-(defun assert-exit-wrong-term_test ()
-  (try
-    (progn
-      (assert-exit 'my-error '(: erlang exit 'another-error))
+      (is-throw 'my-error (: erlang throw 'another-error))
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value `'unexpected-exception-term)))))
 
-(defun assert-exit-unexpected-success_test ()
+(defun is-throw-unexpected-success_test ()
   (try
     (progn
-      (assert-exit 'my-error '(list 'no 'problem 'here))
+      (is-throw 'my-error (list 'no 'problem 'here))
       (: erlang error 'unexpected-success))
     (catch ((tuple type value _)
-      (check-wrong-assert-exception value `'unexpected-success)))))
+      (check-wrong-assert-exception value 'unexpected-success)))))
 
-; XXX add test: assert-not-exit_test
+; XXX add test: is-not-throw_test
 
-; XXX add test: assert-match_test
-; XXX add test: assert-match-fail_test
+(defun is-exit_test ()
+  (is-exit 'my-error (: erlang exit 'my-error)))
 
-; XXX add test: assert-not-match_test
-; XXX add test: assert-not-match-fail_test
+(defun is-exit-wrong-term_test ()
+  (try
+    (progn
+      (is-exit 'my-error (: erlang exit 'another-error))
+      (: erlang error 'unexpected-success))
+    (catch ((tuple type value _)
+      (check-wrong-assert-exception value 'unexpected-exception-term)))))
+
+(defun is-exit-unexpected-success_test ()
+  (try
+    (progn
+      (is-exit 'my-error (list 'no 'problem 'here))
+      (: erlang error 'unexpected-success))
+    (catch ((tuple type value _)
+      (check-wrong-assert-exception value 'unexpected-success)))))
+
+; XXX add test: is-not-exit_test
+
+; XXX add test: is-match_test
+; XXX add test: is-match-fail_test
+
+; XXX add test: is-not-match_test
+; XXX add test: is-not-match-fail_test

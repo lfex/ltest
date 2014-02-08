@@ -5,38 +5,36 @@
       (check-failed-assert 2)
       (check-wrong-assert-exception 2))
     (from lfeunit
-      (assert 1)
-      (_assert 1)
-      (double 1)
-      (assert-not 1)
-      (assert-equal 2)
-      (assert-not-equal 2)
-      (assert-exception 3)
-      (assert-error 2)
-      (assert-throw 2)
-      (assert-exit 2))))
+      (is 1)
+      (is-not 1)
+      (is-equal 2)
+      (is-not-equal 2)
+      (is-exception 3)
+      (is-error 2)
+      (is-throw 2)
+      (is-exit 2))))
 
 (defun set-up ()
   'ok)
 
 (defun tear-down (set-up-result)
-  (assert-equal set-up-result `'ok))
+  (is-equal set-up-result `'ok))
 
 (defun setup-test-case (set-up-result)
   "This is called the 'Instantiator' in EUnit parlance."
   (list
     (lambda ()
-      (assert-equal set-up-result 'nok))
+      (is-equal set-up-result 'nok))
     (lambda ()
-      (assert-not-equal 'this-test 'very-silly))))
+      (is-not-equal 'this-test 'very-silly))))
 
 (defun foreach-test-case (set-up-result)
   "This is called the 'Instantiator' in EUnit parlance."
   (list
     (lambda ()
-      (assert-equal set-up-result 'ok))
+      (is-equal set-up-result 'ok))
     (lambda ()
-      (assert-not-equal 'this-test 'very-silly))))
+      (is-not-equal 'this-test 'very-silly))))
 
 (defun setup-setup_test ()
   (tuple
@@ -85,21 +83,21 @@
     'setup
     (lambda () (set-up))
     (lambda (x)
-      (_assert '"apple"))))
+      (is '"apple"))))
 
 (defun test-2_test_ ()
   (tuple
     'setup
     (lambda () (set-up))
     (lambda (x)
-      (_assert 1))))
+      (is 1))))
 
 (defun test-3_test_ ()
   (tuple
     'setup
     (lambda () (set-up))
     (lambda (x)
-      (_assert `'false))))
+      (is `'false))))
 
 (defun test-4_test_ ()
   (tuple
@@ -107,10 +105,7 @@
     (lambda () (set-up))
     (lambda (x) (tear-down x))
     (lambda (x)
-      (_assert `'true))))
+      (is `'true))))
 
 (defun test-5_test ()
-  (assert-equal 5 '(_assert '"apple")))
-
-(defun test-6_test ()
-  (assert-equal 5 '(double 2)))
+  (is-equal 5 '(is '"apple")))

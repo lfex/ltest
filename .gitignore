@@ -3,3 +3,5 @@ deps
 *.sublime-project
 *.sublime-workspace
 *.beam
+bin
+ebin

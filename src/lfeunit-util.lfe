@@ -4,7 +4,7 @@
   (export all)
   (import
     (from lfeunit
-      (assert-equal 2))))
+      (is-equal 2))))
 
 (defmacro LINE ()
   "Define a macro/constant to make up for LFE's lack of ?LINE support."
@@ -35,7 +35,7 @@
        that they are the same.
   "
   (let (((tuple failure-type _) data))
-    (assert-equal failure-type expected)))
+    (is-equal failure-type expected)))
 
 (defun check-wrong-assert-exception (data expected)
   "
@@ -47,7 +47,7 @@
   "
   (let (((tuple 'assert-exception_failed
     (list _ _ _ _ (tuple fail-type _))) data))
-    (assert-equal fail-type expected)))
+    (is-equal fail-type expected)))
 
 (defun get-failure-data (expected expression)
   "

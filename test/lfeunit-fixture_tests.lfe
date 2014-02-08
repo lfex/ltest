@@ -3,16 +3,10 @@
   (import
     (from lfeunit-util
       (check-failed-assert 2)
-      (check-wrong-assert-exception 2))
-    (from lfeunit
-      (is 1)
-      (is-not 1)
-      (is-equal 2)
-      (is-not-equal 2)
-      (is-exception 3)
-      (is-error 2)
-      (is-throw 2)
-      (is-exit 2))))
+      (check-wrong-assert-exception 2))))
+
+(include-lib "include/lfeunit-macros.lfe")
+
 
 (defun set-up ()
   'ok)
@@ -77,35 +71,3 @@
 ; XXX add test with timeout option
 ; XXX add test with inorder option
 ; XXX add test with inparallel option
-
-(defun test-1_test_ ()
-  (tuple
-    'setup
-    (lambda () (set-up))
-    (lambda (x)
-      (is '"apple"))))
-
-(defun test-2_test_ ()
-  (tuple
-    'setup
-    (lambda () (set-up))
-    (lambda (x)
-      (is 1))))
-
-(defun test-3_test_ ()
-  (tuple
-    'setup
-    (lambda () (set-up))
-    (lambda (x)
-      (is `'false))))
-
-(defun test-4_test_ ()
-  (tuple
-    'setup
-    (lambda () (set-up))
-    (lambda (x) (tear-down x))
-    (lambda (x)
-      (is `'true))))
-
-(defun test-5_test ()
-  (is-equal 5 '(is '"apple")))

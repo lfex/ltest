@@ -31,32 +31,39 @@ Which will give you output similar to the following:
 
 .. code:: text
 
+    ==> lfeunit (eunit)
     ======================== EUnit ========================
     module 'lfeunit_tests'
-      lfeunit_tests: assert_test...[0.015 s] ok
-      lfeunit_tests: assert-fail_test...ok
-      lfeunit_tests: assert-not_test...ok
-      lfeunit_tests: assert-not-fail_test...ok
-      lfeunit_tests: assert-equal_test...ok
-      lfeunit_tests: assert-equal-fail_test...ok
-      lfeunit_tests: assert-not-equal_test...ok
-      lfeunit_tests: assert-not-equal-fail_test...ok
-      lfeunit_tests: assert-exception_test...ok
-      lfeunit_tests: assert-exception-wrong-class_test...ok
-      lfeunit_tests: assert-exception-wrong-term_test...ok
-      lfeunit_tests: assert-exception-unexpected-success_test...ok
-      lfeunit_tests: assert-error_test...ok
-      lfeunit_tests: assert-error-wrong-term_test...ok
-      lfeunit_tests: assert-error-unexpected-success_test...[0.001 s] ok
-      lfeunit_tests: assert-throw_test...ok
-      lfeunit_tests: assert-throw-wrong-term_test...ok
-      lfeunit_tests: assert-throw-unexpected-success_test...ok
-      lfeunit_tests: assert-exit_test...ok
-      lfeunit_tests: assert-exit-wrong-term_test...ok
-      lfeunit_tests: assert-exit-unexpected-success_test...ok
-      [done in 0.078 s]
+      lfeunit_tests: is_test...ok
+      lfeunit_tests: is-fail_test...[0.036 s] ok
+      lfeunit_tests: is-not_test...ok
+      lfeunit_tests: is-not-fail_test...ok
+      lfeunit_tests: is-equal_test...ok
+      lfeunit_tests: is-equal-fail_test...ok
+      lfeunit_tests: is-not-equal_test...ok
+      lfeunit_tests: is-not-equal-fail_test...ok
+      lfeunit_tests: is-exception_test...ok
+      lfeunit_tests: is-exception-wrong-class_test...ok
+      lfeunit_tests: is-exception-wrong-term_test...ok
+      lfeunit_tests: is-exception-unexpected-success_test...ok
+      lfeunit_tests: is-error_test...ok
+      lfeunit_tests: is-error-wrong-term_test...ok
+      lfeunit_tests: is-error-unexpected-success_test...ok
+      lfeunit_tests: is-throw_test...ok
+      lfeunit_tests: is-throw-wrong-term_test...ok
+      lfeunit_tests: is-throw-unexpected-success_test...ok
+      lfeunit_tests: is-exit_test...ok
+      lfeunit_tests: is-exit-wrong-term_test...ok
+      lfeunit_tests: is-exit-unexpected-success_test...ok
+      [done in 0.097 s]
+    module 'lfeunit-fixture_tests'
+      lfeunit-fixture_tests: setup-setup_test...ok
+      lfeunit-fixture_tests: setup-setup-cleanup_test...ok
+      lfeunit-fixture_tests: foreach-setup_test...ok
+      lfeunit-fixture_tests: foreach-setup-cleanup_test...ok
+      [done in 0.011 s]
     =======================================================
-      All 21 tests passed.
+      All 25 tests passed.
 
 
 Using lfeunit

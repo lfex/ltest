@@ -16,6 +16,17 @@ Well, perhaps not *need*, but certainly a benefit :-) lfeunit is intended to be
 more Lisp-y than simply calling macros from eunit. Futhermore, we hope to
 define some macros that will make testing a pleasure in LFE.
 
+If your project used the old style of lfeunit tests, you can update your
+``rebar.config`` to point to "old-style" instead of "master", for example:
+
+.. code:: erlang
+
+    {deps, [
+        {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "develop"}},
+        {lfeunit, ".*", {git, "git://github.com/lfe/lfeunit.git", "old-style"}}
+      ]}.
+
+
 
 Dogfood
 =======

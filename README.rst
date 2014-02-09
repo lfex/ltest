@@ -46,7 +46,10 @@ Which will give you output similar to the following:
     ======================== EUnit ========================
     module 'lfeunit_tests'
       lfeunit_tests: is_test...ok
-      lfeunit_tests: is-fail_test...[0.036 s] ok
+      lfeunit_tests: is-with-one-phrase-deftest_test...ok
+      lfeunit_tests: is-with-two-phrase-deftest_test...ok
+      lfeunit_tests: is-with-many-phrase-deftest_test...ok
+      lfeunit_tests: is-fail_test...[0.044 s] ok
       lfeunit_tests: is-not_test...ok
       lfeunit_tests: is-not-fail_test...ok
       lfeunit_tests: is-equal_test...ok
@@ -66,7 +69,7 @@ Which will give you output similar to the following:
       lfeunit_tests: is-exit_test...ok
       lfeunit_tests: is-exit-wrong-term_test...ok
       lfeunit_tests: is-exit-unexpected-success_test...ok
-      [done in 0.097 s]
+      [done in 0.115 s]
     module 'lfeunit-fixture_tests'
       lfeunit-fixture_tests: setup-setup_test...ok
       lfeunit-fixture_tests: setup-setup-cleanup_test...ok
@@ -74,7 +77,7 @@ Which will give you output similar to the following:
       lfeunit-fixture_tests: foreach-setup-cleanup_test...ok
       [done in 0.011 s]
     =======================================================
-      All 25 tests passed.
+      All 28 tests passed.
 
 
 Using lfeunit
@@ -136,11 +139,28 @@ conventions that eunit establishes:
 Creating Unit Tests
 -------------------
 
-Due to some current issues in LFE (supporting flexible include paths; see
-the `Google Groups discussion`_ and the `Github LFE ticket`_ for more info),
-lfeunit is only usable via module import (no include support, a la eunit).
+lfeunit is entirely macro-based. lfeunit uses LFE to parse the Erlang macros in
+the eunit header file. It also provides its own header file which defines macros
+whose purpose is to wrap the eunit macros in a more Lispy form.
 
-As such, you use lfeunit like any other LFE or Erlang library:
+lfeunit also provides a syntactic sugar macro for defining tests: ``deftest``.
+Instead of writing something like this for your unit tests:
+
+.. code:: cl
+
+    (defun my-function_test ()
+      ...)
+
+You can use ``deftest`` to write this:
+
+.. code:: cl
+
+    (deftest my-function
+      ...)
+
+Note that the ``_test`` is no longer needed, nor is the empty argument list.
+
+Here is a more complete example:
 
 .. code:: cl
 
@@ -154,16 +174,19 @@ As such, you use lfeunit like any other LFE or Erlang library:
     (include-lib "deps/lfeunit/include/lfeunit-macros.lfe")
 
 
-    (defun is_test ()
+    (deftest is
       (is 'true)
       (is (not 'false))
       (is (not (not 'true))))
 
-    (defun is-not_test ()
+    (deftest is-not
       (is-not `'false))
 
-    (defun is-equal_test ()
+    (deftest is-equal
       (is-equal 2 (+ 1 1)))
+
+lfeunit is working towards full test coverage; while not there yet, the unit
+tests for lfeunit itself provide the best examples of usage.
 
 
 Running Your Tests

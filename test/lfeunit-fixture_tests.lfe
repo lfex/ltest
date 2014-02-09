@@ -46,7 +46,6 @@
 ; XXX add a test for setup-where-setup
 ; XXX add a test for setup-where-setup-cleanup
 
-
 (deftest foreach-setup
   (tuple
     'foreach

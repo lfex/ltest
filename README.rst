@@ -25,7 +25,7 @@ Legacy Support
 --------------
 
 With version 0.1.0, lfeunit changed its API. Functions were converted to macros,
-and these were renamed from "assert-*" to "is-*".
+and these were renamed from ``assert-*`` to ``is-*``.
 
 If you have projects that are still using either the previous release (0.0.1) or
 old development snapshots and you want to continue using these, you can update

@@ -111,7 +111,7 @@ Structuring Your Unit Tests
 We recommend *not* putting your unit tests directly in your modules, but rather
 creating a top-level directory in your project called ``test``. In ``test``,
 create a test cases module for every module your project has, e.g.,
-``test/myproj_base_tests.lfe`` and ``test/myproj_util_tests.lfe``. Obviously,
+``test/myproj-base_tests.lfe`` and ``test/myproj-util_tests.lfe``. Obviously,
 if it makes sense to break things up in a more fine-grained manner, feel free
 to do so :-)
 
@@ -126,14 +126,19 @@ Keep in mind that your tests will be compiled to ``.beam`` and then run with
 Erlang's eunit module. As such, your tests need to following the same
 conventions that eunit establishes:
 
-* Test module names need to end in ``_tests``.
+* Test module filenames need to end in ``_tests``, e.g.,
+  ``some-module_tests.lfe``
 
 * Test module and filename need to be the same, minus the extension. For
   example, ``test/my-module_tests.lfe`` needs to be declared as
-  ``(defmodule my-module_tests ...)``.
+  ``(defmodule my-module_tests ...) in the test case module``.
 
-* Unit tests need to be named with ``_test`` appended to them. For example,
-  ``(defun my-function-negagive-check_test () ...)``.
+* If you chose *not* to use the ``deftest`` macro to build each unit test
+  function, you will need to name your unit test functions with ``_test``
+  appended to them. For example,
+  ``(defun my-function-negagive-check_test () ...)``. We recommend, however,
+  that you use ``deftest`` instead, and obviate the need for ``_test ()``
+  boilerplate.
 
 
 Creating Unit Tests

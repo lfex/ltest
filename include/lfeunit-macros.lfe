@@ -1,39 +1,12 @@
 (include-lib "eunit/include/eunit.hrl")
 
 
-(defmacro returntype (name cmds)
-  `(defun ,name () ',cmds))
-
-(defmacro deftest-1 (name body)
-  `(defun ,(list_to_atom (++ (atom_to_list name) '"_test")) ()
-     ,body))
-
-(defmacro deftest-2 (name body)
-  `(defun ,(list_to_atom (++ (atom_to_list name) '"_test")) ()
-     (: lists map
-      (lambda (expr)
-        (funcall expr))
-      ,body)))
-
-(defmacro deftest-3 (name body)
-  `(defun ,(list_to_atom (++ (atom_to_list name) '"_test")) ()
-     'an-atom))
-
-(defmacro deftest-4 arg
-  "This one looks like the winner."
+(defmacro deftest arg
+  "This macro is inspired by the Clojure unit test macro."
   (let ((name (car arg))
         (body (cdr arg)))
     `(defun ,(list_to_atom (++ (atom_to_list name) '"_test")) ()
        ,@body)))
-
-(defmacro deftest-5 arg
-  (let ((name (car arg))
-        (body (cdr arg)))
-    `(defun ,(list_to_atom (++ (atom_to_list name) '"_test")) ()
-       (: lists map
-         (lambda (expr)
-           (funcall expr))
-         ',body))))
 
 (defmacro is (bool-expression)
   "This function takes an expression that returns a boolean value. If the

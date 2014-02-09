@@ -13,37 +13,18 @@
   (is (not 'false))
   (is (not (not 'true))))
 
-; (deftest-1 is-1-1
-;   (is-not 'false))
-
-; (deftest-1 is-1-2
-;   (is 'true))
-
-; (deftest-1 is-1-3
-;   (is-not 'false)
-;   (is 'true))
-
-; (deftest-2 is-2-1
-;   (is-not 'false))
-
-; (deftest-3 is-3-1
-;   (is-not 'false))
-
-(deftest-4 is-4-1
+(deftest is-with-one-phrase-deftest
   (is-not 'false))
 
-(deftest-4 is-4-2
+(deftest is-with-two-phrase-deftest
   (is-not 'false)
   (is 'true))
 
-(deftest-4 is-4-3
+(deftest is-with-many-phrase-deftest
   (is-not 'false)
   (is 'true)
   (is-equal 1 1)
   (is-not-equal 1 2))
-
-; (deftest-5 is-5-1
-;   (is-not 'false))
 
 (defun is-fail_test ()
   (try

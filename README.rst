@@ -2,6 +2,10 @@
 lfeunit: eunit for LFE
 ######################
 
+
+Introduction
+============
+
 *Caveat Emptor*: This is a new project with **some** implementation done.
 Patches welcome!
 
@@ -15,6 +19,10 @@ Is there still a need for lfeunit?
 Well, perhaps not *need*, but certainly a benefit :-) lfeunit is intended to be
 more Lisp-y than simply calling macros from eunit. Futhermore, we hope to
 define some macros that will make testing a pleasure in LFE.
+
+
+Legacy Support
+--------------
 
 If your project used the old style of lfeunit tests, you can update your
 ``rebar.config`` to point to "old-style" instead of "master", for example:

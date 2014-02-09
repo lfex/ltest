@@ -30,13 +30,13 @@
     (lambda ()
       (is-not-equal 'this-test 'very-silly))))
 
-(defun setup-setup_test ()
+(deftest setup-setup
   (tuple
     'setup
     (lambda () (set-up))
     (lambda (x) (setup-test-case x))))
 
-(defun setup-setup-cleanup_test ()
+(deftest setup-setup-cleanup
   (tuple
     'setup
     (lambda () (set-up))
@@ -47,7 +47,7 @@
 ; XXX add a test for setup-where-setup-cleanup
 
 
-(defun foreach-setup_test ()
+(deftest foreach-setup
   (tuple
     'foreach
     (lambda () (set-up))
@@ -55,7 +55,7 @@
       (lambda (x) (setup-test-case x))
       (lambda (x) (foreach-test-case x)))))
 
-(defun foreach-setup-cleanup_test ()
+(deftest foreach-setup-cleanup
   (tuple
     'foreach
     (lambda () (set-up))

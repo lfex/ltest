@@ -7,7 +7,6 @@
 
 (include-lib "include/lfeunit-macros.lfe")
 
-
 (deftest is
   (is 'true)
   (is (not 'false))
@@ -35,7 +34,7 @@
   (try
     (progn
       (is 'false)
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-failed-assert value 'assertion_failed)))))
 
@@ -48,7 +47,7 @@
   (try
     (progn
       (is-not 'true)
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-failed-assert value 'assertion_failed)))))
 
@@ -61,7 +60,7 @@
   (try
     (progn
       (is-equal 1 2)
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-failed-assert value 'assertEqual_failed)))))
 
@@ -74,18 +73,18 @@
   (try
     (progn
       (is-not-equal 1 (+ 1 0))
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-failed-assert value 'assertNotEqual_failed)))))
 
 (deftest is-exception
-  (is-exception 'throw 'my-error (: erlang throw 'my-error)))
+  (is-exception 'throw 'my-error (throw 'my-error)))
 
 (deftest is-exception-wrong-class
   (try
     (progn
       (is-exception 'throw 'badarith (/ 1 0))
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_exception)))))
 
@@ -93,7 +92,7 @@
   (try
     (progn
       (is-exception 'error 'undef (/ 1 0))
-      (: erlang error 'unexpected-success))
+      (error 'unexpected-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_exception)))))
 
@@ -101,7 +100,7 @@
   (try
     (progn
       (is-exception 'error 'badarith (+ 1 1))
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_success)))))
 
@@ -114,7 +113,7 @@
   (try
     (progn
       (is-error 'undef (/ 1 0))
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_exception)))))
 
@@ -122,7 +121,7 @@
   (try
     (progn
       (is-error 'badarith (+ 1 1))
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_success)))))
 
@@ -134,8 +133,8 @@
 (deftest is-throw-wrong-term
   (try
     (progn
-      (is-throw 'my-error (: erlang throw 'another-error))
-      (: erlang error 'unexpected-test-success))
+      (is-throw 'my-error (throw 'another-error))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_exception)))))
 
@@ -143,7 +142,7 @@
   (try
     (progn
       (is-throw 'my-error (list 'no 'problem 'here))
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_success)))))
 
@@ -155,8 +154,8 @@
 (deftest is-exit-wrong-term
   (try
     (progn
-      (is-exit 'my-error (: erlang exit 'another-error))
-      (: erlang error 'unexpected-test-success))
+      (is-exit 'my-error (exit 'another-error))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_exception)))))
 
@@ -164,7 +163,7 @@
   (try
     (progn
       (is-exit 'my-error (list 'no 'problem 'here))
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_success)))))
 

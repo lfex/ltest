@@ -57,7 +57,7 @@ clean-eunit:
 compile: get-deps clean-ebin
 	rebar compile
 
-compile-only: clean-ebin
+compile-no-deps: clean-ebin
 	rebar compile skip_deps=true
 
 compile-tests: clean-eunit
@@ -68,6 +68,10 @@ shell: compile
 	@clear
 	ERL_LIBS=$(ERL_LIBS) $(LFE) -pa $(TEST_EBIN_DIR)
 
+shell-no-deps: compile-no-deps
+	@clear
+	ERL_LIBS=$(ERL_LIBS) $(LFE) -pa $(TEST_EBIN_DIR)
+
 clean: clean-ebin clean-eunit
 	rebar clean
 
@@ -75,7 +79,7 @@ check: compile compile-tests
 	@clear
 	rebar eunit skip_deps=true verbose=1
 
-check-only: compile-only compile-tests
+check-no-deps: compile-no-deps compile-tests
 	@clear;
 	@rebar eunit verbose=1 skip_deps=true
 

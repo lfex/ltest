@@ -7,7 +7,6 @@
 
 (include-lib "include/lfeunit-macros.lfe")
 
-
 (deftest is
   (is 'true)
   (is (not 'false))
@@ -29,6 +28,7 @@
   (is-not 'false)
   (is 'true)
   (is-equal 1 1)
+  (is-equal 1 (+ 1 0))
   (is-not-equal 1 2))
 
 (deftest is-fail
@@ -171,7 +171,15 @@
 ; XXX add test: is-not-exit_test
 
 ; XXX add test: is-match_test
-; XXX add test: is-match-fail_test
+(deftest is-match
+  (is-match (tuple 1 'a) #(1 a))
+  (is-match (tuple 1 (tuple 2 'pull)) #(1 #(2 pull))))
 
-; XXX add test: is-not-match_test
-; XXX add test: is-not-match-fail_test
+; XXX add test: is-match-fail_test
+(deftest is-match-fail
+  (try
+    (progn
+      (is-match (tuple 1 'a) #(1 b))
+      (: erlang error 'unexpected-test-success))
+    (catch ((tuple type value _)
+      (check-failed-assert value 'assertMatch_failed)))))

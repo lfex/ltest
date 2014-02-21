@@ -1,5 +1,17 @@
 (include-lib "eunit/include/eunit.hrl")
 
+(defmacro deftestsuite arg
+  "This macro provides some syntactic sugar and wrapping for defining test
+  modules."
+  (let ((name (car arg))
+        (body (cdr arg)))
+    `(defmodule ,(list_to_atom (++ (atom_to_list name) '"_tests"))
+       (export all)
+       (import
+         (from lfeunit-util
+           (check-failed-assert 2)
+           (check-wrong-assert-exception 2)))
+       ,@body)))
 
 (defmacro deftest arg
   "This macro is inspired by the Clojure unit test macro."
@@ -73,7 +85,3 @@
 (defmacro is-match (guard expression)
   ""
   `(assertMatch ,guard ,expression))
-
-(defmacro is-not-match (guard expression)
-  ""
-  `(not (is-match ,guard ,expression)))

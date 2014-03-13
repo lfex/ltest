@@ -123,7 +123,7 @@ Structuring Your Unit Tests
 We recommend *not* putting your unit tests directly in your modules, but rather
 creating a top-level directory in your project called ``test``. In ``test``,
 create a test cases module for every module your project has, e.g.,
-``test/myproj-base_tests.lfe`` and ``test/myproj-util_tests.lfe``. Obviously,
+``test/myproj-base-tests.lfe`` and ``test/myproj-util-tests.lfe``. Obviously,
 if it makes sense to break things up in a more fine-grained manner, feel free
 to do so :-)
 
@@ -138,12 +138,14 @@ Keep in mind that your tests will be compiled to ``.beam`` and then run with
 Erlang's eunit module. As such, your tests need to following the same
 conventions that eunit establishes:
 
-* Test module filenames need to end in ``_tests``, e.g.,
-  ``some-module_tests.lfe``
+* Test module filenames should end in ``-tests``, e.g.,
+  ``some-module-tests.lfe``. (In older versions of LFE, it may
+  have been required to name test module filenames with ``_tests``, however
+  this is no longer the case.)
 
 * Test module and filename need to be the same, minus the extension. For
-  example, ``test/my-module_tests.lfe`` needs to be declared as
-  ``(defmodule my-module_tests ...) in the test case module``.
+  example, ``test/my-module-tests.lfe`` needs to be declared as
+  ``(defmodule my-module-tests ...) in the test case module``.
 
 * If you chose *not* to use the ``deftest`` macro to build each unit test
   function, you will need to name your unit test functions with ``_test``
@@ -151,7 +153,6 @@ conventions that eunit establishes:
   ``(defun my-function-negagive-check_test () ...)``. We recommend, however,
   that you use ``deftest`` instead, and obviate the need for ``_test ()``
   boilerplate.
-
 
 Creating Unit Tests
 -------------------
@@ -165,7 +166,7 @@ Instead of writing something like this for your unit tests:
 
 .. code:: cl
 
-    (defun my-function_test ()
+    (defun my-function-test ()
       ...)
 
 You can use ``deftest`` to write this:
@@ -175,13 +176,13 @@ You can use ``deftest`` to write this:
     (deftest my-function
       ...)
 
-Note that the ``_test`` is no longer needed, nor is the empty argument list.
+Note that the ``-test`` is no longer needed, nor is the empty argument list.
 
 Here is a more complete example:
 
 .. code:: cl
 
-    (defmodule mymodule_tests
+    (defmodule mymodule-tests
       (export all)
       (import
         (from lfeunit-util
@@ -219,7 +220,7 @@ little more work. I like to put this work in a Makefile:
     TEST_EBIN_DIR = ./.eunit
 
     compile-tests:
-        ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*_tests.lfe
+        ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*[_-]tests.lfe
 
     check: compile-tests
         @clear;

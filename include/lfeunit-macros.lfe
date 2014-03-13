@@ -5,7 +5,7 @@
   modules."
   (let ((name (car arg))
         (body (cdr arg)))
-    `(defmodule ,(list_to_atom (++ (atom_to_list name) '"_tests"))
+    `(defmodule ,(list_to_atom (++ (atom_to_list name) '"-tests"))
        (export all)
        (import
          (from lfeunit-util

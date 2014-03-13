@@ -1,4 +1,4 @@
-(defmodule lfeunit-fixture_tests
+(defmodule lfeunit-fixture-tests
   (export all)
   (import
     (from lfeunit-util

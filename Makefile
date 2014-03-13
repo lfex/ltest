@@ -62,7 +62,7 @@ compile-no-deps: clean-ebin
 
 compile-tests: clean-eunit
 	mkdir -p $(TEST_EBIN_DIR)
-	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*_tests.lfe
+	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*[_-]tests.lfe
 
 shell: compile
 	@clear

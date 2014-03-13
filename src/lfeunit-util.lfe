@@ -19,7 +19,12 @@
      (tuple 'module (MODULE))
      (tuple 'line (LINE))))
 
+(defmacro -test (expression)
+  "A macro that allows expression names to end in -test for tests."
+  (lambda () expression))
+
 (defmacro _test (expression)
+  "A macro that allows expression names to end in _test for tests."
   (lambda () expression))
 
 (defun add-data (key value data)

@@ -106,7 +106,7 @@ In your ``rebar.config`` file, simply add an extra line for ``lfeunit``:
 
     {deps, [
         {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "develop"}},
-        {lfeunit, ".*", {git, "git://github.com/lfe/lfeunit.git", ""}}
+        {lfeunit, ".*", {git, "git://github.com/lfe/lfeunit.git", "master"}}
       ]}.
 
 And then do the usual:
@@ -153,6 +153,7 @@ conventions that eunit establishes:
   ``(defun my-function-negagive-check_test () ...)``. We recommend, however,
   that you use ``deftest`` instead, and obviate the need for ``_test ()``
   boilerplate.
+
 
 Creating Unit Tests
 -------------------

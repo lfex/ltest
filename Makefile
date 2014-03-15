@@ -93,10 +93,15 @@ check-no-deps: compile-no-deps compile-tests
 	@rebar eunit verbose=1 skip_deps=true
 
 check-travis: compile compile-tests
-	for FILE in `ls .eunit|sed -e 's/.beam//'` do \
-	ERL_LIBS=$(ERL_LIBS) erl -pa .eunit -noshell \
-	-eval "eunit:test({inparallel,$$FILE},[verbose])" -s init stop \
-	done
+	@echo "Building and running unit tests ..."
+	@ERL_LIBS=$(ERL_LIBS) erl -pa .eunit -noshell \
+	-eval "eunit:test({inparallel,[\
+		`ls .eunit| \
+		sed -e 's/.beam//'| \
+		awk '{print "\x27" $$1 "\x27"}'| \
+		sed -e :a -e N -e 's/\n/,/'`]},[verbose])" \
+	-s init stop
+
 # Note that this make target expects to be used like so:
 #	$ ERL_LIB=some/path make install
 #

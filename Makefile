@@ -81,12 +81,8 @@ clean: clean-ebin clean-eunit
 
 check: compile compile-tests
 	@echo "Building and running unit tests ..."
-	echo "DEBUG"
-	ls -al
-	ls -al ebin
-	ls -al .eunit
-	#@clear
-	rebar eunit skip_deps=true verbose=3
+	@clear
+	@rebar eunit skip_deps=true verbose=1
 
 check-no-deps: compile-no-deps compile-tests
 	@clear;

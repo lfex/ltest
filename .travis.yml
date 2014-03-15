@@ -1,5 +1,5 @@
 language: erlang
-script: "make check"
+script: "make check-travis"
 notifications:
   #irc: "irc.freenode.org#erlang-lisp"
   recipients:

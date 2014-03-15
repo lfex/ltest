@@ -1,5 +1,5 @@
 language: erlang
-script: "make check-no-deps"
+script: "make check"
 notifications:
   irc: "irc.freenode.org#erlang-lisp"
   recipients:

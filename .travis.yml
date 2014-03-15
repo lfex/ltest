@@ -1,0 +1,9 @@
+language: erlang
+script: "make check-no-deps"
+notifications:
+  irc: "irc.freenode.org#erlang-lisp"
+  recipients:
+    - duncan@cogitat.io
+otp_release:
+  - R16B03
+  - R15B03

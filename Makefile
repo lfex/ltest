@@ -44,25 +44,29 @@ $(EXPM): $(BIN_DIR)
 	chmod +x $(EXPM)
 
 get-deps:
-	rebar get-deps
-	for DIR in $(wildcard $(DEPS)/*); do \
+	@echo "Getting dependencies ..."
+	@rebar get-deps
+	@for DIR in $(wildcard $(DEPS)/*); do \
 	cd $$DIR; git pull; cd - ; done
 
 clean-ebin:
 	-rm -f $(OUT_DIR)/*.beam
 
 clean-eunit:
-	-rm -rf $(TEST_EBIN_DIR)
+	@echo "Cleaning eunit dir ..."
+	@-rm -rf $(TEST_EBIN_DIR)
 
 compile: get-deps clean-ebin
-	rebar compile
+	@echo "Compiling dependencies and project ..."
+	@rebar compile
 
 compile-no-deps: clean-ebin
 	rebar compile skip_deps=true
 
 compile-tests: clean-eunit
-	mkdir -p $(TEST_EBIN_DIR)
-	ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*[_-]tests.lfe
+	@echo "Compiling unit test code ..."
+	@mkdir -p $(TEST_EBIN_DIR)
+	@ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*[_-]tests.lfe
 
 shell: compile
 	@clear
@@ -76,8 +80,9 @@ clean: clean-ebin clean-eunit
 	rebar clean
 
 check: compile compile-tests
+	@echo "Building and running unit tests ..."
 	@clear
-	rebar eunit skip_deps=true verbose=1
+	@rebar eunit skip_deps=true verbose=1
 
 check-no-deps: compile-no-deps compile-tests
 	@clear;

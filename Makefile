@@ -84,7 +84,7 @@ check: compile compile-tests
 	echo "DEBUG"
 	ls -al
 	@clear
-	@rebar eunit skip_deps=true verbose=1
+	rebar eunit skip_deps=true verbose=1
 
 check-no-deps: compile-no-deps compile-tests
 	@clear;

@@ -58,7 +58,7 @@ clean-eunit:
 
 compile: get-deps clean-ebin
 	@echo "Compiling dependencies and project ..."
-	@rebar compile
+	@ERL_LIBS=$(ERL_LIBS) rebar compile
 
 compile-no-deps: clean-ebin
 	rebar compile skip_deps=true

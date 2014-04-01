@@ -23,16 +23,16 @@ $(LFETOOL):
 
 get-version:
 	@echo
-	@echo -n package.exs: ''
-	@grep version package.exs |awk '{print $$2}'|sed -e 's/,//g'
-	@echo -n app.src: ''
-	@erl -eval 'io:format("~p~n", [ \
+	@echo "Version info:\n"
+	@echo "\tpackage.exs: \t$$(grep version package.exs |awk '{print $$2}'|sed -e 's/,//g')"
+	@echo "\tapp.src: \t$$(erl -eval 'io:format("~p~n", [ \
 		proplists:get_value(vsn,element(3,element(2,hd(element(3, \
 		erl_eval:exprs(element(2, erl_parse:parse_exprs(element(2, \
 		erl_scan:string("Data = " ++ binary_to_list(element(2, \
 		file:read_file("src/$(LIB).app.src"))))))), []))))))])' \
-		$(FINISH)
-
+		$(FINISH))"
+	@echo "\tLatest tag:\t\""`git tag|tail -1`'"'
+	@echo
 # Note that this make target expects to be used like so:
 #	$ ERL_LIB=some/path make get-install-dir
 #

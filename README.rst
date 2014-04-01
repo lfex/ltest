@@ -234,6 +234,8 @@ tests is now as easy as doing the following:
 
 or
 
+.. code:: bash
+
     $ lfetool tests all
 
 If you would like to see how to do this manually, you should examine the source

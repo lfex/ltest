@@ -54,42 +54,45 @@ Which will give you output similar to the following:
 
 .. code:: text
 
-    ==> lfeunit (eunit)
+    ------------------
+    Running unit tests ...
+    ------------------
+
     ======================== EUnit ========================
-    module 'lfeunit-tests'
-      lfeunit-tests: is_test...ok
-      lfeunit-tests: is-with-one-phrase-deftest_test...ok
-      lfeunit-tests: is-with-two-phrase-deftest_test...ok
-      lfeunit-tests: is-with-many-phrase-deftest_test...ok
-      lfeunit-tests: is-fail_test...[0.017 s] ok
-      lfeunit-tests: is-not_test...ok
-      lfeunit-tests: is-not-fail_test...ok
-      lfeunit-tests: is-equal_test...ok
-      lfeunit-tests: is-equal-fail_test...ok
-      lfeunit-tests: is-not-equal_test...ok
-      lfeunit-tests: is-not-equal-fail_test...ok
-      lfeunit-tests: is-exception_test...ok
-      lfeunit-tests: is-exception-wrong-class_test...ok
-      lfeunit-tests: is-exception-wrong-term_test...ok
-      lfeunit-tests: is-exception-unexpected-success_test...ok
-      lfeunit-tests: is-error_test...ok
-      lfeunit-tests: is-error-wrong-term_test...ok
-      lfeunit-tests: is-error-unexpected-success_test...ok
-      lfeunit-tests: is-throw_test...ok
-      lfeunit-tests: is-throw-wrong-term_test...ok
-      lfeunit-tests: is-throw-unexpected-success_test...ok
-      lfeunit-tests: is-exit_test...ok
-      lfeunit-tests: is-exit-wrong-term_test...ok
-      lfeunit-tests: is-exit-unexpected-success_test...ok
-      lfeunit-tests: is-match_test...ok
-      lfeunit-tests: is-match-fail_test...ok
-      [done in 0.094 s]
-    module 'lfeunit-fixture-tests'
-      lfeunit-fixture-tests: setup-setup_test...ok
-      lfeunit-fixture-tests: setup-setup-cleanup_test...ok
-      lfeunit-fixture-tests: foreach-setup_test...ok
-      lfeunit-fixture-tests: foreach-setup-cleanup_test...ok
-      [done in 0.012 s]
+    module 'unit-lfeunit-fixture-tests'
+      setup-setup .................................... [ok]
+      setup-setup-cleanup ............................ [ok]
+      foreach-setup .................................. [ok]
+      foreach-setup-cleanup .......................... [ok]
+      Total module test time: 0.003 s
+    module 'unit-lfeunit-tests'
+      is ............................................. [ok]
+      is-with-one-phrase-deftest ..................... [ok]
+      is-with-two-phrase-deftest ..................... [ok]
+      is-with-many-phrase-deftest .................... [ok]
+      is-fail .............................. [0.007 s] [ok]
+      is-not ......................................... [ok]
+      is-not-fail .......................... [0.007 s] [ok]
+      is-equal ....................................... [ok]
+      is-equal-fail ........................ [0.007 s] [ok]
+      is-not-equal ................................... [ok]
+      is-not-equal-fail .................... [0.007 s] [ok]
+      is-exception ................................... [ok]
+      is-exception-wrong-class ............. [0.007 s] [ok]
+      is-exception-wrong-term .............. [0.007 s] [ok]
+      is-exception-unexpected-success ...... [0.007 s] [ok]
+      is-error ....................................... [ok]
+      is-error-wrong-term .................. [0.007 s] [ok]
+      is-error-unexpected-success .......... [0.007 s] [ok]
+      is-throw ....................................... [ok]
+      is-throw-wrong-term .................. [0.007 s] [ok]
+      is-throw-unexpected-success .......... [0.007 s] [ok]
+      is-exit ........................................ [ok]
+      is-exit-wrong-term ................... [0.007 s] [ok]
+      is-exit-unexpected-success ........... [0.007 s] [ok]
+      is-match ....................................... [ok]
+      is-match-fail ........................ [0.007 s] [ok]
+      Total module test time: 0.011 s
     =======================================================
       All 30 tests passed.
 
@@ -129,6 +132,12 @@ create a test cases module for every module your project has, e.g.,
 if it makes sense to break things up in a more fine-grained manner, feel free
 to do so :-)
 
+Furthermore, LFE projects support a standard directory layout for separating
+unit, integration, and system tests. These are written as modules in their own
+directories, but compiled to the standard ``.eunit`` directory. Modules of a
+particular type (e.g., unit, integration, etc.) are distinguished by a module
+name prefix.
+
 For a working example of such a structure, see the layout of the ``lfeunit``
 project itself: it uses just such a setup.
 
@@ -146,15 +155,15 @@ conventions that eunit establishes:
   this is no longer the case.)
 
 * Test module and filename need to be the same, minus the extension. For
-  example, ``test/my-module-tests.lfe`` needs to be declared as
-  ``(defmodule my-module-tests ...) in the test case module``.
+  example, ``test/unit/unit-my-module-tests.lfe`` needs to be declared as
+  ``(defmodule unit-my-module-tests ...) in the test case module``.
 
 * If you chose *not* to use the ``deftest`` macro to build each unit test
   function, you will need to name your unit test functions with ``_test``
   appended to them. For example,
-  ``(defun my-function-negagive-check_test () ...)``. We recommend, however,
-  that you use ``deftest`` instead, and obviate the need for ``_test ()``
-  boilerplate.
+  ``(defun unit-my-function-negagive-check_test () ...)``. We recommend,
+  however, that you use ``deftest`` instead, and obviate the need for ``_test
+  ()`` boilerplate.
 
 
 Creating Unit Tests
@@ -169,14 +178,14 @@ Instead of writing something like this for your unit tests:
 
 .. code:: cl
 
-    (defun my-function-test ()
+    (defun unit-my-function-test ()
       ...)
 
 You can use ``deftest`` to write this:
 
 .. code:: cl
 
-    (deftest my-function
+    (deftest unit-my-function
       ...)
 
 Note that the ``-test`` is no longer needed, nor is the empty argument list.
@@ -185,7 +194,7 @@ Here is a more complete example:
 
 .. code:: cl
 
-    (defmodule mymodule-tests
+    (defmodule unit-mymodule-tests
       (export all)
       (import
         (from lfeunit-util
@@ -193,7 +202,6 @@ Here is a more complete example:
           (check-wrong-assert-exception 2))))
 
     (include-lib "deps/lfeunit/include/lfeunit-macros.lfe")
-
 
     (deftest is
       (is 'true)
@@ -215,33 +223,48 @@ Running Your Tests
 
 Rebar doesn't seem to compile lfe unit tests right now (See the
 `Rebar discussion`_ for more information about this). As such, we have to do a
-little more work. I like to put this work in a Makefile:
+little more work. Prior to ``lfetool`` each project had to include make
+targets for compiling unit tests. ``lfetool`` now does this for you. Running
+tests is now as easy as doing the following:
 
-.. code:: Makefile
+.. code:: bash
 
-    TEST_DIR = ./test
-    TEST_EBIN_DIR = ./.eunit
+    $ lfetool tests build
+    $ lfetool tests unit
 
-    compile-tests:
-        ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*[_-]tests.lfe
+or
 
-    check: compile-tests
-        @clear;
-        rebar eunit skip_deps=true verbose=1
+    $ lfetool tests all
 
-For full context and a more robust example, see the `Makefile`_ for this
-project.
+If you would like to see how to do this manually, you should examine the source
+code of ``lfetool``. In particular, the file
+``plugins/lfetool/templates/lfetool.tmpl`` in the lfetool source code.
 
-Once this is updated for your project and in your ``Makefile``, you can simply
-execute the following to run your tests:
+Also, for an example of testing targets that are using ``lfetool``, see the
+`common.mk`_ file for this project.
+
+Once your project is using these targets, you can simply
+execute the any one of the following to run your tests:
 
 .. code:: bash
 
     $ make check
+    $ make check-unit-only
+    $ make check-integration-only
+    $ make check-system-only
+    $ make check-unit-with-deps
+    $ make check-unit
+    $ make check-integration
+    $ make check-system
+    $ make check-all-with-deps
+    $ make check-all
 
-At which point your ``.lfe`` test files will be compiled to ``.beam`` and placed
-in a directory where Rebar expects them (``.eunit``). Rebar will then run your
-unit tests.
+The make targets suffixed with ``-only`` assume that your unit tests have
+already been compiled (as such, these run very quickly). The other targets do
+various levels of compiling (deps, tests, etc.) for you, at which point your
+``.lfe`` test files will be compiled to ``.beam`` and placed in the testing
+directory (``.eunit``). This is the directory that all ``check*`` targets
+use to look for the tests to run.
 
 
 .. Links

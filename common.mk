@@ -7,13 +7,19 @@ LFE_DIR = $(DEPS)/lfe
 LFE_EBIN = $(LFE_DIR)/ebin
 LFE = $(LFE_DIR)/bin/lfe
 LFEC = $(LFE_DIR)/bin/lfec
-ERL_LIBS = $(LFE_DIR):./
+LFETOOL=/usr/local/bin/lfetool
 SOURCE_DIR = ./src
 OUT_DIR = ./ebin
 TEST_DIR = ./test
 TEST_EBIN_DIR = ./.eunit
 SANDBOX = ./sandbox
 FINISH=-run init stop -noshell
+ERL_LIBS = $(shell find $(DEPS) -maxdepth 1 -exec echo -n '{}:' \;|sed 's/:$$/:./'):$(TEST_OUT_DIR)
+SCRIPT_PATH=.:$(PATH)
+
+$(LFETOOL):
+	curl -o ./lfetool https://raw.github.com/lfe/lfetool/master/lfetool
+	chmod 755 ./lfetool
 
 get-version:
 	@echo
@@ -63,10 +69,8 @@ compile: get-deps clean-ebin
 compile-no-deps: clean-ebin
 	rebar compile skip_deps=true
 
-compile-tests: clean-eunit
-	@echo "Compiling unit test code ..."
-	@mkdir -p $(TEST_EBIN_DIR)
-	@ERL_LIBS=$(ERL_LIBS) $(LFEC) -o $(TEST_EBIN_DIR) $(TEST_DIR)/*[_-]tests.lfe
+compile-tests:
+	@PATH=$(SCRIPT_PATH) lfetool tests build
 
 shell: compile
 	@clear
@@ -79,24 +83,27 @@ shell-no-deps: compile-no-deps
 clean: clean-ebin clean-eunit
 	rebar clean
 
-check: compile compile-tests
-	@echo "Building and running unit tests ..."
-	@clear
-	@rebar eunit skip_deps=true verbose=1
+check-unit-only:
+	@PATH=$(SCRIPT_PATH) lfetool tests unit
 
-check-no-deps: compile-no-deps compile-tests
-	@clear;
-	@rebar eunit verbose=1 skip_deps=true
+check-integration-only:
+	@PATH=$(SCRIPT_PATH) lfetool tests integration
 
-check-travis: compile compile-tests
-	@echo "Building and running unit tests ..."
-	@ERL_LIBS=$(ERL_LIBS) erl -pa .eunit -noshell \
-	-eval "eunit:test({inparallel,[\
-		`ls .eunit| \
-		sed -e 's/.beam//'| \
-		awk '{print "\x27" $$1 "\x27"}'| \
-		sed -e :a -e N -e 's/\n/,/'`]},[verbose])" \
-	-s init stop
+check-system-only:
+	@PATH=$(SCRIPT_PATH) lfetool tests system
+
+check-unit-with-deps: get-deps compile compile-tests check-unit-only
+check-unit: compile-no-deps check-unit-only
+check-integration: compile check-integration-only
+check-system: compile check-system-only
+check-all-with-deps: compile check-unit-only check-integration-only \
+	check-system-only
+check-all: get-deps compile-no-deps
+	@PATH=$(SCRIPT_PATH) lfetool tests all
+
+check: check-unit-with-deps
+
+check-travis: $(LFETOOL) check
 
 # Note that this make target expects to be used like so:
 #	$ ERL_LIB=some/path make install

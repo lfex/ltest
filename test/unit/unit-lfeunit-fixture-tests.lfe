@@ -14,15 +14,7 @@
 (defun tear-down (set-up-result)
   (is-equal set-up-result 'ok))
 
-(defun setup-test-case (set-up-result)
-  "This is called the 'Instantiator' in EUnit parlance."
-  (list
-    (lambda ()
-      (is-equal set-up-result 'nok))
-    (lambda ()
-      (is-not-equal 'this-test 'very-silly))))
-
-(defun foreach-test-case (set-up-result)
+(defun setup_test_case (set-up-result)
   "This is called the 'Instantiator' in EUnit parlance."
   (list
     (lambda ()
@@ -30,38 +22,46 @@
     (lambda ()
       (is-not-equal 'this-test 'very-silly))))
 
-(deftestskip setup-setup
+(defun foreach_test_case (set-up-result)
+  "This is called the 'Instantiator' in EUnit parlance."
+  (list
+    (lambda ()
+      (is-equal set-up-result 'ok))
+    (lambda ()
+      (is-not-equal 'this-test 'very-silly))))
+
+(deftestgen setup-setup
   (tuple
     'setup
     (lambda () (set-up))
-    (lambda (x) (setup-test-case x))))
+    (lambda (x) (setup_test_case x))))
 
-(deftestskip setup-setup-cleanup
+(deftestgen setup-setup-cleanup
   (tuple
     'setup
     (lambda () (set-up))
     (lambda (x) (tear-down x))
-    (lambda (x) (setup-test-case x))))
+    (lambda (x) (setup_test_case x))))
 
 ; XXX add a test for setup-where-setup
 ; XXX add a test for setup-where-setup-cleanup
 
-(deftestskip foreach-setup
+(deftestgen foreach-setup
   (tuple
     'foreach
     (lambda () (set-up))
     (list
-      (lambda (x) (setup-test-case x))
-      (lambda (x) (foreach-test-case x)))))
+      (lambda (x) (setup_test_case x))
+      (lambda (x) (foreach_test_case x)))))
 
-(deftestskip foreach-setup-cleanup
+(deftestgen foreach-setup-cleanup
   (tuple
     'foreach
     (lambda () (set-up))
     (lambda (x) (tear-down x))
     (list
-      (lambda (x) (setup-test-case x))
-      (lambda (x) (foreach-test-case x)))))
+      (lambda (x) (setup_test_case x))
+      (lambda (x) (foreach_test_case x)))))
 
 ; XXX add a test for foreach-where-setup
 ; XXX add a test for foreach-where-setup-cleanup

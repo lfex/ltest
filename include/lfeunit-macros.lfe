@@ -14,10 +14,25 @@
        ,@body)))
 
 (defmacro deftest arg
-  "This macro is inspired by the Clojure unit test macro."
+  "This macro is for defining standard EUnit tests."
   (let ((name (car arg))
         (body (cdr arg)))
     `(defun ,(list_to_atom (++ (atom_to_list name) '"_test")) ()
+       ,@body)))
+
+(defmacro deftestgen arg
+  "This macro is for defining EUnit tests that use test generators."
+  (let ((name (car arg))
+        (body (cdr arg)))
+    `(defun ,(list_to_atom (++ (atom_to_list name) '"_test_")) ()
+       ,@body)))
+
+(defmacro deftestskip arg
+  "This macro is for defining standard EUnit test that will be skipped (not
+  run)."
+  (let ((name (car arg))
+        (body (cdr arg)))
+    `(defun ,(list_to_atom (++ (atom_to_list name) '"_skip")) ()
        ,@body)))
 
 (defmacro is (bool-expression)

@@ -158,12 +158,12 @@ In your ``rebar.config`` file, simply add an extra line for ``lfeunit``:
         {lfeunit, ".*", {git, "git://github.com/lfe/lfeunit.git", "master"}}
       ]}.
 
-And then do the usual:
+Once you write some tests (see below for how to do that), you can then do this:
 
 .. code:: bash
 
-    $ rebar get-deps
-    $ rebar compile
+    $ lfetool tests build
+    $ lfetool tests unit
 
 
 Structuring Your Unit Tests

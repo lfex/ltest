@@ -59,42 +59,75 @@ Which will give you output similar to the following:
     ------------------
 
     ======================== EUnit ========================
+    unit-check2-tests: basic2-test- ...[ok]
     module 'unit-lfeunit-fixture-tests'
-      setup-setup .................................... [ok]
-      setup-setup-cleanup ............................ [ok]
-      foreach-setup .................................. [ok]
-      foreach-setup-cleanup .......................... [ok]
-      Total module test time: 0.003 s
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      foreach-test-case .............................. [ok]
+      foreach-test-case .............................. [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      foreach-test-case .............................. [ok]
+      foreach-test-case .............................. [ok]
+      Total module test time: 0.036 s
+    module 'unit-lfeunit-generated-tests'
+      one-lambda ..................................... [ok]
+      one-lambda-in-list ............................. [ok]
+      many-lambdas-in-list ........................... [ok]
+      many-lambdas-in-list ........................... [ok]
+      many-lambdas-in-list ........................... [ok]
+      lambda-with-nested-testset ..................... [ok]
+      Total module test time: 0.018 s
+    module 'unit-lfeunit-named-tests'
+      named-is ....................................... [ok]
+      named-is-not-fail .................... [0.003 s] [ok]
+      named-testset-with-one ......................... [ok]
+      named-testset-with-two ......................... [ok]
+      named-testset-with-three ....................... [ok]
+      named-testset-nested ........................... [ok]
+      named-testset-deeply-nested .................... [ok]
+      Total module test time: 0.024 s
     module 'unit-lfeunit-tests'
       is ............................................. [ok]
       is-with-one-phrase-deftest ..................... [ok]
       is-with-two-phrase-deftest ..................... [ok]
       is-with-many-phrase-deftest .................... [ok]
-      is-fail .............................. [0.007 s] [ok]
+      is-fail ........................................ [ok]
       is-not ......................................... [ok]
-      is-not-fail .......................... [0.007 s] [ok]
+      is-not-fail .................................... [ok]
       is-equal ....................................... [ok]
-      is-equal-fail ........................ [0.007 s] [ok]
+      is-equal-fail .................................. [ok]
       is-not-equal ................................... [ok]
-      is-not-equal-fail .................... [0.007 s] [ok]
+      is-not-equal-fail .............................. [ok]
       is-exception ................................... [ok]
-      is-exception-wrong-class ............. [0.007 s] [ok]
-      is-exception-wrong-term .............. [0.007 s] [ok]
-      is-exception-unexpected-success ...... [0.007 s] [ok]
+      is-exception-wrong-class ....................... [ok]
+      is-exception-wrong-term ........................ [ok]
+      is-exception-unexpected-success ................ [ok]
       is-error ....................................... [ok]
-      is-error-wrong-term .................. [0.007 s] [ok]
-      is-error-unexpected-success .......... [0.007 s] [ok]
+      is-error-wrong-term ............................ [ok]
+      is-error-unexpected-success .................... [ok]
       is-throw ....................................... [ok]
-      is-throw-wrong-term .................. [0.007 s] [ok]
-      is-throw-unexpected-success .......... [0.007 s] [ok]
+      is-throw-wrong-term ............................ [ok]
+      is-throw-unexpected-success .................... [ok]
       is-exit ........................................ [ok]
-      is-exit-wrong-term ................... [0.007 s] [ok]
-      is-exit-unexpected-success ........... [0.007 s] [ok]
+      is-exit-wrong-term ............................. [ok]
+      is-exit-unexpected-success ..................... [ok]
       is-match ....................................... [ok]
-      is-match-fail ........................ [0.007 s] [ok]
-      Total module test time: 0.011 s
+      is-match-fail .................................. [ok]
+      Total module test time: 0.078 s
+    module 'unit-lfeunit-testset-tests'
+      testset-with-one ............................... [ok]
+      testset-with-two ............................... [ok]
+      testset-with-three ............................. [ok]
+      testset-nested ................................. [ok]
+      testset-deeply-nested .......................... [ok]
+      Total module test time: 0.016 s
     =======================================================
-      All 30 tests passed.
+      All 57 tests passed.
 
 
 Using lfeunit
@@ -164,6 +197,8 @@ conventions that eunit establishes:
   ``(defun unit-my-function-negagive-check_test () ...)``. We recommend,
   however, that you use ``deftest`` instead, and obviate the need for ``_test
   ()`` boilerplate.
+
+**Naming rules with fixture**: TBD
 
 
 Creating Unit Tests

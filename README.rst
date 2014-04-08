@@ -24,13 +24,13 @@ define some macros that will make testing a pleasure in LFE.
 Features
 --------
 
- * ``(deftest ...)`` for standard unit tests
- * ``(deftestgen ...)`` for writing tests with generators, including the
-   standard EUnit test fixtures (see naming caveat below)
- * ``(deftestskip ...)`` for skipping unit tests
- * ``(list ...)``-wrapped tests (of arbitrary depth) for use as test sets
- * ``(tuple ...)``-wrapped tests for naming/describing tests (first element
-   of tuple)
+* ``(deftest ...)`` for standard unit tests
+* ``(deftestgen ...)`` for writing tests with generators, including the
+ standard EUnit test fixtures (see naming caveat below)
+* ``(deftestskip ...)`` for skipping unit tests
+* ``(list ...)``-wrapped tests (of arbitrary depth) for use as test sets
+* ``(tuple ...)``-wrapped tests for naming/describing tests (first element
+ of tuple)
 
 
 Legacy Support

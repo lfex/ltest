@@ -21,6 +21,18 @@ more Lisp-y than simply calling macros from eunit. Futhermore, we hope to
 define some macros that will make testing a pleasure in LFE.
 
 
+Features
+--------
+
+ * ``(deftest ...)`` for standard unit tests
+ * ``(deftestgen ...)`` for writing tests with generators, including the
+   standard EUnit test fixtures (see naming caveat below)
+ * ``(deftestskip ...)`` for skipping unit tests
+ * ``(list ...)``-wrapped tests (of arbitrary depth) for use as test sets
+ * ``(tuple ...)``-wrapped tests for naming/describing tests (first element
+   of tuple)
+
+
 Legacy Support
 --------------
 
@@ -37,7 +49,6 @@ your ``rebar.config`` to point to "old-style" instead of "master", for example:
         {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "develop"}},
         {lfeunit, ".*", {git, "git://github.com/lfe/lfeunit.git", "old-style"}}
       ]}.
-
 
 
 Dogfood
@@ -198,7 +209,10 @@ conventions that eunit establishes:
   however, that you use ``deftest`` instead, and obviate the need for ``_test
   ()`` boilerplate.
 
-**Naming rules with fixture**: TBD
+**Naming rules with fixtures**: If you choose to use named functions instead of
+``lambda``s for your fixtures or if your ``lambda``s make calls to functions --
+all of those need to be standard, unquoted Erlang atoms. In otherwords: no
+dashes; you must use underscores.
 
 
 Creating Unit Tests
@@ -225,6 +239,27 @@ You can use ``deftest`` to write this:
 
 Note that the ``-test`` is no longer needed, nor is the empty argument list.
 
+If you would like to use EUnit's fixtures feature, you must use another macro:
+
+.. code:: cl
+
+    (deftestgen unit-my-function
+      ...)
+
+See above the note on naming functions for use in fixtures.
+
+If you would like tests to be skipped, you can use this macro:
+
+.. code:: cl
+
+    (deftestskip unit-my-function
+      ...)
+
+This will simply make the test invisible to EUnit. EUnit doesn't actually
+track user-skipped tests; it only tracks tests that are skipped do to issues
+as perceived by EUnit.
+
+
 Here is a more complete example:
 
 .. code:: cl
@@ -248,6 +283,7 @@ Here is a more complete example:
 
     (deftest is-equal
       (is-equal 2 (+ 1 1)))
+
 
 lfeunit is working towards full test coverage; while not there yet, the unit
 tests for lfeunit itself provide the best examples of usage.

@@ -12,7 +12,7 @@
   'ok)
 
 (defun tear-down (set-up-result)
-  (is-equal set-up-result `'ok))
+  (is-equal set-up-result 'ok))
 
 (defun setup-test-case (set-up-result)
   "This is called the 'Instantiator' in EUnit parlance."
@@ -65,6 +65,14 @@
 
 ; XXX add a test for foreach-where-setup
 ; XXX add a test for foreach-where-setup-cleanup
+
+; XXX add a test for node
+; XXX add a test for node-args
+
+; XXX add a test for foreachx-setupx-pairs
+; XXX add a test for foreachx-wherex-setupx-pairs
+; XXX add a test for foreachx-setupx-cleanupx-pairs
+; XXX add a test for foreachx-wherex-setupx-cleanupx-pairs
 
 ; XXX add test with spawn option
 ; XXX add test with timeout option

@@ -22,9 +22,9 @@
 
 (defmacro deftestgen arg
   "This macro is for defining EUnit tests that use test generators."
-  (let ((name (car arg))
+  (let ((name (re:replace (atom_to_list (car arg)) '"-" '"_" '(#(return list) global)))
         (body (cdr arg)))
-    `(defun ,(list_to_atom (++ (atom_to_list name) '"_test_")) ()
+    `(defun ,(list_to_atom (++ name '"_test_")) ()
        ,@body)))
 
 (defmacro deftestskip arg

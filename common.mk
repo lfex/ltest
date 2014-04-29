@@ -14,7 +14,7 @@ $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
 $(LFETOOL): $(BIN_DIR)
-	curl -o ./lfetool https://raw.github.com/lfe/lfetool/master/lfetool
+	curl -L -o ./lfetool https://raw.github.com/lfe/lfetool/master/lfetool
 	chmod 755 ./lfetool
 	mv ./lfetool ./bin/
 

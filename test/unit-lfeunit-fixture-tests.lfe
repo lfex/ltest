@@ -8,7 +8,6 @@
 
 (include-lib "include/lfeunit-macros.lfe")
 
-
 (defun set-up ()
   'ok)
 

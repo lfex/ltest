@@ -1,18 +1,5 @@
 (include-lib "eunit/include/eunit.hrl")
 
-(defmacro deftestsuite arg
-  "This macro provides some syntactic sugar and wrapping for defining test
-  modules."
-  (let ((name (car arg))
-        (body (cdr arg)))
-    `(defmodule ,(list_to_atom (++ (atom_to_list name) '"-tests"))
-       (export all)
-       (import
-         (from lfeunit-util
-           (check-failed-assert 2)
-           (check-wrong-assert-exception 2)))
-       ,@body)))
-
 (defmacro deftest arg
   "This macro is for defining standard EUnit tests."
   (let ((name (car arg))

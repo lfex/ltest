@@ -1,4 +1,5 @@
 (defmodule unit-lfeunit-testset-tests
+  (behaviour lfeunit-unit)
   (export all)
   (import
     (from lfeunit

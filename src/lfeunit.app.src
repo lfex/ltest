@@ -10,7 +10,11 @@
   %% All modules used by the application.
   {modules,
    [
-    lfeunit, 'lfeunit-util'
+    lfeunit,
+    'lfeunit-integration',
+    'lfeunit-system',
+    'lfeunit-unit',
+    'lfeunit-util'
    ]},
 
   %% All of the registered names the application uses. This can be ignored.

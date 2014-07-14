@@ -11,7 +11,7 @@
 ;; ok
 ;; > (is-equal 1 2)
 ;; exception error: #(assertEqual_failed
-;;                    (#(module lfeunit)
+;;                    (#(module lunit)
 ;;                     #(line 1)
 ;;                     #(expression "2")
 ;;                     #(expected 1)

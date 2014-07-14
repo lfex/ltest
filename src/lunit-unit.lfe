@@ -1,4 +1,4 @@
-(defmodule lfeunit-integration
+(defmodule lunit-unit
   (export all))
 
 (defun behaviour_info

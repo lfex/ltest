@@ -1,12 +1,12 @@
-(defmodule unit-lfeunit-fixture-tests
-  (behaviour lfeunit-unit)
+(defmodule lunit-fixture-tests
+  (behaviour lunit-unit)
   (export all)
   (import
-    (from lfeunit
+    (from lunit
       (check-failed-assert 2)
       (check-wrong-assert-exception 2))))
 
-(include-lib "include/lfeunit-macros.lfe")
+(include-lib "include/lunit-macros.lfe")
 
 (defun set-up ()
   'ok)

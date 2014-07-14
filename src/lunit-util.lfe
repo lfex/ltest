@@ -1,9 +1,9 @@
 ;;;; Utility functions
 ;;;;
-(defmodule lfeunit-util
+(defmodule lunit-util
   (export all))
 
-(include-lib "include/lfeunit-macros.lfe")
+(include-lib "include/lunit-macros.lfe")
 
 (defmacro DEFAULT-DATA ()
   "This macro returns the boilerplate needed for every assertion's failure

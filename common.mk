@@ -26,7 +26,13 @@ $(EXPM): $(BIN_DIR)
 
 get-deps:
 	@echo "Getting dependencies ..."
-	@rebar get-deps
+	@-rebar get-deps && \
+	cd deps && \
+	git clone https://github.com/lfex/lutil.git && \
+	cd lutil && \
+	mkdir deps && cd deps && \
+	ln -s ../../../../lunit lunit && \
+	ln -s ../../lfe lfe
 	@PATH=$(SCRIPT_PATH) lfetool update deps
 
 clean-ebin:
@@ -38,7 +44,8 @@ clean-eunit:
 
 compile: get-deps clean-ebin
 	@echo "Compiling project code and dependencies ..."
-	@rebar compile
+	@rebar compile && cd deps/lutil && \
+	rebar compile skip_deps=true
 
 compile-no-deps: clean-ebin
 	@echo "Compiling only project code ..."

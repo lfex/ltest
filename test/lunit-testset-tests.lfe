@@ -1,12 +1,12 @@
-(defmodule unit-lfeunit-testset-tests
-  (behaviour lfeunit-unit)
+(defmodule lunit-testset-tests
+  (behaviour lunit-unit)
   (export all)
   (import
     (from lfeunit
       (check-failed-assert 2)
       (check-wrong-assert-exception 2))))
 
-(include-lib "include/lfeunit-macros.lfe")
+(include-lib "include/lunit-macros.lfe")
 
 (deftest testset-with-one
   (list (is 'true)))

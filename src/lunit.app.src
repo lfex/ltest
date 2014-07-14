@@ -13,8 +13,7 @@
     lunit,
     'lunit-integration',
     'lunit-system',
-    'lunit-unit',
-    'lunit-util'
+    'lunit-unit'
    ]},
 
   %% All of the registered names the application uses. This can be ignored.

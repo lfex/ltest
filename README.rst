@@ -91,7 +91,7 @@ And two more as well:
 
 .. code:: cl
 
-  (defmodule my-unit-tests
+  (defmodule my-integration-tests
     (behaviour lunit-integration)
     (export ...))
 
@@ -99,13 +99,15 @@ or
 
 .. code:: cl
 
-  (defmodule my-unit-tests
+  (defmodule my-system-tests
     (behaviour lunit-system)
     (export ...))
 
 For a working example of such a structure, see the layout of the ``lunit``
 project itself: it uses just such a setup.
 
+To read more about the distinction between unit, integration, and system
+tests, check out the Wikipedia `article on testing`_.
 
 Naming Rules
 ------------
@@ -331,3 +333,4 @@ Which will give you output similar to the following:
 .. _Google Groups discussion: https://groups.google.com/d/msg/lisp-flavoured-erlang/eJH2m7XK0dM/WFibzgrqP1AJ
 .. _Rebar discussion: http://lists.basho.com/pipermail/rebar_lists.basho.com/2011-January/000471.html
 .. _lfeunit: https://github.com/lfe/lfeunit/
+.. _article on testing: http://en.wikipedia.org/wiki/Software_testing#Testing_levels

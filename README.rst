@@ -38,113 +38,6 @@ Features
   system test
 
 
-Legacy Support
---------------
-
-With version 0.1.0, lunit (lfeunit) changed its API. Functions were converted to macros,
-and these were renamed from ``assert-*`` to ``is-*``.
-
-If you have projects that are still using either the previous release (0.0.1) or
-old development snapshots and you want to continue using these, you can update
-your ``rebar.config`` to point to "old-style" instead of "master", for example:
-
-.. code:: erlang
-
-    {deps, [
-        {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "develop"}},
-        {lfeunit, ".*", {git, "git://github.com/lfe/lfeunit.git", "old-style"}}
-      ]}.
-
-
-Dogfood
-=======
-
-``lunit`` writes its unit tests in ``lunit`` :-) You can run them from the
-project directory:
-
-.. code:: bash
-
-    $ make check
-
-Which will give you output similar to the following:
-
-.. code:: text
-
-    ------------------
-    Running unit tests ...
-    ------------------
-
-    ======================== EUnit ========================
-    module 'lunit-basic-tests'
-      is ............................................. [ok]
-      is-with-one-phrase-deftest ..................... [ok]
-      is-with-two-phrase-deftest ..................... [ok]
-      is-with-many-phrase-deftest .................... [ok]
-      is-fail .............................. [0.003 s] [ok]
-      is-not ......................................... [ok]
-      is-not-fail .................................... [ok]
-      is-equal ....................................... [ok]
-      is-equal-fail .................................. [ok]
-      is-not-equal ................................... [ok]
-      is-not-equal-fail .............................. [ok]
-      is-exception ................................... [ok]
-      is-exception-wrong-class ....................... [ok]
-      is-exception-wrong-term ........................ [ok]
-      is-exception-unexpected-success ................ [ok]
-      is-error ....................................... [ok]
-      is-error-wrong-term ............................ [ok]
-      is-error-unexpected-success .................... [ok]
-      is-throw ....................................... [ok]
-      is-throw-wrong-term ............................ [ok]
-      is-throw-unexpected-success .................... [ok]
-      is-exit ........................................ [ok]
-      is-exit-wrong-term ............................. [ok]
-      is-exit-unexpected-success ..................... [ok]
-      is-match ....................................... [ok]
-      is-match-fail .................................. [ok]
-      Total module test time: 0.081 s
-    module 'lunit-fixture-tests'
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      foreach-test-case .............................. [ok]
-      foreach-test-case .............................. [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      foreach-test-case .............................. [ok]
-      foreach-test-case .............................. [ok]
-      Total module test time: 0.035 s
-    module 'lunit-generated-tests'
-      one-lambda ..................................... [ok]
-      one-lambda-in-list ............................. [ok]
-      many-lambdas-in-list ........................... [ok]
-      many-lambdas-in-list ........................... [ok]
-      many-lambdas-in-list ........................... [ok]
-      lambda-with-nested-testset ..................... [ok]
-      Total module test time: 0.017 s
-    module 'lunit-named-tests'
-      named-is ....................................... [ok]
-      named-is-not-fail .............................. [ok]
-      named-testset-with-one ......................... [ok]
-      named-testset-with-two ......................... [ok]
-      named-testset-with-three ....................... [ok]
-      named-testset-nested ........................... [ok]
-      named-testset-deeply-nested .................... [ok]
-      Total module test time: 0.021 s
-    module 'lunit-testset-tests'
-      testset-with-one ............................... [ok]
-      testset-with-two ............................... [ok]
-      testset-with-three ............................. [ok]
-      testset-nested ................................. [ok]
-      testset-deeply-nested .......................... [ok]
-      Total module test time: 0.015 s
-    =======================================================
-      All 56 tests passed.
-
-
 Using lunit
 ===========
 
@@ -173,18 +66,42 @@ Once you write some tests (see below for how to do that), you can then do this:
 Structuring Your Unit Tests
 ----------------------------
 
-We recommend *not* putting your unit tests directly in your modules, but rather
-creating a top-level directory in your project called ``test``. In ``test``,
-create a test cases module for every module your project has, e.g.,
-``test/myproj-base-tests.lfe`` and ``test/myproj-util-tests.lfe``. Obviously,
-if it makes sense to break things up in a more fine-grained manner, feel free
-to do so :-)
+lunit doesn not support putting your unit tests directly in your modules. If
+you do this, things may break or not work properly, even though Erlang's EUnit
+does support it.
 
-Furthermore, LFE projects support a standard directory layout for separating
-unit, integration, and system tests. These are written as modules in their own
-directories, but compiled to the standard ``.eunit`` directory. Modules of a
-particular type (e.g., unit, integration, etc.) are distinguished by a module
-name prefix.
+Instead, you should create a top-level directory in your project called
+``test``. In ``test``, create a test cases module for every module your project
+has, e.g., ``test/myproj-base-tests.lfe`` and ``test/myproj-util-tests.lfe``. 
+Obviously, if it makes sense to break things up in a more fine-grained manner,
+feel free to do so :-)
+
+Furthermore, lunit supports separating unit, integration, and system tests.
+This is done using custom OTP behaviours. For each test cases module you have
+created in ``./test``, be sure to set the behaviour in the ``(defmodule ...)``
+form. For instance:
+
+.. code:: cl
+
+  (defmodule my-unit-tests
+    (behaviour lunit-unit)
+    (export ...))
+
+And two more as well:
+
+.. code:: cl
+
+  (defmodule my-unit-tests
+    (behaviour lunit-integration)
+    (export ...))
+
+or
+
+.. code:: cl
+
+  (defmodule my-unit-tests
+    (behaviour lunit-system)
+    (export ...))
 
 For a working example of such a structure, see the layout of the ``lunit``
 project itself: it uses just such a setup.
@@ -317,6 +234,95 @@ the following:
 .. code:: bash
 
     $ lfetool tests all
+
+
+Dogfood
+=======
+
+``lunit`` writes its unit tests in ``lunit`` :-) You can run them from the
+project directory:
+
+.. code:: bash
+
+    $ make check
+
+Which will give you output similar to the following:
+
+.. code:: text
+
+    ------------------
+    Running unit tests ...
+    ------------------
+
+    ======================== EUnit ========================
+    module 'lunit-basic-tests'
+      is ............................................. [ok]
+      is-with-one-phrase-deftest ..................... [ok]
+      is-with-two-phrase-deftest ..................... [ok]
+      is-with-many-phrase-deftest .................... [ok]
+      is-fail .............................. [0.003 s] [ok]
+      is-not ......................................... [ok]
+      is-not-fail .................................... [ok]
+      is-equal ....................................... [ok]
+      is-equal-fail .................................. [ok]
+      is-not-equal ................................... [ok]
+      is-not-equal-fail .............................. [ok]
+      is-exception ................................... [ok]
+      is-exception-wrong-class ....................... [ok]
+      is-exception-wrong-term ........................ [ok]
+      is-exception-unexpected-success ................ [ok]
+      is-error ....................................... [ok]
+      is-error-wrong-term ............................ [ok]
+      is-error-unexpected-success .................... [ok]
+      is-throw ....................................... [ok]
+      is-throw-wrong-term ............................ [ok]
+      is-throw-unexpected-success .................... [ok]
+      is-exit ........................................ [ok]
+      is-exit-wrong-term ............................. [ok]
+      is-exit-unexpected-success ..................... [ok]
+      is-match ....................................... [ok]
+      is-match-fail .................................. [ok]
+      Total module test time: 0.081 s
+    module 'lunit-fixture-tests'
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      foreach-test-case .............................. [ok]
+      foreach-test-case .............................. [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      foreach-test-case .............................. [ok]
+      foreach-test-case .............................. [ok]
+      Total module test time: 0.035 s
+    module 'lunit-generated-tests'
+      one-lambda ..................................... [ok]
+      one-lambda-in-list ............................. [ok]
+      many-lambdas-in-list ........................... [ok]
+      many-lambdas-in-list ........................... [ok]
+      many-lambdas-in-list ........................... [ok]
+      lambda-with-nested-testset ..................... [ok]
+      Total module test time: 0.017 s
+    module 'lunit-named-tests'
+      named-is ....................................... [ok]
+      named-is-not-fail .............................. [ok]
+      named-testset-with-one ......................... [ok]
+      named-testset-with-two ......................... [ok]
+      named-testset-with-three ....................... [ok]
+      named-testset-nested ........................... [ok]
+      named-testset-deeply-nested .................... [ok]
+      Total module test time: 0.021 s
+    module 'lunit-testset-tests'
+      testset-with-one ............................... [ok]
+      testset-with-two ............................... [ok]
+      testset-with-three ............................. [ok]
+      testset-nested ................................. [ok]
+      testset-deeply-nested .......................... [ok]
+      Total module test time: 0.015 s
+    =======================================================
+      All 56 tests passed.
 
 
 .. Links

@@ -75,44 +75,12 @@ Which will give you output similar to the following:
     ------------------
 
     ======================== EUnit ========================
-    unit-check2-tests: basic2-test- ...[ok]
-    module 'unit-lfeunit-fixture-tests'
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      foreach-test-case .............................. [ok]
-      foreach-test-case .............................. [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      foreach-test-case .............................. [ok]
-      foreach-test-case .............................. [ok]
-      Total module test time: 0.036 s
-    module 'unit-lfeunit-generated-tests'
-      one-lambda ..................................... [ok]
-      one-lambda-in-list ............................. [ok]
-      many-lambdas-in-list ........................... [ok]
-      many-lambdas-in-list ........................... [ok]
-      many-lambdas-in-list ........................... [ok]
-      lambda-with-nested-testset ..................... [ok]
-      Total module test time: 0.018 s
-    module 'unit-lfeunit-named-tests'
-      named-is ....................................... [ok]
-      named-is-not-fail .................... [0.003 s] [ok]
-      named-testset-with-one ......................... [ok]
-      named-testset-with-two ......................... [ok]
-      named-testset-with-three ....................... [ok]
-      named-testset-nested ........................... [ok]
-      named-testset-deeply-nested .................... [ok]
-      Total module test time: 0.024 s
-    module 'unit-lfeunit-tests'
+    module 'lunit-basic-tests'
       is ............................................. [ok]
       is-with-one-phrase-deftest ..................... [ok]
       is-with-two-phrase-deftest ..................... [ok]
       is-with-many-phrase-deftest .................... [ok]
-      is-fail ........................................ [ok]
+      is-fail .............................. [0.003 s] [ok]
       is-not ......................................... [ok]
       is-not-fail .................................... [ok]
       is-equal ....................................... [ok]
@@ -134,16 +102,47 @@ Which will give you output similar to the following:
       is-exit-unexpected-success ..................... [ok]
       is-match ....................................... [ok]
       is-match-fail .................................. [ok]
-      Total module test time: 0.078 s
-    module 'unit-lfeunit-testset-tests'
+      Total module test time: 0.081 s
+    module 'lunit-fixture-tests'
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      foreach-test-case .............................. [ok]
+      foreach-test-case .............................. [ok]
+      setup-test-case ................................ [ok]
+      setup-test-case ................................ [ok]
+      foreach-test-case .............................. [ok]
+      foreach-test-case .............................. [ok]
+      Total module test time: 0.035 s
+    module 'lunit-generated-tests'
+      one-lambda ..................................... [ok]
+      one-lambda-in-list ............................. [ok]
+      many-lambdas-in-list ........................... [ok]
+      many-lambdas-in-list ........................... [ok]
+      many-lambdas-in-list ........................... [ok]
+      lambda-with-nested-testset ..................... [ok]
+      Total module test time: 0.017 s
+    module 'lunit-named-tests'
+      named-is ....................................... [ok]
+      named-is-not-fail .............................. [ok]
+      named-testset-with-one ......................... [ok]
+      named-testset-with-two ......................... [ok]
+      named-testset-with-three ....................... [ok]
+      named-testset-nested ........................... [ok]
+      named-testset-deeply-nested .................... [ok]
+      Total module test time: 0.021 s
+    module 'lunit-testset-tests'
       testset-with-one ............................... [ok]
       testset-with-two ............................... [ok]
       testset-with-three ............................. [ok]
       testset-nested ................................. [ok]
       testset-deeply-nested .......................... [ok]
-      Total module test time: 0.016 s
+      Total module test time: 0.015 s
     =======================================================
-      All 57 tests passed.
+      All 56 tests passed.
 
 
 Using lunit

@@ -2,7 +2,7 @@
   (behaviour lunit-unit)
   (export all)
   (import
-    (from lfeunit
+    (from lunit
       (check-failed-assert 2)
       (check-wrong-assert-exception 2))))
 

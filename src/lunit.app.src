@@ -2,7 +2,7 @@
 {application, lunit,
  [
   %% A quick description of the application.
-  {description, "An eunit clone for LFE"},
+  {description, "Unit Testing Framework for LFE"},
 
   %% The version of the application
   {vsn, "0.1.3"},

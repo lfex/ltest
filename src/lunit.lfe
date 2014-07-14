@@ -3,7 +3,7 @@
 ;; one can't include macros directly in the REPL, this module allows one to
 ;; still use the macros while in the REPL by doing the following:
 ;;
-;; > (slurp '"src/lfeunit.lfe")
+;; > (slurp '"src/lunit.lfe")
 ;;
 ;; At which point you will be able to call all the macros:
 ;;
@@ -17,10 +17,10 @@
 ;;                     #(expected 1)
 ;;                     #(value 2)))
 ;;
-(defmodule lfeunit
+(defmodule lunit
   (export all))
 
-(include-lib "include/lfeunit-macros.lfe")
+(include-lib "include/lunit-macros.lfe")
 
 (defun get-test-beams ()
   "Get the compiled .beam files, but without the .beam extension. The list of
@@ -48,16 +48,16 @@
 (defun has-behaviour? (beam type)
   (lists:member
     type
-    (lfe-utils:get-beam-behaviors beam)))
+    (lutil:get-beam-behaviors beam)))
 
 (defun integration? (beam)
-  (has-behaviour? beam 'lfeunit-integration))
+  (has-behaviour? beam 'lunit-integration))
 
 (defun system? (beam)
-  (has-behaviour? beam 'lfeunit-system))
+  (has-behaviour? beam 'lunit-system))
 
 (defun unit? (beam)
-  (has-behaviour? beam 'lfeunit-unit))
+  (has-behaviour? beam 'lunit-unit))
 
 (defun check-failed-assert (data expected)
   "This function

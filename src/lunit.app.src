@@ -1,5 +1,5 @@
 %% -*- erlang -*-
-{application, lfeunit,
+{application, lunit,
  [
   %% A quick description of the application.
   {description, "An eunit clone for LFE"},
@@ -10,11 +10,11 @@
   %% All modules used by the application.
   {modules,
    [
-    lfeunit,
-    'lfeunit-integration',
-    'lfeunit-system',
-    'lfeunit-unit',
-    'lfeunit-util'
+    lunit,
+    'lunit-integration',
+    'lunit-system',
+    'lunit-unit',
+    'lunit-util'
    ]},
 
   %% All of the registered names the application uses. This can be ignored.

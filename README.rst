@@ -117,12 +117,10 @@ Erlang's eunit module. As such, your tests need to following the same
 conventions that eunit establishes:
 
 * Test module filenames should end in ``-tests``, e.g.,
-  ``some-module-tests.lfe``. (In older versions of LFE, it may
-  have been required to name test module filenames with ``_tests``, however
-  this is no longer the case.)
-
+  ``some-module-tests.lfe``. 
+  
 * Test module and filename need to be the same, minus the extension. For
-  example, ``test/unit/unit-my-module-tests.lfe`` needs to be declared as
+  example, ``test/unit-my-module-tests.lfe`` needs to be declared as
   ``(defmodule unit-my-module-tests ...) in the test case module``.
 
 * If you chose *not* to use the ``deftest`` macro to build each unit test
@@ -133,7 +131,7 @@ conventions that eunit establishes:
   ()`` boilerplate.
 
 **Naming rules with fixtures**: If you choose to use named functions instead of
-``lambda``s for your fixtures or if your ``lambda``s make calls to functions --
+``lambda`` s for your fixtures or if your ``lambda`` s make calls to functions --
 all of those need to be standard, unquoted Erlang atoms. In otherwords: no
 dashes; you must use underscores.
 

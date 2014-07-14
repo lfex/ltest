@@ -1,24 +1,23 @@
-######################
-lfeunit: eunit for LFE
-######################
+#####
+lunit
+#####
+
+*A Unit, Integration, and System Tests Framework for LFE*
 
 
 Introduction
 ============
 
-*Caveat Emptor*: This is a new project with **some** implementation done.
-Patches welcome!
+This project is the successor of `lfeunit`_. That project is now deprecated;
+lunit should be used instead.
 
-The original implementation of lfeunit was made due to some difficulties in
-parsing the ``eunit.hrl`` file fully by LFE (it didn't convert all the Erlang
-macros). Robert has since made some enhancements to the LFE Erlang macro
-processing code, and it now pulls in everything.
+The original implementation of lunit (as lfeunit) was made due to some
+difficulties in parsing the Erlang include file for EUnit, ``eunit.hrl``, by
+LFE (it didn't convert all the Erlang macros). That has since been fixed.
 
-Is there still a need for lfeunit?
-
-Well, perhaps not *need*, but certainly a benefit :-) lfeunit is intended to be
-more Lisp-y than simply calling macros from eunit. Futhermore, we hope to
-define some macros that will make testing a pleasure in LFE.
+Since then, new features have landed in lunit making the creation of not only
+unit tests, but system and integration tests, easier and more consistent. These
+are briefly outlined in the next section.
 
 
 Features
@@ -31,12 +30,18 @@ Features
 * ``(list ...)``-wrapped tests (of arbitrary depth) for use as test sets
 * ``(tuple ...)``-wrapped tests for naming/describing tests (first element
   of tuple)
+* ``(behaviour lunit-unit)`` - annotating a test module to be run as a unit
+  test
+* ``(behaviour lunit-integration)`` - annotating a test module to be run as an
+  integration test
+* ``(behaviour lunit-system)`` - annotating a test module to be run as a
+  system test
 
 
 Legacy Support
 --------------
 
-With version 0.1.0, lfeunit changed its API. Functions were converted to macros,
+With version 0.1.0, lunit (lfeunit) changed its API. Functions were converted to macros,
 and these were renamed from ``assert-*`` to ``is-*``.
 
 If you have projects that are still using either the previous release (0.0.1) or
@@ -54,7 +59,7 @@ your ``rebar.config`` to point to "old-style" instead of "master", for example:
 Dogfood
 =======
 
-``lfeunit`` writes its unit tests in ``lfeunit`` :-) You can run them from the
+``lunit`` writes its unit tests in ``lunit`` :-) You can run them from the
 project directory:
 
 .. code:: bash
@@ -141,21 +146,21 @@ Which will give you output similar to the following:
       All 57 tests passed.
 
 
-Using lfeunit
-=============
+Using lunit
+===========
 
 
-Adding lfeunit to Your Project
-------------------------------
+Adding lunit to Your Project
+----------------------------
 
-In order to use lfeunit in your project, all you need to do is add a Rebar dep.
-In your ``rebar.config`` file, simply add an extra line for ``lfeunit``:
+In order to use lunit in your project, all you need to do is add a rebar dep.
+In your ``rebar.config`` file, simply add an extra line for ``lunit``:
 
 .. code:: erlang
 
     {deps, [
-        {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "develop"}},
-        {lfeunit, ".*", {git, "git://github.com/lfe/lfeunit.git", "master"}}
+        {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "master"}},
+        {lunit, ".*", {git, "git://github.com/lfex/lunit.git", "master"}}
       ]}.
 
 Once you write some tests (see below for how to do that), you can then do this:
@@ -182,7 +187,7 @@ directories, but compiled to the standard ``.eunit`` directory. Modules of a
 particular type (e.g., unit, integration, etc.) are distinguished by a module
 name prefix.
 
-For a working example of such a structure, see the layout of the ``lfeunit``
+For a working example of such a structure, see the layout of the ``lunit``
 project itself: it uses just such a setup.
 
 
@@ -218,11 +223,11 @@ dashes; you must use underscores.
 Creating Unit Tests
 -------------------
 
-lfeunit is entirely macro-based. lfeunit uses LFE to parse the Erlang macros in
+lunit is entirely macro-based. lunit uses LFE to parse the Erlang macros in
 the eunit header file. It also provides its own header file which defines macros
-whose purpose is to wrap the eunit macros in a more Lispy form.
+whose main purpose is to wrap the eunit macros in a more Lispy form.
 
-lfeunit also provides a syntactic sugar macro for defining tests: ``deftest``.
+lunit also provides a syntactic sugar macro for defining tests: ``deftest``.
 Instead of writing something like this for your unit tests:
 
 .. code:: cl
@@ -265,13 +270,14 @@ Here is a more complete example:
 .. code:: cl
 
     (defmodule unit-mymodule-tests
+      (behaviour lunit-unit)
       (export all)
       (import
-        (from lfeunit-util
+        (from lunit
           (check-failed-assert 2)
           (check-wrong-assert-exception 2))))
 
-    (include-lib "deps/lfeunit/include/lfeunit-macros.lfe")
+    (include-lib "deps/lunit/include/lunit-macros.lfe")
 
     (deftest is
       (is 'true)
@@ -285,64 +291,38 @@ Here is a more complete example:
       (is-equal 2 (+ 1 1)))
 
 
-lfeunit is working towards full test coverage; while not there yet, the unit
-tests for lfeunit itself provide the best examples of usage.
+lunit is working towards full test coverage; while not there yet, the unit
+tests for lunit itself provide the best examples of usage.
 
 
 Running Your Tests
 ------------------
 
-Rebar doesn't seem to compile lfe unit tests right now (See the
-`Rebar discussion`_ for more information about this). As such, we have to do a
-little more work. Prior to ``lfetool`` each project had to include make
-targets for compiling unit tests. ``lfetool`` now does this for you. Running
-tests is now as easy as doing the following:
+The recommended way to run unit tests is to use ``lfetool``. Running
+unit tests is now as easy as doing the following:
 
 .. code:: bash
 
     $ lfetool tests build
     $ lfetool tests unit
 
-or
+Similarly, if your project has defined integration tests, you can do:
+
+.. code:: bash
+
+    $ lfetool tests integration
+
+If you'd like to run unit, integration, and system tests together, run
+the following:
 
 .. code:: bash
 
     $ lfetool tests all
-
-If you would like to see how to do this manually, you should examine the source
-code of ``lfetool``. In particular, the file
-``plugins/lfetool/templates/lfetool.tmpl`` in the lfetool source code.
-
-Also, for an example of testing targets that are using ``lfetool``, see the
-`common.mk`_ file for this project.
-
-Once your project is using these targets, you can simply
-execute the any one of the following to run your tests:
-
-.. code:: bash
-
-    $ make check
-    $ make check-unit-only
-    $ make check-integration-only
-    $ make check-system-only
-    $ make check-unit-with-deps
-    $ make check-unit
-    $ make check-integration
-    $ make check-system
-    $ make check-all-with-deps
-    $ make check-all
-
-The make targets suffixed with ``-only`` assume that your unit tests have
-already been compiled (as such, these run very quickly). The other targets do
-various levels of compiling (deps, tests, etc.) for you, at which point your
-``.lfe`` test files will be compiled to ``.beam`` and placed in the testing
-directory (``.eunit``). This is the directory that all ``check*`` targets
-use to look for the tests to run.
 
 
 .. Links
 .. -----
 .. _Makefile: Makefile
 .. _Google Groups discussion: https://groups.google.com/d/msg/lisp-flavoured-erlang/eJH2m7XK0dM/WFibzgrqP1AJ
-.. _Github LFE ticket: https://github.com/rvirding/lfe/issues/31
 .. _Rebar discussion: http://lists.basho.com/pipermail/rebar_lists.basho.com/2011-January/000471.html
+.. _lfeunit: https://github.com/lfe/lfeunit/

@@ -1,2 +1,0 @@
-(defmacro xxx (y z)
-  `(list y z ,y ,z))

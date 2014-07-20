@@ -1,5 +1,5 @@
 #####
-lunit
+ltest
 #####
 
 *A Unit, Integration, and System Tests Framework for LFE*
@@ -9,13 +9,13 @@ Introduction
 ============
 
 This project is the successor of `lfeunit`_. That project is now deprecated;
-lunit should be used instead.
+ltest should be used instead.
 
-The original implementation of lunit (as lfeunit) was made due to some
+The original implementation of ltest (as lfeunit) was made due to some
 difficulties in parsing the Erlang include file for EUnit, ``eunit.hrl``, by
 LFE (it didn't convert all the Erlang macros). That has since been fixed.
 
-Since then, new features have landed in lunit making the creation of not only
+Since then, new features have landed in ltest making the creation of not only
 unit tests, but system and integration tests, easier and more consistent. These
 are briefly outlined in the next section.
 
@@ -30,29 +30,29 @@ Features
 * ``(list ...)``-wrapped tests (of arbitrary depth) for use as test sets
 * ``(tuple ...)``-wrapped tests for naming/describing tests (first element
   of tuple)
-* ``(behaviour lunit-unit)`` - annotating a test module to be run as a unit
+* ``(behaviour ltest-unit)`` - annotating a test module to be run as a unit
   test
-* ``(behaviour lunit-integration)`` - annotating a test module to be run as an
+* ``(behaviour ltest-integration)`` - annotating a test module to be run as an
   integration test
-* ``(behaviour lunit-system)`` - annotating a test module to be run as a
+* ``(behaviour ltest-system)`` - annotating a test module to be run as a
   system test
 
 
-Using lunit
+Using ltest
 ===========
 
 
-Adding lunit to Your Project
+Adding ltest to Your Project
 ----------------------------
 
-In order to use lunit in your project, all you need to do is add a rebar dep.
-In your ``rebar.config`` file, simply add an extra line for ``lunit``:
+In order to use ltest in your project, all you need to do is add a rebar dep.
+In your ``rebar.config`` file, simply add an extra line for ``ltest``:
 
 .. code:: erlang
 
     {deps, [
         {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "master"}},
-        {lunit, ".*", {git, "git://github.com/lfex/lunit.git", "master"}}
+        {ltest, ".*", {git, "git://github.com/lfex/ltest.git", "master"}}
       ]}.
 
 Once you write some tests (see below for how to do that), you can then do this:
@@ -66,7 +66,7 @@ Once you write some tests (see below for how to do that), you can then do this:
 Structuring Your Unit Tests
 ----------------------------
 
-lunit doesn not support putting your unit tests directly in your modules. If
+ltest doesn not support putting your unit tests directly in your modules. If
 you do this, things may break or not work properly, even though Erlang's EUnit
 does support it.
 
@@ -76,7 +76,7 @@ has, e.g., ``test/myproj-base-tests.lfe`` and ``test/myproj-util-tests.lfe``.
 Obviously, if it makes sense to break things up in a more fine-grained manner,
 feel free to do so :-)
 
-Furthermore, lunit supports separating unit, integration, and system tests.
+Furthermore, ltest supports separating unit, integration, and system tests.
 This is done using custom OTP behaviours. For each test cases module you have
 created in ``./test``, be sure to set the behaviour in the ``(defmodule ...)``
 form. For instance:
@@ -84,7 +84,7 @@ form. For instance:
 .. code:: cl
 
   (defmodule my-unit-tests
-    (behaviour lunit-unit)
+    (behaviour ltest-unit)
     (export ...))
 
 And two more as well:
@@ -92,7 +92,7 @@ And two more as well:
 .. code:: cl
 
   (defmodule my-integration-tests
-    (behaviour lunit-integration)
+    (behaviour ltest-integration)
     (export ...))
 
 or
@@ -100,10 +100,10 @@ or
 .. code:: cl
 
   (defmodule my-system-tests
-    (behaviour lunit-system)
+    (behaviour ltest-system)
     (export ...))
 
-For a working example of such a structure, see the layout of the ``lunit``
+For a working example of such a structure, see the layout of the ``ltest``
 project itself: it uses just such a setup.
 
 To read more about the distinction between unit, integration, and system
@@ -139,11 +139,11 @@ dashes; you must use underscores.
 Creating Unit Tests
 -------------------
 
-lunit is entirely macro-based. lunit uses LFE to parse the Erlang macros in
+ltest is entirely macro-based. ltest uses LFE to parse the Erlang macros in
 the eunit header file. It also provides its own header file which defines macros
 whose main purpose is to wrap the eunit macros in a more Lispy form.
 
-lunit also provides a syntactic sugar macro for defining tests: ``deftest``.
+ltest also provides a syntactic sugar macro for defining tests: ``deftest``.
 Instead of writing something like this for your unit tests:
 
 .. code:: cl
@@ -186,14 +186,14 @@ Here is a more complete example:
 .. code:: cl
 
     (defmodule unit-mymodule-tests
-      (behaviour lunit-unit)
+      (behaviour ltest-unit)
       (export all)
       (import
-        (from lunit
+        (from ltest
           (check-failed-assert 2)
           (check-wrong-assert-exception 2))))
 
-    (include-lib "deps/lunit/include/lunit-macros.lfe")
+    (include-lib "deps/ltest/include/ltest-macros.lfe")
 
     (deftest is
       (is 'true)
@@ -207,8 +207,8 @@ Here is a more complete example:
       (is-equal 2 (+ 1 1)))
 
 
-lunit is working towards full test coverage; while not there yet, the unit
-tests for lunit itself provide the best examples of usage.
+ltest is working towards full test coverage; while not there yet, the unit
+tests for ltest itself provide the best examples of usage.
 
 
 Running Your Tests
@@ -239,7 +239,7 @@ the following:
 Dogfood
 =======
 
-``lunit`` writes its unit tests in ``lunit`` :-) You can run them from the
+``ltest`` writes its unit tests in ``ltest`` :-) You can run them from the
 project directory:
 
 .. code:: bash
@@ -255,7 +255,7 @@ Which will give you output similar to the following:
     ------------------
 
     ======================== EUnit ========================
-    module 'lunit-basic-tests'
+    module 'ltest-basic-tests'
       is ............................................. [ok]
       is-with-one-phrase-deftest ..................... [ok]
       is-with-two-phrase-deftest ..................... [ok]
@@ -283,7 +283,7 @@ Which will give you output similar to the following:
       is-match ....................................... [ok]
       is-match-fail .................................. [ok]
       Total module test time: 0.081 s
-    module 'lunit-fixture-tests'
+    module 'ltest-fixture-tests'
       setup-test-case ................................ [ok]
       setup-test-case ................................ [ok]
       setup-test-case ................................ [ok]
@@ -297,7 +297,7 @@ Which will give you output similar to the following:
       foreach-test-case .............................. [ok]
       foreach-test-case .............................. [ok]
       Total module test time: 0.035 s
-    module 'lunit-generated-tests'
+    module 'ltest-generated-tests'
       one-lambda ..................................... [ok]
       one-lambda-in-list ............................. [ok]
       many-lambdas-in-list ........................... [ok]
@@ -305,7 +305,7 @@ Which will give you output similar to the following:
       many-lambdas-in-list ........................... [ok]
       lambda-with-nested-testset ..................... [ok]
       Total module test time: 0.017 s
-    module 'lunit-named-tests'
+    module 'ltest-named-tests'
       named-is ....................................... [ok]
       named-is-not-fail .............................. [ok]
       named-testset-with-one ......................... [ok]
@@ -314,7 +314,7 @@ Which will give you output similar to the following:
       named-testset-nested ........................... [ok]
       named-testset-deeply-nested .................... [ok]
       Total module test time: 0.021 s
-    module 'lunit-testset-tests'
+    module 'ltest-testset-tests'
       testset-with-one ............................... [ok]
       testset-with-two ............................... [ok]
       testset-with-three ............................. [ok]

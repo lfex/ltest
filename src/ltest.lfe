@@ -51,7 +51,7 @@
 (defun has-behaviour? (beam type)
   (lists:member
     type
-    (lutil:get-beam-behaviors beam)))
+    (lutil-file:get-beam-behaviors beam)))
 
 (defun integration? (beam)
   (has-behaviour? beam 'ltest-integration))

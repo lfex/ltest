@@ -1,4 +1,4 @@
-(defmodule lunit-integration
+(defmodule ltest-system
   (export all))
 
 (defun behaviour_info

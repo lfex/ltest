@@ -3,7 +3,7 @@
 ;; one can't include macros directly in the REPL, this module allows one to
 ;; still use the macros while in the REPL by doing the following:
 ;;
-;; > (slurp '"src/lunit.lfe")
+;; > (slurp '"src/ltest.lfe")
 ;;
 ;; At which point you will be able to call all the macros:
 ;;
@@ -11,16 +11,16 @@
 ;; ok
 ;; > (is-equal 1 2)
 ;; exception error: #(assertEqual_failed
-;;                    (#(module lunit)
+;;                    (#(module ltest)
 ;;                     #(line 1)
 ;;                     #(expression "2")
 ;;                     #(expected 1)
 ;;                     #(value 2)))
 ;;
-(defmodule lunit
+(defmodule ltest
   (export all))
 
-(include-lib "include/lunit-macros.lfe")
+(include-lib "include/ltest-macros.lfe")
 
 (defun skip-test-patt () '".*_skip")
 (defun skip-test-group-patt () '"(.*)(_skip)")
@@ -54,13 +54,13 @@
     (lutil:get-beam-behaviors beam)))
 
 (defun integration? (beam)
-  (has-behaviour? beam 'lunit-integration))
+  (has-behaviour? beam 'ltest-integration))
 
 (defun system? (beam)
-  (has-behaviour? beam 'lunit-system))
+  (has-behaviour? beam 'ltest-system))
 
 (defun unit? (beam)
-  (has-behaviour? beam 'lunit-unit))
+  (has-behaviour? beam 'ltest-unit))
 
 (defun check-skip-funcs (funcs)
   (lists:map

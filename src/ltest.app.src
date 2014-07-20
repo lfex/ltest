@@ -1,5 +1,5 @@
 %% -*- erlang -*-
-{application, lunit,
+{application, ltest,
  [
   %% A quick description of the application.
   {description, "Unit Testing Framework for LFE"},
@@ -10,10 +10,10 @@
   %% All modules used by the application.
   {modules,
    [
-    lunit,
-    'lunit-integration',
-    'lunit-system',
-    'lunit-unit'
+    ltest,
+    'ltest-integration',
+    'ltest-system',
+    'ltest-unit'
    ]},
 
   %% All of the registered names the application uses. This can be ignored.

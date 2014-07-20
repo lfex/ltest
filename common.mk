@@ -31,7 +31,7 @@ get-deps:
 	git clone https://github.com/lfex/lutil.git && \
 	cd lutil && \
 	mkdir deps && cd deps && \
-	ln -s ../../../../lunit lunit && \
+	ln -s ../../../../ltest ltest && \
 	ln -s ../../lfe lfe
 	@PATH=$(SCRIPT_PATH) lfetool update deps
 

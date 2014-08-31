@@ -1,1 +1,1 @@
-include common.mk
+include resources/make/common.mk

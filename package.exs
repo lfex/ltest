@@ -1,6 +1,6 @@
 Expm.Package.new(name: "ltest",
-                 description: "Unit Testing Framework for LFE",
-                 version: "0.2.0",
+                 description: "A Testing Framework for LFE",
+                 version: "0.3.0",
                  keywords: ["LFE", "Lisp", "Testing", "Unit Tests", "TDD"],
                  maintainers: [[name: "Duncan McGreggor",
                                 email: "oubiwann@cogitat.io"]],

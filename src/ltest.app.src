@@ -2,10 +2,10 @@
 {application, ltest,
  [
   %% A quick description of the application.
-  {description, "Unit Testing Framework for LFE"},
+  {description, "A Testing Framework for LFE"},
 
   %% The version of the application
-  {vsn, "0.2.0"},
+  {vsn, "0.3.0"},
 
   %% All modules used by the application.
   {modules,

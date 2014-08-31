@@ -55,8 +55,7 @@ clean-eunit:
 
 compile: get-deps clean-ebin
 	@echo "Compiling project code and dependencies ..."
-	@rebar compile && cd deps/lutil && \
-	rebar compile skip_deps=true
+	@rebar compile
 
 compile-no-deps: clean-ebin
 	@echo "Compiling only project code ..."

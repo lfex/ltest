@@ -33,15 +33,24 @@
     (filelib:wildcard
       (filename:join (list path ".eunit" "*.beam")))))
 
+(defun get-integration-beams ()
+  (get-integration-beams "."))
+
 (defun get-integration-beams (path)
   (lists:filter
     #'integration?/1
     (get-test-beams path)))
 
+(defun get-system-beams ()
+  (get-system-beams "."))
+
 (defun get-system-beams (path)
   (lists:filter
     #'system?/1
     (get-test-beams path)))
+
+(defun get-unit-beams ()
+  (get-unit-beams "."))
 
 (defun get-unit-beams (path)
   (lists:filter

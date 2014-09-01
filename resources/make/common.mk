@@ -44,7 +44,7 @@ $(EXPM): $(BIN_DIR)
 get-deps:
 	@echo "Getting dependencies ..."
 	@-rebar get-deps && \
-	@PATH=$(SCRIPT_PATH) lfetool update deps
+	PATH=$(SCRIPT_PATH) lfetool update deps
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."

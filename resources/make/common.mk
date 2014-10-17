@@ -65,7 +65,7 @@ get-deps:
 	@which rebar.cmd >/dev/null 2>&1 && rebar.cmd get-deps || rebar get-deps
 	git clone https://github.com/lfex/lutil.git deps/lutil && \
 	cd deps/lutil && \
-	git checkout tags/0.3.0
+	git checkout tags/0.3.0 &> /dev/null
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."
@@ -97,7 +97,7 @@ shell-no-deps: compile-no-deps
 	@echo "Starting an Erlang shell ..."
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) erl
 
-compile: get-deps clean-ebin
+compile: get-deps clean-ebin copy-appsrc
 	@echo "Compiling project code and dependencies ..."
 	@which rebar.cmd >/dev/null 2>&1 && \
 	PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) rebar.cmd compile || \

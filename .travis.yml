@@ -1,10 +1,14 @@
 language: erlang
-script: "make check-travis"
+before_script:
+  - "make get-lfetool"
+  - "make copy-appsrc"
+script:
+  - "make check-travis"
 notifications:
   irc: "irc.freenode.org#cogitat"
   recipients:
     - duncan@cogitat.io
 otp_release:
-  - 17.0
+  - 17.1
   - R16B03
   - R15B03

@@ -66,7 +66,6 @@ get-deps:
 	git clone https://github.com/lfex/lutil.git deps/lutil && \
 	cd deps/lutil && \
 	git checkout tags/0.3.0
-	@PATH=$(SCRIPT_PATH) $(LFETOOL) update deps
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."

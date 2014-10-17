@@ -65,7 +65,7 @@ get-deps:
 	@which rebar.cmd >/dev/null 2>&1 && rebar.cmd get-deps || rebar get-deps
 	git clone https://github.com/lfex/lutil.git deps/lutil && \
 	cd deps/lutil && \
-	git checkout tags/0.3.0 &> /dev/null || echo "Skipping ..."
+	git checkout tags/0.4.0 &> /dev/null || echo "Skipping ..."
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."

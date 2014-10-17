@@ -63,6 +63,9 @@ $(EXPM): $(BIN_DIR)
 get-deps:
 	@echo "Getting dependencies ..."
 	@which rebar.cmd >/dev/null 2>&1 && rebar.cmd get-deps || rebar get-deps
+	git clone https://github.com/lfex/lutil.git deps/lutil && \
+	cd deps/lutil && \
+	git checkout tags/0.2.9
 	@PATH=$(SCRIPT_PATH) $(LFETOOL) update deps
 
 clean-ebin:
@@ -100,6 +103,7 @@ compile: get-deps clean-ebin
 	@which rebar.cmd >/dev/null 2>&1 && \
 	PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) rebar.cmd compile || \
 	PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) rebar compile
+	@cd deps/lutil && make compile
 
 compile-no-deps: clean-ebin
 	@echo "Compiling only project code ..."

@@ -3,6 +3,7 @@ $(error Can't find Erlang executable 'erl')
 exit 1
 endif
 
+LUTIL_VERSION = 0.6.0
 LIB = $(PROJECT)
 DEPS = ./deps
 BIN_DIR = ./bin
@@ -65,7 +66,7 @@ get-deps:
 	@which rebar.cmd >/dev/null 2>&1 && rebar.cmd get-deps || rebar get-deps
 	git clone https://github.com/lfex/lutil.git deps/lutil && \
 	cd deps/lutil && \
-	git checkout tags/0.5.1 &> /dev/null || echo "Skipping ..."
+	git checkout tags/$(LUTIL_VERSION) &> /dev/null || echo "Skipping ..."
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."

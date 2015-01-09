@@ -134,6 +134,7 @@ check: check-unit-with-deps
 check-travis: compile compile-tests check-unit-only
 
 check-runner-ltest: compile-no-deps compile-tests
+	@clear
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \
 	erl -cwd "`pwd`" -listener ltest-listener -eval \
 	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \

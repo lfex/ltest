@@ -30,6 +30,7 @@
   ; (io:format "Running tests for ~s using listener '~s'~n"
   ;            (list module listener))
   (eunit:test `(,module)
+              ; call (get-default-options ...) from above?
               `(no_tty #(report #(,listener (colored))))))
 
 (defun run-modules (modules)

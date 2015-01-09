@@ -21,10 +21,10 @@ endif
 ERL_LIBS = .:..:../ltest:$(shell $(LFETOOL) info erllibs)
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
-        HOST=$(HOSTNAME)
+		HOST=$(HOSTNAME)
 endif
 ifeq ($(OS),Darwin)
-        HOST = $(shell scutil --get ComputerName)
+		HOST = $(shell scutil --get ComputerName)
 endif
 
 $(BIN_DIR):
@@ -63,10 +63,7 @@ $(EXPM): $(BIN_DIR)
 
 get-deps:
 	@echo "Getting dependencies ..."
-	@which rebar.cmd >/dev/null 2>&1 && rebar.cmd get-deps || rebar get-deps
-	git clone https://github.com/lfex/lutil.git deps/lutil && \
-	cd deps/lutil && \
-	git checkout tags/$(LUTIL_VERSION) &> /dev/null || echo "Skipping ..."
+	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) download deps
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."
@@ -103,11 +100,6 @@ compile: get-deps clean-ebin copy-appsrc
 	@which rebar.cmd >/dev/null 2>&1 && \
 	PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) rebar.cmd compile || \
 	PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) rebar compile
-	@cd deps/lutil && mkdir ebin && \
-	ERL_LIBS=$(ERL_LIBS) erl -noshell -eval \
-	"lfe_comp:file(\"src/lutil-file.lfe\", \
-	[verbose, report, {outdir,\"ebin\"}])." -s erlang halt || \
-	echo "lutil dependency compile failed."
 
 compile-no-deps: clean-ebin
 	@echo "Compiling only project code ..."
@@ -140,6 +132,15 @@ check-all: get-deps compile-no-deps clean-eunit
 check: check-unit-with-deps
 
 check-travis: compile compile-tests check-unit-only
+
+check-runner-ltest: compile-no-deps compile-tests
+	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \
+	erl -cwd "`pwd`" -listener ltest-listener -eval \
+	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
+	-noshell
+
+check-runner-eunit: compile-no-deps compile-tests
+	erl -cwd "`pwd`" -listener eunit_progress
 
 push-all:
 	@echo "Pusing code to github ..."

@@ -25,3 +25,11 @@
     #(lfe ,(get-lfe-version))
     #(ltest ,(get-version))))
 
+(defun get-module (bin-data)
+  (lutil-file:beam->module (get-beam bin-data)))
+
+(defun get-beam (bin-data)
+  (let* ((`#(,_ ,start) (binary:match bin-data (binary "file \"")))
+         (`#(,end ,_) (binary:match bin-data (binary ".beam\"")))
+         (len (- end start)))
+    (binary_to_list (binary:part bin-data `#(,start ,len)))))

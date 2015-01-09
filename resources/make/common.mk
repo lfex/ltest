@@ -140,7 +140,10 @@ check-runner-ltest: compile-no-deps compile-tests
 	-noshell
 
 check-runner-eunit: compile-no-deps compile-tests
-	erl -cwd "`pwd`" -listener eunit_progress
+	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \
+	erl -cwd "`pwd`" -listener eunit_progress -eval \
+	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
+	-noshell
 
 push-all:
 	@echo "Pusing code to github ..."

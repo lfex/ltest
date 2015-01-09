@@ -1,15 +1,9 @@
-#####
-ltest
-#####
+# ltest
 
 *A Unit, Integration, and System Tests Framework for LFE*
 
 
-Introduction
-============
-
-This project is the successor of `lfeunit`_. That project is now deprecated;
-ltest should be used instead.
+## Introduction
 
 The original implementation of ltest (as lfeunit) was made due to some
 difficulties in parsing the Erlang include file for EUnit, ``eunit.hrl``, by
@@ -19,9 +13,14 @@ Since then, new features have landed in ltest making the creation of not only
 unit tests, but system and integration tests, easier and more consistent. These
 are briefly outlined in the next section.
 
+Of particular interest to those coming from the Clojure community, the macros
+in this library are inspired by Clojure's excellent unit test framework.
 
-Features
---------
+Finally, features have been introduced into ltest that have no counterpart in
+EUnit (e.g., defining tests to be skipped, using behaviours to "tag" types
+of tests, etc.)
+
+### Features
 
 * ``(deftest ...)`` for standard unit tests
 * ``(deftestgen ...)`` for writing tests with generators, including the
@@ -38,33 +37,30 @@ Features
   system test
 
 
-Using ltest
-===========
+## Using ltest
 
 
-Adding ltest to Your Project
-----------------------------
+### Adding ltest to Your Project
 
 In order to use ltest in your project, all you need to do is add a rebar dep.
 In your ``rebar.config`` file, simply add an extra line for ``ltest``:
 
-.. code:: erlang
-
-    {deps, [
-        {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "master"}},
-        {ltest, ".*", {git, "git://github.com/lfex/ltest.git", "master"}}
-      ]}.
+```erlang
+{deps, [
+    {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "master"}},
+    {ltest, ".*", {git, "git://github.com/lfex/ltest.git", "master"}}
+  ]}.
+```
 
 Once you write some tests (see below for how to do that), you can then do this:
 
-.. code:: bash
+```bash
+$ lfetool tests build
+$ lfetool tests unit
+```
 
-    $ lfetool tests build
-    $ lfetool tests unit
 
-
-Structuring Your Unit Tests
-----------------------------
+### Structuring Your Unit Tests
 
 ltest doesn not support putting your unit tests directly in your modules. If
 you do this, things may break or not work properly, even though Erlang's EUnit
@@ -72,7 +68,7 @@ does support it.
 
 Instead, you should create a top-level directory in your project called
 ``test``. In ``test``, create a test cases module for every module your project
-has, e.g., ``test/myproj-base-tests.lfe`` and ``test/myproj-util-tests.lfe``. 
+has, e.g., ``test/myproj-base-tests.lfe`` and ``test/myproj-util-tests.lfe``.
 Obviously, if it makes sense to break things up in a more fine-grained manner,
 feel free to do so :-)
 
@@ -81,44 +77,44 @@ This is done using custom OTP behaviours. For each test cases module you have
 created in ``./test``, be sure to set the behaviour in the ``(defmodule ...)``
 form. For instance:
 
-.. code:: cl
-
+```cl
   (defmodule my-unit-tests
     (behaviour ltest-unit)
     (export ...))
-
+```
 And two more as well:
 
-.. code:: cl
-
+```cl
   (defmodule my-integration-tests
     (behaviour ltest-integration)
     (export ...))
+```
 
 or
 
-.. code:: cl
-
+```cl
   (defmodule my-system-tests
     (behaviour ltest-system)
     (export ...))
+```
 
 For a working example of such a structure, see the layout of the ``ltest``
 project itself: it uses just such a setup.
 
 To read more about the distinction between unit, integration, and system
-tests, check out the Wikipedia `article on testing`_.
+tests, check out the Wikipedia
+[article on testing](http://en.wikipedia.org/wiki/Software_testing#Testing_levels).
 
-Naming Rules
-------------
+
+### Naming Rules
 
 Keep in mind that your tests will be compiled to ``.beam`` and then run with
 Erlang's eunit module. As such, your tests need to following the same
 conventions that eunit establishes:
 
 * Test module filenames should end in ``-tests``, e.g.,
-  ``some-module-tests.lfe``. 
-  
+  ``some-module-tests.lfe``.
+
 * Test module and filename need to be the same, minus the extension. For
   example, ``test/unit-my-module-tests.lfe`` needs to be declared as
   ``(defmodule unit-my-module-tests ...) in the test case module``.
@@ -132,12 +128,11 @@ conventions that eunit establishes:
 
 **Naming rules with fixtures**: If you choose to use named functions instead of
 ``lambda`` s for your fixtures or if your ``lambda`` s make calls to functions --
-all of those need to be standard, unquoted Erlang atoms. In otherwords: no
+all of those need to be standard, unquoted Erlang atoms. In other words: no
 dashes; you must use underscores.
 
 
-Creating Unit Tests
--------------------
+### Creating Unit Tests
 
 ltest is entirely macro-based. ltest uses LFE to parse the Erlang macros in
 the eunit header file. It also provides its own header file which defines macros
@@ -146,35 +141,37 @@ whose main purpose is to wrap the eunit macros in a more Lispy form.
 ltest also provides a syntactic sugar macro for defining tests: ``deftest``.
 Instead of writing something like this for your unit tests:
 
-.. code:: cl
+```cl
 
     (defun unit-my-function-test ()
       ...)
+```
 
 You can use ``deftest`` to write this:
 
-.. code:: cl
+```cl
 
     (deftest unit-my-function
       ...)
+```
 
 Note that the ``-test`` is no longer needed, nor is the empty argument list.
 
 If you would like to use EUnit's fixtures feature, you must use another macro:
 
-.. code:: cl
-
+```cl
     (deftestgen unit-my-function
       ...)
+```
 
 See above the note on naming functions for use in fixtures.
 
 If you would like tests to be skipped, you can use this macro:
 
-.. code:: cl
-
+```cl
     (deftestskip unit-my-function
       ...)
+```
 
 This will simply make the test invisible to EUnit. EUnit doesn't actually
 track user-skipped tests; it only tracks tests that are skipped do to issues
@@ -183,8 +180,7 @@ as perceived by EUnit.
 
 Here is a more complete example:
 
-.. code:: cl
-
+```cl
     (defmodule unit-mymodule-tests
       (behaviour ltest-unit)
       (export all)
@@ -205,51 +201,48 @@ Here is a more complete example:
 
     (deftest is-equal
       (is-equal 2 (+ 1 1)))
-
+```
 
 ltest is working towards full test coverage; while not there yet, the unit
 tests for ltest itself provide the best examples of usage.
 
 
-Running Your Tests
-------------------
+### Running Your Tests
 
 The recommended way to run unit tests is to use ``lfetool``. Running
 unit tests is now as easy as doing the following:
 
-.. code:: bash
-
+```bash
     $ lfetool tests build
     $ lfetool tests unit
+```
 
 Similarly, if your project has defined integration tests, you can do:
 
-.. code:: bash
-
+```bash
     $ lfetool tests integration
+```
 
 If you'd like to run unit, integration, and system tests together, run
 the following:
 
-.. code:: bash
-
+```bash
     $ lfetool tests all
+```
 
 
-Dogfood
-=======
+## Dogfood
 
 ``ltest`` writes its unit tests in ``ltest`` :-) You can run them from the
 project directory:
 
-.. code:: bash
-
+```bash
     $ make check
+```
 
 Which will give you output similar to the following:
 
-.. code:: text
-
+```
     ------------------
     Running unit tests ...
     ------------------
@@ -323,12 +316,4 @@ Which will give you output similar to the following:
       Total module test time: 0.015 s
     =======================================================
       All 56 tests passed.
-
-
-.. Links
-.. -----
-.. _Makefile: Makefile
-.. _Google Groups discussion: https://groups.google.com/d/msg/lisp-flavoured-erlang/eJH2m7XK0dM/WFibzgrqP1AJ
-.. _Rebar discussion: http://lists.basho.com/pipermail/rebar_lists.basho.com/2011-January/000471.html
-.. _lfeunit: https://github.com/lfe/lfeunit/
-.. _article on testing: http://en.wikipedia.org/wiki/Software_testing#Testing_levels
+```

@@ -2,7 +2,7 @@
 
 *A Unit, Integration, and System Tests Framework for LFE*
 
-<a href="resources/images/ltest-logo-small.png"><img src="resources/images/ltest-logo-small.png"/></a>
+<img src="resources/images/ltest-logo-small.png"/>
 
 
 ## Table of Contents

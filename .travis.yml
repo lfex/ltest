@@ -9,7 +9,6 @@ notifications:
   recipients:
     - duncan@cogitat.io
 otp_release:
-  - 17.4
   - 17.3
   - 17.1
   - 17.0

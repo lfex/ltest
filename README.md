@@ -2,8 +2,20 @@
 
 *A Unit, Integration, and System Tests Framework for LFE*
 
+## Table of Contents
 
-## Introduction
+* [Introduction](#introduction-)
+* [Features](#features-)
+* [Using ltest](#using-ltest-)
+  * [Adding ltest to Your Project](#adding-ltest-to-your-project-)
+  * [Structuring Your Tests](#structuring-your-tests-)
+  * [Naming Rules](#naming-rules-)
+  * [Creating Unit Tests](#creating-unit-tests-)
+  * [Running Your Tests](#running-your-tests-)
+* [Dogfood](#dogfood-)
+
+
+## Introduction [&#x219F;](#table-of-contents)
 
 The original implementation of ltest (as lfeunit) was made due to some
 difficulties in parsing the Erlang include file for EUnit, ``eunit.hrl``, by
@@ -20,7 +32,7 @@ Finally, features have been introduced into ltest that have no counterpart in
 EUnit (e.g., defining tests to be skipped, using behaviours to "tag" types
 of tests, etc.)
 
-### Features
+### Features [&#x219F;](#table-of-contents)
 
 * ``(deftest ...)`` for standard unit tests
 * ``(deftestgen ...)`` for writing tests with generators, including the
@@ -37,10 +49,10 @@ of tests, etc.)
   system test
 
 
-## Using ltest
+## Using ``ltest`` [&#x219F;](#table-of-contents)
 
 
-### Adding ltest to Your Project
+### Adding ltest to Your Project [&#x219F;](#table-of-contents)
 
 In order to use ltest in your project, all you need to do is add a rebar dep.
 In your ``rebar.config`` file, simply add an extra line for ``ltest``:
@@ -60,7 +72,7 @@ $ lfetool tests unit
 ```
 
 
-### Structuring Your Unit Tests
+### Structuring Your Tests [&#x219F;](#table-of-contents)
 
 ltest doesn not support putting your unit tests directly in your modules. If
 you do this, things may break or not work properly, even though Erlang's EUnit
@@ -106,7 +118,7 @@ tests, check out the Wikipedia
 [article on testing](http://en.wikipedia.org/wiki/Software_testing#Testing_levels).
 
 
-### Naming Rules
+### Naming Rules [&#x219F;](#table-of-contents)
 
 Keep in mind that your tests will be compiled to ``.beam`` and then run with
 Erlang's eunit module. As such, your tests need to following the same
@@ -132,7 +144,7 @@ all of those need to be standard, unquoted Erlang atoms. In other words: no
 dashes; you must use underscores.
 
 
-### Creating Unit Tests
+### Creating Unit Tests [&#x219F;](#table-of-contents)
 
 ltest is entirely macro-based. ltest uses LFE to parse the Erlang macros in
 the eunit header file. It also provides its own header file which defines macros
@@ -207,7 +219,7 @@ ltest is working towards full test coverage; while not there yet, the unit
 tests for ltest itself provide the best examples of usage.
 
 
-### Running Your Tests
+### Running Your Tests [&#x219F;](#table-of-contents)
 
 The recommended way to run unit tests is to use ``lfetool``. Running
 unit tests is now as easy as doing the following:
@@ -231,7 +243,7 @@ the following:
 ```
 
 
-## Dogfood
+## Dogfood [&#x219F;](#table-of-contents)
 
 ``ltest`` writes its unit tests in ``ltest`` :-) You can run them from the
 project directory:

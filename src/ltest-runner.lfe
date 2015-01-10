@@ -37,7 +37,11 @@
   (run-modules modules (get-listener)))
 
 (defun run-modules (modules listener)
-  (eunit:test modules (get-default-options listener)))
+  (handle-results
+    (eunit:test modules (get-default-options listener))))
+
+(defun handle-results (x)
+  (io:format "Results: ~p~n" `(,x)))
 
 (defun run-beams (beams)
   (run-beams beams (get-listener)))

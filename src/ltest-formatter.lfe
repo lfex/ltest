@@ -17,24 +17,29 @@
   'noop)
 
 (defun test-suite-header ()
-  (test-header (ltest-const:test-suite-title)
-               (ltest-const:test-suite-header)))
+  (io:format
+    (color:greenb
+      (test-header (ltest-const:test-suite-title)
+                   (ltest-const:test-suite-header)))))
 
 (defun test-suite-footer ()
-  (io:format "~s~n~n" `(,(string:copies
-                           (ltest-const:test-suite-header)
-                           (ltest-const:test-suite-width)))))
+  (io:format "~s~n~n" `(,(color:greenb
+                           (string:copies
+                             (ltest-const:test-suite-header)
+                             (ltest-const:test-suite-width))))))
 
 (defun test-type-header (title)
-  (test-header title (ltest-const:test-suite-subheader)))
+  (io:format
+    (color:blueb
+      (test-header title (ltest-const:test-suite-subheader)))))
 
 (defun test-header (title char)
   (let* ((title (++ " " title " "))
          (width (ltest-const:test-suite-width))
          (header-len (trunc (/ (- width (length title)) 2))))
-    (io:format "~s~n~n" `(,(color:blue (++ (string:copies char header-len)
-                                       title
-                                       (string:copies char header-len)))))))
+    (io_lib:format "~s~n~n" `(,(++ (string:copies char header-len)
+                                   title
+                                   (string:copies char header-len))))))
 (defun indent (count)
   (string:copies " " count))
 

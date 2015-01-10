@@ -49,9 +49,8 @@
   (run-beams beams (get-listener)))
 
 (defun run-beams (beams listener)
-  (handle-results
-    (eunit:test (lutil-file:beams->files beams)
-                (get-default-options listener))))
+  (eunit:test (lutil-file:beams->files beams)
+              (get-default-options listener)))
 
 (defun get-listener ()
   "Valid listeners include:
@@ -64,9 +63,6 @@
         (lutil-file:get-arg
           'listener
           "ltest-listener")))))
-
-(defun handle-results (x)
-  (io:format "Results: ~p~n" `(,x)))
 
 (defun get-default-options (listener)
   `(no_tty #(report #(,listener (colored)))))

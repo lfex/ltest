@@ -1,6 +1,8 @@
 (defmodule ltest-util
   (export all))
 
+(include-lib "ltest/include/ltest-records.lfe")
+
 (defun get-app-version
   ((name) (when (is_atom name))
     (get-app-src-version
@@ -33,3 +35,9 @@
          (`#(,end ,_) (binary:match bin-data (binary ".beam\"")))
          (len (- end start)))
     (binary_to_list (binary:part bin-data `#(,start ,len)))))
+
+(defun all-tests (state)
+  (+ (state-ok state)
+     (state-skip state)
+     (state-fail state)
+     (state-cancel state)))

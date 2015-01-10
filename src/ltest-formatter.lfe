@@ -1,20 +1,7 @@
 (defmodule ltest-formatter
   (export all))
 
-(defun display-failures (state)
-  'noop)
-
-(defun display-pending (state)
-  'noop)
-
-(defun display-profile (state)
-  'noop)
-
-(defun display-timing (state)
-  'noop)
-
-(defun display-results (data state)
-  'noop)
+(include-lib "ltest/include/ltest-records.lfe")
 
 (defun test-suite-header ()
   (io:format (get-suite-header)))
@@ -77,7 +64,7 @@
 (defun fail (error where)
   (io:format " [~s]~n~n~s~s:~n" `(,(color:red "fail")
                                    ,(indent (ltest-const:error-indent))
-                                   ,(color:yellow "Error")))
+                                   ,(color:yellowb "Error")))
   (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
                                            ,error)))
 
@@ -86,3 +73,52 @@
                                ,(color:blackb "time:")
                                ,(color:blackb (integer_to_list time))
                                ,(color:blackb "ms"))))
+
+(defun display-results (data state)
+  (stats-heading)
+  (display-all state)
+  (display-successes state)
+  (display-skips state)
+  (display-failures state)
+  ;;(ltest-formatter:display-pending state)
+  ;;(ltest-formatter:display-profile state)
+  (display-timing state)
+  ;;(ltest-formatter:display-results data state)
+  (finish-section))
+
+(defun stats-heading ()
+  (io:format (++ (color:yellow "summary:") "~n")))
+
+(defun display-all (state)
+  (io:format "~sTests: ~p  " `(,(indent (ltest-const:func-indent))
+                                    ,(ltest-util:all-tests state))))
+
+(defun display-successes (state)
+  (io:format "~s: ~p  " `(,(color:greenb "Passed")
+                                ,(state-ok state))))
+
+(defun display-skips (state)
+  (io:format "~s: ~p  " `(,(color:blue "Skipped")
+                                ,(state-skip state))))
+
+(defun display-failures (state)
+  (io:format "~s: ~p~n" `(,(color:red "Failed")
+                                ,(state-fail state))))
+
+(defun display-pending (state)
+  (io:format "Pending state: ~p~n" `(,state)))
+
+(defun display-profile (state)
+  (io:format "Profile state: ~p~n" `(,state)))
+
+(defun display-timing (state)
+  (io:format "~sTotal time: ~pms~n" `(,(indent (ltest-const:func-indent))
+                                    ,(state-time state))))
+
+(defun display-no-results (data state)
+  (io:format "No tests: ~p~n" `(,state))
+  (finish-section))
+
+(defun finish-section ()
+  (io:nl)
+  (io:nl))

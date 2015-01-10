@@ -44,7 +44,17 @@
   (string:copies " " count))
 
 (defun func-line (func)
-  (io:format "~s~s ..." `(,(indent (ltest-const:func-indent)) ,func)))
+  (io:format "~s~s ~s" `(,(indent (ltest-const:func-indent))
+                         ,func
+                         ,(get-elision func))))
+
+(defun get-elision (func-name)
+  (let* ((init-len (+ (ltest-const:func-indent)
+                      (length (atom_to_list func-name))))
+         (end-len (length " [fail]"))
+         (elide-len (- (ltest-const:test-suite-width)
+                       (+ init-len end-len 1))))
+    (string:copies "." elide-len)))
 
 (defun mod-line (desc)
   (io:format "~smodule: ~s~n"
@@ -55,8 +65,11 @@
   (io:format (++ ".. [" (color:greenb "ok") "]~n")))
 
 (defun fail (error where)
-  (io:format (++ " [" (color:red "fail") "]~n~n\tError:\n"))
-  (lfe_io:format "\t\e[31m~p\e[0m~n~n" `(,error)))
+  (io:format " [~s]~n~n~s~s:~n" `(,(color:red "fail")
+                                   ,(indent (ltest-const:error-indent))
+                                   ,(color:yellow "Error")))
+  (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
+                                           ,error)))
 
 (defun mod-time (time)
   (io:format "~s~s ~s~s~n~n" `(,(indent (ltest-const:func-indent))

@@ -32,6 +32,9 @@
   (is-equal 1 (+ 1 0))
   (is-not-equal 1 2))
 
+(deftest XXX-remove-XXX
+  (is 'false))
+
 (deftest is-fail
   (try
     (progn

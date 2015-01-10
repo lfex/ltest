@@ -76,6 +76,7 @@
 
 (defun terminate
   ((`#(ok ,data) state)
+    ;(io:format "Terminating ...~n")
     (ltest-formatter:display-failures state)
     (ltest-formatter:display-pending state)
     (ltest-formatter:display-profile state)

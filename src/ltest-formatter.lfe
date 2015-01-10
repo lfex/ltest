@@ -17,16 +17,21 @@
   'noop)
 
 (defun test-suite-header ()
-  (io:format
-    (color:greenb
-      (test-header (ltest-const:test-suite-title)
-                   (ltest-const:test-suite-header)))))
+  (io:format (get-suite-header)))
+
+(defun get-suite-header ()
+  (color:greenb
+    (test-header (ltest-const:test-suite-title)
+                 (ltest-const:test-suite-header))))
 
 (defun test-suite-footer ()
-  (io:format "~s~n~n" `(,(color:greenb
-                           (string:copies
-                             (ltest-const:test-suite-header)
-                             (ltest-const:test-suite-width))))))
+  (io:format (get-suite-footer)))
+
+(defun get-suite-footer ()
+  (io_lib:format "~s~n~n" `(,(color:greenb
+                               (string:copies
+                                 (ltest-const:test-suite-header)
+                                 (ltest-const:test-suite-width))))))
 
 (defun test-type-header (title)
   (io:format
@@ -36,10 +41,15 @@
 (defun test-header (title char)
   (let* ((title (++ " " title " "))
          (width (ltest-const:test-suite-width))
-         (header-len (trunc (/ (- width (length title)) 2))))
-    (io_lib:format "~s~n~n" `(,(++ (string:copies char header-len)
-                                   title
-                                   (string:copies char header-len))))))
+         (header-len (trunc (/ (- width (length title)) 2)))
+         (header (++ (string:copies char header-len)
+                     title
+                     (string:copies char header-len))))
+    (io_lib:format "~s~n~n" `(,(string:left
+                                 header
+                                 width
+                                 (car char))))))
+
 (defun indent (count)
   (string:copies " " count))
 

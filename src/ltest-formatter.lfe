@@ -40,20 +40,26 @@
 (defun indent (count)
   (string:copies " " count))
 
-(defun func-line (func)
-  (io:format "~s~s ~s" `(,(indent (ltest-const:func-indent))
-                         ,(get-func-name func)
-                         ,(get-elision func))))
+(defun func-line (raw-func)
+  (let ((func (get-func-name raw-func)))
+    (io:format "~s~s ~s" `(,(indent (ltest-const:func-indent))
+                           ,func
+                           ,(get-elision func)))))
+
+(defun get-skip-func-name (func-name)
+  (re:replace
+    (atom_to_list func-name)
+    "_skip$" "" '(global #(return list))))
 
 (defun get-func-name (func-name)
   (re:replace
     (atom_to_list func-name)
-    "_test$" "" '(global #(return list))))
+    "_test(_)?$" "" '(global #(return list))))
 
 
 (defun get-elision (func-name)
   (let* ((init-len (+ (ltest-const:func-indent)
-                      (length (atom_to_list func-name))))
+                      (length func-name)))
          (end-len (length " [fail]"))
          (elide-len (- (ltest-const:test-suite-width)
                        (+ init-len end-len 1))))
@@ -74,11 +80,26 @@
   (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
                                            ,error)))
 
+(defun skip ()
+  (++ " [" (color:blue "skip") "]"))
+
 (defun mod-time (time)
   (io:format "~s~s ~s~s~n~n" `(,(indent (ltest-const:func-indent))
                                ,(color:blackb "time:")
                                ,(color:blackb (integer_to_list time))
                                ,(color:blackb "ms"))))
+
+(defun skip-lines (skipped)
+  (lists:map #'skip-line/1 skipped))
+
+(defun skip-line
+  ((`#(,raw-func ,_))
+    (let ((func (get-skip-func-name raw-func)))
+      (io:format "~s~s ~s~s~n" `(,(indent (ltest-const:func-indent))
+                                 ,func
+                                 ,(get-elision func)
+                                 ,(skip))))))
+
 
 (defun display-results (data state)
   (stats-heading)
@@ -90,6 +111,8 @@
   ;;(ltest-formatter:display-profile state)
   (display-timing state)
   ;;(ltest-formatter:display-results data state)
+  ;; XXX DEBUG
+  ;;(io:format "Data: ~p~nState: ~p~n" `(,data ,state))
   (finish-section))
 
 (defun stats-heading ()

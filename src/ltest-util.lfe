@@ -36,6 +36,25 @@
          (len (- end start)))
     (binary_to_list (binary:part bin-data `#(,start ,len)))))
 
+(defun get-skip-tests (bin-data)
+  (filter-skipped
+    (lutil-file:get-beam-exports
+      (get-beam bin-data))))
+
+(defun filter-skipped (funcs)
+  (lists:filter #'skipped?/1 funcs))
+
+(defun skipped?
+  ((`#(,func ,_))
+    (skip-match?
+      (re:run (atom_to_list func) "_skip$"))))
+
+(defun skip-match?
+  ((`#(match ,_))
+    'true)
+  (('nomatch)
+    'false))
+
 (defun all-tests (state)
   (+ (state-ok state)
      (state-skip state)

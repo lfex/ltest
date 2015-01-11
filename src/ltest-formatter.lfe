@@ -111,8 +111,6 @@
   ;;(ltest-formatter:display-profile state)
   (display-timing state)
   ;;(ltest-formatter:display-results data state)
-  ;; XXX DEBUG
-  ;;(io:format "Data: ~p~nState: ~p~n" `(,data ,state))
   (finish-section))
 
 (defun stats-heading ()

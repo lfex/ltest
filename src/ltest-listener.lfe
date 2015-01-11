@@ -44,15 +44,7 @@
     ;(io:format "\tstate: ~p~n" (list state))
     (case (binary:match desc (binary "file"))
       ('nomatch state)
-      (_
-        (let ((skipped-tests (ltest-util:get-skip-tests desc))
-              (`#(,data-1 ,_) (lists:split 2 data))
-              (`#(,_ ,data-2) (lists:split 3 data)))
-          (ltest-formatter:skip-lines skipped-tests)
-          (ltest-formatter:mod-time time)
-          (update-skips
-            (update-time state time)
-            (length skipped-tests))))))
+      (_ (handle-module-end desc time data state))))
   (('group data state)
     ;(io:format "ending group ...~n")
     ;(io:format "\tdata: ~p~n" (list data))
@@ -91,6 +83,16 @@
     (`#(stop ,reference ,reply-to)
       (! reply-to `#(result ,reference ,result))
       `#(ok ,result))))
+
+(defun handle-module-end (desc time data state)
+  (let ((skipped-tests (ltest-util:get-skip-tests desc))
+        (`#(,data-1 ,_) (lists:split 2 data))
+        (`#(,_ ,data-2) (lists:split 3 data)))
+    (ltest-formatter:skip-lines skipped-tests)
+    (ltest-formatter:mod-time time)
+    (update-skips
+      (update-time state time)
+      (length skipped-tests))))
 
 (defun update-time (state time)
   (set-state-time state (+ time (state-time state))))

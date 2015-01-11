@@ -23,18 +23,22 @@
 
 The original implementation of ltest (as lfeunit) was made due to some
 difficulties in parsing the Erlang include file for EUnit, ``eunit.hrl``, by
-LFE (it didn't convert all the Erlang macros). That has since been fixed.
+LFE (it didn't convert all the Erlang macros). Good news: that has since been
+fixed!
 
-Since then, new features have landed in ltest making the creation of not only
-unit tests, but system and integration tests, easier and more consistent. These
-are briefly outlined in the next section.
+However, during lfeunit's early existence, additional features were added
+-- things that EUnit didn't have or were clumsy to use. Such features, improved
+in ltest, make the creation of not only unit tests, but system and integration
+tests, easier and more consistent. These are briefly outlined in the next
+section.
 
 Of particular interest to those coming from the Clojure community, the macros
 in this library are inspired by Clojure's excellent unit test framework.
 
 Finally, features have been introduced into ltest that have no counterpart in
 EUnit (e.g., defining tests to be skipped, using behaviours to "tag" types
-of tests, etc.)
+of tests, and a REALLY BEAUTIFUL test runner, etc.)
+
 
 ### Features [&#x219F;](#table-of-contents)
 
@@ -51,6 +55,7 @@ of tests, etc.)
   integration test
 * ``(behaviour ltest-system)`` - annotating a test module to be run as a
   system test
+* A custom test runner that over-rides EUnit behaviour and aesthetics
 
 
 ## Using ``ltest`` [&#x219F;](#table-of-contents)

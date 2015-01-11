@@ -15,6 +15,7 @@
   * [Naming Rules](#naming-rules-)
   * [Creating Unit Tests](#creating-unit-tests-)
   * [Running Your Tests](#running-your-tests-)
+  * [The LFE Test Runner](#the-lfe-test-runner-)
 * [Dogfood](#dogfood-)
 
 
@@ -244,6 +245,48 @@ the following:
 ```bash
     $ lfetool tests all
 ```
+
+
+### The LFE Test Runner [&#x219F;](#table-of-contents)
+
+ltest now includes a test runner which overrides the EUnit handlers with its
+own. The original (and currently used) test runner functionality in lfetool
+is actually a series of gross shell hacks around the verbose EUnit test
+runner. More ``sed`` and manual ANSI terminal colors than is healthy for
+anyone.
+
+The new test runner code in ltest let's you skip that madness. For example,
+this project has a ``make`` target that uses it:
+
+```Makefile
+check-runner-eunit: compile-no-deps compile-tests
+    @PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \
+    erl -cwd "`pwd`" -listener eunit_progress -eval \
+    "case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
+    -noshell
+```
+
+Here's what the output looks like with failing and skipped tests:
+
+<img src="resources/images/screen-1-1.png"/>
+
+End:
+
+<img src="resources/images/screen-1-2.png"/>
+
+And here's what passing tests looks like:
+
+<img src="resources/images/screen-2-1.png"/>
+
+End:
+
+<img src="resources/images/screen-2-2.png"/>
+
+The rest of the ``make`` targets still use lfetool, and will continue to do
+so, since lfetool will be updating to use ltest's new runner. If you'd like
+to track the progress on these, here are the related tickets:
+ * https://github.com/lfex/ltool/issues/4
+ * https://github.com/lfe/lfetool/issues/160
 
 
 ## Dogfood [&#x219F;](#table-of-contents)

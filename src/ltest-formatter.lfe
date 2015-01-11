@@ -91,19 +91,19 @@
 
 (defun display-all (state)
   (io:format "~sTests: ~p  " `(,(indent (ltest-const:func-indent))
-                                    ,(ltest-util:all-tests state))))
+                               ,(ltest-util:all-tests state))))
 
 (defun display-successes (state)
-  (io:format "~s: ~p  " `(,(color:greenb "Passed")
-                                ,(state-ok state))))
+  (io:format "~s: ~p  " `(,(get-ok-report state)
+                          ,(state-ok state))))
 
 (defun display-skips (state)
-  (io:format "~s: ~p  " `(,(color:blue "Skipped")
-                                ,(state-skip state))))
+  (io:format "~s: ~p  " `(,(get-skip-report state)
+                          ,(state-skip state))))
 
 (defun display-failures (state)
-  (io:format "~s: ~p~n" `(,(color:red "Failed")
-                                ,(state-fail state))))
+  (io:format "~s: ~p~n" `(,(get-fail-report state)
+                          ,(state-fail state))))
 
 (defun display-pending (state)
   (io:format "Pending state: ~p~n" `(,state)))
@@ -122,3 +122,17 @@
 (defun finish-section ()
   (io:nl)
   (io:nl))
+
+(defun get-ok-report (state)
+  (get-report "Passed" #'color:greenb/1 (state-ok state)))
+
+(defun get-skip-report (state)
+  (get-report "Skipped" #'color:blue/1 (state-skip state)))
+
+(defun get-fail-report (state)
+  (get-report "Failed" #'color:red/1 (state-fail state)))
+
+(defun get-report (text color-func count)
+  (if (== count 0)
+      text
+      (funcall color-func text)))

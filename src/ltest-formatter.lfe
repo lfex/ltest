@@ -116,8 +116,13 @@
                                     ,(state-time state))))
 
 (defun display-no-results (data state)
-  (io:format "No tests: ~p~n" `(,state))
+  (io:format (color:yellow (get-no-results-report data state)))
   (finish-section))
+
+(defun get-no-results-report (data state)
+  (io_lib:format
+    "There were no ~s tests found.~n"
+    `(,(state-test-type state))))
 
 (defun finish-section ()
   (io:nl)

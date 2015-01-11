@@ -11,7 +11,7 @@
   (eunit_listener:start (MODULE) options))
 
 (defun init (options)
-  (make-state options options))
+  (make-state test-type (proplists:get_value 'test-type options)))
 
 (defun handle_begin
   (('group (= `(,_ #(desc undefined) ,_ ,_) data) state)

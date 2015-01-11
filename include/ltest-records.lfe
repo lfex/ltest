@@ -1,6 +1,6 @@
 (defrecord state
   (status (orddict:new))
-  options
+  test-type
   (ok 0)
   (fail 0)
   (skip 0)

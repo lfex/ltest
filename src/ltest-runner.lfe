@@ -37,20 +37,24 @@
 
 (defun run
   (('integration)
-    (run-beams (ltest:get-integration-beams (lutil-file:get-cwd))))
+    (run-beams 'integration
+               (ltest:get-integration-beams (lutil-file:get-cwd))))
   (('system)
-    (run-beams (ltest:get-system-beams (lutil-file:get-cwd))))
+    (run-beams 'system
+               (ltest:get-system-beams (lutil-file:get-cwd))))
   (('unit)
-    (run-beams (ltest:get-unit-beams (lutil-file:get-cwd))))
+    (run-beams 'unit
+               (ltest:get-unit-beams (lutil-file:get-cwd))))
   ((beam)
     (run-beam beam (get-listener))))
 
-(defun run-beams (beams)
-  (run-beams beams (get-listener)))
+(defun run-beams (test-type beams)
+  (run-beams test-type beams (get-listener)))
 
-(defun run-beams (beams listener)
+(defun run-beams (test-type beams listener)
   (eunit:test (lutil-file:beams->files beams)
-              (get-default-options listener)))
+              (get-options listener `(#(color true)
+                                      #(test-type ,test-type)))))
 
 (defun get-listener ()
   "Valid listeners include:
@@ -64,8 +68,16 @@
           'listener
           "ltest-listener")))))
 
-(defun get-default-options (listener)
-  `(no_tty #(report #(,listener (colored)))))
+(defun get-options (listener)
+  (get-options listener '(colored)))
+
+  ;`(no_tty #(report #(,listener (colored ltest-type)))))
+
+(defun get-options (listener options)
+  `(no_tty ,(get-report-options listener options)))
+
+(defun get-report-options (listener options)
+  `#(report #(,listener ,options)))
 
 (defun run-beam (beam)
   (run-beam beam (get-listener)))
@@ -74,14 +86,11 @@
   (run-module (lutil-file:beam->module beam) listener))
 
 (defun run-module (module listener)
-  ; (io:format "Running tests for ~s using listener '~s'~n"
-  ;            (list module listener))
   (eunit:test `(,module)
-              ; call (get-default-options ...) from above?
-              `(no_tty #(report #(,listener (colored))))))
+              (get-options listener)))
 
 (defun run-modules (modules)
   (run-modules modules (get-listener)))
 
 (defun run-modules (modules listener)
-  (eunit:test modules (get-default-options listener)))
+  (eunit:test modules (get-options listener)))

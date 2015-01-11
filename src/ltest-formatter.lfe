@@ -42,8 +42,14 @@
 
 (defun func-line (func)
   (io:format "~s~s ~s" `(,(indent (ltest-const:func-indent))
-                         ,func
+                         ,(get-func-name func)
                          ,(get-elision func))))
+
+(defun get-func-name (func-name)
+  (re:replace
+    (atom_to_list func-name)
+    "_test$" "" '(global #(return list))))
+
 
 (defun get-elision (func-name)
   (let* ((init-len (+ (ltest-const:func-indent)

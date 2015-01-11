@@ -8,6 +8,7 @@
 ## Table of Contents
 
 * [Introduction](#introduction-)
+* [EUnit Compatibility](#eunit-compatibility-)
 * [Features](#features-)
 * [Using ltest](#using-ltest-)
   * [Adding ltest to Your Project](#adding-ltest-to-your-project-)
@@ -38,6 +39,13 @@ in this library are inspired by Clojure's excellent unit test framework.
 Finally, features have been introduced into ltest that have no counterpart in
 EUnit (e.g., defining tests to be skipped, using behaviours to "tag" types
 of tests, and a REALLY BEAUTIFUL test runner, etc.)
+
+
+## EUnit Compatibility [&#x219F;](#table-of-contents)
+
+The tests created with ltest are compatible with EUnit ane can be run from
+either Erlang or LFE, using the standard EUnit listener or the ltest
+listener (test runner).
 
 
 ### Features [&#x219F;](#table-of-contents)
@@ -198,6 +206,8 @@ This will simply make the test invisible to EUnit. EUnit doesn't actually
 track user-skipped tests; it only tracks tests that are skipped do to issues
 as perceived by EUnit.
 
+However, ltest's test runner *does* track skipped tests and will report
+these in its output.
 
 Here is a more complete example:
 

@@ -7,7 +7,6 @@ LUTIL_VERSION = 0.6.0
 LIB = $(PROJECT)
 DEPS = ./deps
 BIN_DIR = ./bin
-EXPM = $(BIN_DIR)/expm
 SOURCE_DIR = ./src
 OUT_DIR = ./ebin
 TEST_DIR = ./test
@@ -145,25 +144,3 @@ check-runner-eunit: compile-no-deps compile-tests
 	erl -cwd "`pwd`" -listener eunit_progress -eval \
 	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
 	-noshell
-
-push-all:
-	@echo "Pusing code to github ..."
-	git push --all
-	git push upstream --all
-	git push --tags
-	git push upstream --tags
-
-install: compile
-	@echo "Installing ltest ..."
-	@PATH=$(SCRIPT_PATH) lfetool install lfe
-
-upload: $(EXPM) get-version
-	@echo "Preparing to upload ltest ..."
-	@echo
-	@echo "Package file:"
-	@echo
-	@cat package.exs
-	@echo
-	@echo "Continue with upload? "
-	@read
-	$(EXPM) publish

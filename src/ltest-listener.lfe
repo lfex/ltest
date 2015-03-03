@@ -2,6 +2,7 @@
   (behaviour eunit_listener)
   (export all))
 
+(include-lib "lutil/include/core.lfe")
 (include-lib "ltest/include/ltest-records.lfe")
 
 (defun start ()
@@ -53,11 +54,16 @@
   (('test (= `(,_ #(status #(error #(error ,error ,where))) ,_ ,_ ,_ ,_ ,_) data) state)
     (ltest-formatter:fail error where)
     (set-state-fail state (+ 1 (state-fail state))))
+  (('test (= `(,_ #(status #(error #(exit ,error ,where))) ,_ ,_ ,_ ,_ ,_) data) state)
+    (ltest-formatter:err
+      (element 2 (proplists:get_value 'status data)) where)
+    ;; XXX maybe change this to set-state-cancel?
+    (set-state-err state (+ 1 (state-err state))))
   (('test `(,_ #(status ok) ,_ ,_ ,_ ,_ ,_) state)
     (ltest-formatter:ok)
     (set-state-ok state (+ 1 (state-ok state))))
   (('test data state)
-    (io:format "\tending test ...~n")
+    (io:format "\tltest ERROR: unhandled state!~n")
     (io:format "\t\tdata: ~p~n" `(,data))
     (io:format "\t\tstate: ~p~n" `(,state))
     state))

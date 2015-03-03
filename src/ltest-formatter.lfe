@@ -62,7 +62,7 @@
                       (length func-name)))
          (end-len (length " [fail]"))
          (elide-len (- (ltest-const:test-suite-width)
-                       (+ init-len end-len 1))))
+                       (+ init-len end-len))))
     (string:copies "." elide-len)))
 
 (defun mod-line (desc)
@@ -71,10 +71,17 @@
                ,(color:greenb (atom_to_list (ltest-util:get-module desc))))))
 
 (defun ok ()
-  (io:format (++ ".. [" (color:greenb "ok") "]~n")))
+  (io:format (++ "... [" (color:greenb "ok") "]~n")))
 
 (defun fail (error where)
-  (io:format " [~s]~n~n~s~s:~n" `(,(color:red "fail")
+  (io:format ". [~s]~n~n~s~s:~n" `(,(color:red "fail")
+                                   ,(indent (ltest-const:error-indent))
+                                   ,(color:yellowb "Assertion failure")))
+  (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
+                                           ,error)))
+
+(defun err (error where)
+  (io:format " [~s]~n~n~s~s:~n" `(,(color:yellow "error")
                                    ,(indent (ltest-const:error-indent))
                                    ,(color:yellowb "Error")))
   (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
@@ -107,6 +114,7 @@
   (display-successes state)
   (display-skips state)
   (display-failures state)
+  (display-errors state)
   ;;(ltest-formatter:display-pending state)
   ;;(ltest-formatter:display-profile state)
   (display-timing state)
@@ -129,8 +137,12 @@
                           ,(state-skip state))))
 
 (defun display-failures (state)
-  (io:format "~s: ~p~n" `(,(get-fail-report state)
+  (io:format "~s: ~p " `(,(get-fail-report state)
                           ,(state-fail state))))
+
+(defun display-errors (state)
+  (io:format "~s: ~p~n" `(,(get-err-report state)
+                          ,(state-err state))))
 
 (defun display-pending (state)
   (io:format "Pending state: ~p~n" `(,state)))
@@ -163,6 +175,9 @@
 
 (defun get-fail-report (state)
   (get-report "Failed" #'color:red/1 (state-fail state)))
+
+(defun get-err-report (state)
+  (get-report "Erred" #'color:yellow/1 (state-err state)))
 
 (defun get-report (text color-func count)
   (if (== count 0)

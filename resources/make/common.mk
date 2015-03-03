@@ -56,10 +56,6 @@ get-codepath:
 
 debug: get-erllibs get-codepath
 
-$(EXPM): $(BIN_DIR)
-	@[ -f $(EXPM) ] || \
-	PATH=$(SCRIPT_PATH) lfetool install expm $(BIN_DIR)
-
 get-deps:
 	@echo "Getting dependencies ..."
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) download deps

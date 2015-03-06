@@ -1,17 +1,23 @@
 (include-lib "eunit/include/eunit.hrl")
 
+(eval-when-compile
+  (defun to-unders (atm)
+    (re:replace (atom_to_list atm) "-" "_" '(#(return list) global)))
+  ;; end of eval-when-compile
+  )
+
 (defmacro deftest arg
   "This macro is for defining standard EUnit tests."
   (let ((name (car arg))
         (body (cdr arg)))
-    `(defun ,(list_to_atom (++ (atom_to_list name) '"_test")) ()
+    `(defun ,(list_to_atom (++ (atom_to_list name) "_test")) ()
        ,@body)))
 
 (defmacro deftestgen arg
   "This macro is for defining EUnit tests that use test generators."
-  (let ((name (re:replace (atom_to_list (car arg)) '"-" '"_" '(#(return list) global)))
+  (let ((name (to-unders (car arg)))
         (body (cdr arg)))
-    `(defun ,(list_to_atom (++ name '"_test_")) ()
+    `(defun ,(list_to_atom (++ name "_test_")) ()
        ,@body)))
 
 (defmacro deftestskip arg
@@ -19,8 +25,34 @@
   run)."
   (let ((name (car arg))
         (body (cdr arg)))
-    `(defun ,(list_to_atom (++ (atom_to_list name) '"_skip")) ()
+    `(defun ,(list_to_atom (++ (atom_to_list name) "_skip")) ()
        ,@body)))
+
+(defmacro defsetup (func-name)
+  ""
+  `(lambda () (,func-name)))
+
+(defmacro defteardown (func-name)
+  ""
+  `(lambda (x) (,func-name x)))
+
+(defmacro deftestcase (func-name args body)
+  "This macro is for defining EUnit tests for use by fixtures which have
+  particular naming convention needs."
+  `(defun ,(list_to_atom (++ (to-unders func-name) "_test_case")) (,@args)
+     ,body))
+
+(defmacro deftestcases funcs
+  (cond ((> (length funcs) 1)
+         `(list
+           ,@(lists:map
+              (lambda (func-name)
+                `(lambda (x)
+                   (,(list_to_atom (++ (to-unders func-name) "_test_case")) x)))
+              funcs)))
+        ('true
+         `(lambda (x)
+            (,(list_to_atom (++ (to-unders (car funcs)) "_test_case")) x)))))
 
 (defmacro is (bool-expression)
   "This macro takes an expression that returns a boolean value. If the

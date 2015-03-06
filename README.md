@@ -155,11 +155,6 @@ conventions that eunit establishes:
   however, that you use ``deftest`` instead, and obviate the need for ``_test
   ()`` boilerplate.
 
-**Naming rules with fixtures**: If you choose to use named functions instead of
-``lambda`` s for your fixtures or if your ``lambda`` s make calls to functions --
-all of those need to be standard, unquoted Erlang atoms. In other words: no
-dashes; you must use underscores.
-
 
 ### Creating Unit Tests [&#x219F;](#table-of-contents)
 
@@ -193,7 +188,8 @@ If you would like to use EUnit's fixtures feature, you must use another macro:
       ...)
 ```
 
-See above the note on naming functions for use in fixtures.
+See the unit tests in the ``test`` directory for example usage.
+
 
 If you would like tests to be skipped, you can use this macro:
 

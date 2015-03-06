@@ -34,11 +34,11 @@
        ,@body)))
 
 (defmacro defsetup (func-name)
-  ""
+  "A simple wrapper macro for defining the set-up function in a fixture."
   `(lambda () (,func-name)))
 
 (defmacro defteardown (func-name)
-  ""
+  "A simple wrapper macro for defining the tear-down function in a fixture."
   `(lambda (x) (,func-name x)))
 
 (defmacro deftestcase body
@@ -55,6 +55,12 @@
         rest)))))
 
 (defmacro deftestcases funcs
+  "This macro expects one or more function *names* which have been defined
+  using (deftestcase ...).
+
+  Note that this macro is not composable with (deftestcase ...); you must
+  defined the test case and then only pass the test case name to this
+  macro."
   (cond ((> (length funcs) 1)
          `(list
            ,@(lists:map

@@ -3,6 +3,11 @@
 (eval-when-compile
   (defun to-unders (atm)
     (re:replace (atom_to_list atm) "-" "_" '(#(return list) global)))
+  (defun list-body
+    ((body) (when (is_list body))
+      body)
+    ((body)
+      (list body)))
   ;; end of eval-when-compile
   )
 
@@ -36,11 +41,18 @@
   ""
   `(lambda (x) (,func-name x)))
 
-(defmacro deftestcase (func-name args body)
+(defmacro deftestcase body
   "This macro is for defining EUnit tests for use by fixtures which have
   particular naming convention needs."
+  (let ((func-name (car body))
+        (args (cadr body))
+        (rest (cddr body)))
   `(defun ,(list_to_atom (++ (to-unders func-name) "_test_case")) (,@args)
-     ,body))
+    (list
+      ,@(lists:map
+        (lambda (part)
+          `(lambda () ,part))
+        rest)))))
 
 (defmacro deftestcases funcs
   (cond ((> (length funcs) 1)

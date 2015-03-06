@@ -16,19 +16,13 @@
 
 (deftestcase setup-tc (set-up-result)
   ;; This is called the 'Instantiator' in EUnit parlance.
-  (list
-    (lambda ()
-      (is-equal set-up-result 'ok))
-    (lambda ()
-      (is-not-equal 'this-test 'very-silly))))
+  (is-equal set-up-result 'ok)
+  (is-not-equal 'this-test 'very-silly))
 
 (deftestcase foreach-tc (set-up-result)
   ;; This is called the 'Instantiator' in EUnit parlance.
-  (list
-    (lambda ()
-      (is-equal set-up-result 'ok))
-    (lambda ()
-      (is-not-equal 'this-test 'very-silly))))
+  (is-equal set-up-result 'ok)
+  (is-not-equal 'this-test 'very-silly))
 
 (deftestgen setup-setup
   (tuple

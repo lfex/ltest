@@ -59,6 +59,7 @@ debug: get-erllibs get-codepath
 get-deps:
 	@echo "Getting dependencies ..."
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) download deps
+	-@rm deps/kla/rebar.config
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."
@@ -104,7 +105,7 @@ compile-no-deps: clean-ebin
 	PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) rebar compile skip_deps=true
 
 clean: clean-ebin clean-eunit
-	@which rebar.cmd >/dev/null 2>&1 && rebar.cmd clean || rebar clean
+	@which rebar.cmd >/dev/null 2>&1 && rebar.cmd clean || rebar -v clean
 
 check-unit-only: clean-eunit
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) tests unit

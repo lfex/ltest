@@ -25,6 +25,7 @@ endif
 ifeq ($(OS),Darwin)
 		HOST = $(shell scutil --get ComputerName)
 endif
+CHROMEDRIVER=./bin/chromedriver
 
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
@@ -135,6 +136,21 @@ check-runner-ltest: compile-no-deps compile-tests
 	erl -cwd "`pwd`" -listener ltest-listener -eval \
 	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
 	-noshell
+
+$(CHROMEDRIVER):
+	mkdir -p bin
+	cd bin && \
+	curl -O http://chromedriver.storage.googleapis.com/2.9/chromedriver_mac32.zip && \
+	unzip chromedriver_mac32.zip
+
+start-chromedriver:
+	-@$(CHROMEDRIVER) &
+
+stop-chromedriver:
+	@ps aux|grep $(CHROMEDRIVER)|grep -v grep|awk '{print $$2}'|xargs kill -15
+
+check-selenium: start-chromedriver
+	make stop-chromedriver
 
 check-runner-eunit: compile-no-deps compile-tests
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \

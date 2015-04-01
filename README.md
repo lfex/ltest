@@ -17,6 +17,8 @@
   * [Creating Unit Tests](#creating-unit-tests-)
   * [Running Your Tests](#running-your-tests-)
   * [The LFE Test Runner](#the-lfe-test-runner-)
+  * [Selenium Web Driver](#selenium-web-driver-)
+    * [Example Selenium Usage](#example-selenium-usage-)
 * [Dogfood](#dogfood-)
 
 
@@ -299,6 +301,25 @@ to track the progress on these, here are the related tickets:
  * https://github.com/lfex/ltool/issues/4
  * https://github.com/lfe/lfetool/issues/160
 
+
+### Selenium Web Driver [&#x219F;](#table-of-contents)
+
+ltest offers a light-weight lispy-wrapper around the
+[Erlang Selenium webdriver](https://github.com/Quviq/webdrv). In order to use
+ltest's support of Selenium, you will need to have the latest development
+releaase of [lfetool](https://github.com/lfe/lfetool/tree/dev-v1#dev-)
+installed.
+
+The Selenium macros available in ``include/ltest-se-macros.lfe`` and the
+Selenium functions in ``src/ltest-se.lfe`` are generated with
+[kla](https://github.com/lfex/kla), and have thus taken advantage of the feature
+that converts underscores to dashes: functions defined in the Erlang webdriver
+code base will appear in ltest with dashes, not underscores.
+
+
+#### Example Selenium Usage [&#x219F;](#table-of-contents)
+
+TBD
 
 ## Dogfood [&#x219F;](#table-of-contents)
 

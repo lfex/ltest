@@ -6,6 +6,8 @@
   (unit 'combined)
   (integration 'combined)
   (system 'combined)
+  (ltest-formatter:test-suite-footer)
+  (selenium 'combined)
   (ltest-formatter:test-suite-footer))
 
 (defun integration (_)
@@ -26,6 +28,15 @@
   (system 'solo)
   (ltest-formatter:test-suite-footer))
 
+(defun selenium (_)
+  (ltest-formatter:test-type-header "Selenium Tests")
+  (run 'selenium))
+
+(defun selenium ()
+  (ltest-formatter:test-suite-header)
+  (selenium 'solo)
+  (ltest-formatter:test-suite-footer))
+
 (defun unit (_)
   (ltest-formatter:test-type-header "Unit Tests")
   (run 'unit))
@@ -42,6 +53,9 @@
   (('system)
     (run-beams 'system
                (ltest:get-system-beams (lutil-file:get-cwd))))
+  (('selenium)
+    (run-beams 'selenium
+               (ltest:get-selenium-beams (lutil-file:get-cwd))))
   (('unit)
     (run-beams 'unit
                (ltest:get-unit-beams (lutil-file:get-cwd))))

@@ -117,10 +117,19 @@ check-integration-only: clean-eunit
 check-system-only: clean-eunit
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) tests system
 
-check-unit-with-deps: get-deps compile compile-tests check-unit-only
+check-selenium-only: clean-eunit compile-tests
+	@clear
+	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \
+	erl -cwd "`pwd`" -listener ltest-listener -eval \
+	"case 'ltest-runner':selenium() of ok -> halt(0); _ -> halt(127) end" \
+	-noshell
+
+check-unit-with-deps: compile compile-tests check-unit-only
 check-unit: compile-no-deps check-unit-only
 check-integration: compile check-integration-only
 check-system: compile check-system-only
+check-selenium: compile check-selenium-only
+
 check-all-with-deps: compile check-unit-only check-integration-only \
 	check-system-only
 check-all: get-deps compile-no-deps clean-eunit

@@ -330,29 +330,83 @@ chromedriver docs for that).
 ##### From the REPL [&#x219F;](#table-of-contents)
 
 ```cl
-> (ltest-selenium:start-session
+> (ltest-se:start-session
     'se-session
     "http://localhost:9515/"
-    (ltest-selenium:default-chrome)
+    (ltest-se:default-chrome)
     10000))
 #(ok <0.46.0>)
-> (ltest-selenium:set-url 'se-session "http://google.com")
+> (ltest-se:set-url 'se-session "http://google.com")
 ok
-> (ltest-selenium:get-page-title 'se-session)
+> (ltest-se:get-page-title 'se-session)
 #(ok "Google")
-> (set `#(ok ,elem) (ltest-selenium:find-element 'se-session "name" "q"))
+> (set `#(ok ,elem) (ltest-se:find-element 'se-session "name" "q"))
 #(ok "0.12670360947959125-1")
-> (ltest-selenium:send-value 'se-session elem "LFE")
+> (ltest-se:send-value 'se-session elem "LFE")
 ok
-> (ltest-selenium:submit 'se-session elem)
+> (ltest-se:submit 'se-session elem)
 ok
-> (ltest-selenium:get-page-title 'se-session)
+> (ltest-se:get-page-title 'se-session)
 #(ok "LFE - Google Search")
 ```
 
 
 ##### In a Test Suite [&#x219F;](#table-of-contents)
 
+Here is some sample usage from a test module (with the ``ltest-selenium``
+behaviour):
+
+```lisp
+(defmodule ltest-selenium-tests
+  (behaviour ltest-selenium)
+  (export all))
+
+(include-lib "include/ltest-macros.lfe")
+
+(defun get-session ()
+  'ltest-selenium-session)
+
+(defun start-session ()
+  (ltest-se:start-session
+    (get-session)
+    "http://localhost:9515/"
+    (ltest-se:default-chrome)
+    10000))
+
+(defun set-up ()
+  (prog1
+    (case (start-session)
+      (`#(ok ,pid) pid)
+      (x x))
+    (timer:sleep 3000)))
+
+(defun tear-down (pid)
+  (ltest-se:stop-session (get-session)))
+
+(deftestcase google-site-page-title (pid)
+  (ltest-se:set-url (get-session) "http://google.com")
+  (is-equal #(ok "Google") (ltest-se:get-page-title (get-session))))
+
+(deftestcase google-submit-search (pid)
+  (ltest-se:set-url (get-session) "http://google.com")
+  (let ((`#(ok ,elem) (ltest-se:find-element (get-session) "name" "q")))
+    (ltest-se:send-value (get-session) elem "LFE AND Lisp")
+    (ltest-se:submit (get-session) elem)
+    (timer:sleep 1500)
+    (is-equal #(ok "LFE AND Lisp - Google Search")
+              (ltest-se:get-page-title (get-session)))))
+
+(deftestgen foreach-test-suite
+  (tuple
+    'foreach
+    (defsetup set-up)
+    (defteardown tear-down)
+    (deftestcases
+      google-site-page-title
+      google-submit-search)))
+```
+
+Note that for now, only ``foreach`` fixtures are supported.
 
 
 ## Dogfood [&#x219F;](#table-of-contents)

@@ -315,8 +315,8 @@ installed.
 The Selenium macros available in ``include/ltest-se-macros.lfe`` and the
 Selenium functions in ``src/ltest-se.lfe`` are generated with
 [kla](https://github.com/lfex/kla), and have thus taken advantage of the feature
-that converts underscores to dashes: functions defined in the Erlang webdriver
-code base will appear in ltest with dashes, not underscores.
+that converts underscores in the Erlang source library to dashes in the wrapped
+LFE library.
 
 
 #### Example Selenium Usage [&#x219F;](#table-of-contents)
@@ -404,6 +404,20 @@ behaviour):
     (deftestcases
       google-site-page-title
       google-submit-search)))
+```
+
+To run selenium tests, you will need to add a ``make`` target like the
+following, since ``lfetool`` doesn't yet support the ``ltest-selenium``
+behaviour:
+
+
+```Makefile
+check-selenium-only: clean-eunit compile-tests
+	@clear
+	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \
+	erl -cwd "`pwd`" -listener ltest-listener -eval \
+	"case 'ltest-runner':selenium() of ok -> halt(0); _ -> halt(127) end" \
+	-noshell
 ```
 
 Note that for now, only ``foreach`` fixtures are supported.

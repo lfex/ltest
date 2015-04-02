@@ -19,6 +19,8 @@
   * [The LFE Test Runner](#the-lfe-test-runner-)
   * [Selenium Web Driver](#selenium-web-driver-)
     * [Example Selenium Usage](#example-selenium-usage-)
+      * [From the REPL](#from-the-repl-)
+      * [In a Test Suite](#in-a-test-suite-)
 * [Dogfood](#dogfood-)
 
 
@@ -319,7 +321,39 @@ code base will appear in ltest with dashes, not underscores.
 
 #### Example Selenium Usage [&#x219F;](#table-of-contents)
 
-TBD
+If you have your Chrome web browser in a non-standard location, tests against
+the webdriver will fail. You will need to symlink your browser to the expected
+location or pass options in the capabilities data structure (see the
+chromedriver docs for that).
+
+
+##### From the REPL [&#x219F;](#table-of-contents)
+
+```cl
+> (ltest-selenium:start-session
+    'se-session
+    "http://localhost:9515/"
+    (ltest-selenium:default-chrome)
+    10000))
+#(ok <0.46.0>)
+> (ltest-selenium:set-url 'se-session "http://google.com")
+ok
+> (ltest-selenium:get-page-title 'se-session)
+#(ok "Google")
+> (set `#(ok ,elem) (ltest-selenium:find-element 'se-session "name" "q"))
+#(ok "0.12670360947959125-1")
+> (ltest-selenium:send-value 'se-session elem "LFE")
+ok
+> (ltest-selenium:submit 'se-session elem)
+ok
+> (ltest-selenium:get-page-title 'se-session)
+#(ok "LFE - Google Search")
+```
+
+
+##### In a Test Suite [&#x219F;](#table-of-contents)
+
+
 
 ## Dogfood [&#x219F;](#table-of-contents)
 

@@ -60,7 +60,7 @@ debug: get-erllibs get-codepath
 get-deps:
 	@echo "Getting dependencies ..."
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) download deps
-	-@rm deps/kla/rebar.config
+	@-rm deps/kla/rebar.config
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."
@@ -144,7 +144,7 @@ $(CHROMEDRIVER):
 	unzip chromedriver_mac32.zip
 
 start-chromedriver:
-	-@$(CHROMEDRIVER) &
+	-@$(CHROMEDRIVER) --verbose &
 
 stop-chromedriver:
 	@ps aux|grep $(CHROMEDRIVER)|grep -v grep|awk '{print $$2}'|xargs kill -15

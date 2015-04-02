@@ -1,8 +1,8 @@
 ;;;; Wrappers for the Erlang Selenium webdriver library
-(defmodule ltest-se
+(defmodule ltest-selenium
   (export all))
 
-;;(include-lib "ltest/include/ltest-se-macros.lfe")
+(include-lib "ltest/include/ltest-se-macros.lfe")
 
 (defun behaviour_info
   (('callbacks)

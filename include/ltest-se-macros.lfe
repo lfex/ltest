@@ -1,7 +1,7 @@
 ;;;; Wrappers for the Erlang Selenium webdriver library
 (eval-when-compile
 
-  (defun get-api-funcs ()
+  (defun get-session-funcs ()
     '((execute 3)
       (execute-async 3)
       (get-screenshot 1)
@@ -79,12 +79,27 @@
       (start-session 3)
       (start-session 4)
       (stop-session 1)
-      (stop 1))))
+      (stop 1)))
 
-(defmacro generate-api ()
-  `(progn ,@(kla:make-funcs (get-api-funcs) 'webdrv_session)))
+  (defun get-cap-funcs ()
+    '((default 0)
+      (default-browser 1)
+      (to-json 1)
+      (default-firefox 0)
+      (default-chrome 0)
+      (default-htmlunit 0)
+      (default-safari 1)))
+  ;; end of eval-when-compile
+  )
 
-(generate-api)
+(defmacro generate-session-api ()
+  `(progn ,@(kla:make-funcs (get-session-funcs) 'webdrv_session)))
+
+(defmacro generate-capabilities-api ()
+  `(progn ,@(kla:make-funcs (get-cap-funcs) 'webdrv_cap)))
+
+(generate-session-api)
+(generate-capabilities-api)
 
 (defun loaded-ltest-se-meacros ()
   "This is just a dummy function for display purposes when including from the

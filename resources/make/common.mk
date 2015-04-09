@@ -25,6 +25,7 @@ endif
 ifeq ($(OS),Darwin)
 		HOST = $(shell scutil --get ComputerName)
 endif
+CHROMEDRIVER=./bin/chromedriver
 
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
@@ -59,6 +60,7 @@ debug: get-erllibs get-codepath
 get-deps:
 	@echo "Getting dependencies ..."
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) download deps
+	@-rm deps/kla/rebar.config
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."
@@ -104,7 +106,7 @@ compile-no-deps: clean-ebin
 	PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) rebar compile skip_deps=true
 
 clean: clean-ebin clean-eunit
-	@which rebar.cmd >/dev/null 2>&1 && rebar.cmd clean || rebar clean
+	@which rebar.cmd >/dev/null 2>&1 && rebar.cmd clean || rebar -v clean
 
 check-unit-only: clean-eunit
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) tests unit
@@ -115,10 +117,19 @@ check-integration-only: clean-eunit
 check-system-only: clean-eunit
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) tests system
 
-check-unit-with-deps: get-deps compile compile-tests check-unit-only
+check-selenium-only: clean-eunit compile-tests
+	@clear
+	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \
+	erl -cwd "`pwd`" -listener ltest-listener -eval \
+	"case 'ltest-runner':selenium() of ok -> halt(0); _ -> halt(127) end" \
+	-noshell
+
+check-unit-with-deps: compile compile-tests check-unit-only
 check-unit: compile-no-deps check-unit-only
 check-integration: compile check-integration-only
 check-system: compile check-system-only
+check-selenium: compile check-selenium-only
+
 check-all-with-deps: compile check-unit-only check-integration-only \
 	check-system-only
 check-all: get-deps compile-no-deps clean-eunit
@@ -134,6 +145,21 @@ check-runner-ltest: compile-no-deps compile-tests
 	erl -cwd "`pwd`" -listener ltest-listener -eval \
 	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
 	-noshell
+
+$(CHROMEDRIVER):
+	mkdir -p bin
+	cd bin && \
+	curl -O http://chromedriver.storage.googleapis.com/2.9/chromedriver_mac32.zip && \
+	unzip chromedriver_mac32.zip
+
+start-chromedriver:
+	-@$(CHROMEDRIVER) --verbose &
+
+stop-chromedriver:
+	@ps aux|grep $(CHROMEDRIVER)|grep -v grep|awk '{print $$2}'|xargs kill -15
+
+check-selenium: start-chromedriver
+	make stop-chromedriver
 
 check-runner-eunit: compile-no-deps compile-tests
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \

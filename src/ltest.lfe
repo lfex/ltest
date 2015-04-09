@@ -22,6 +22,14 @@
     #'integration?/1
     (get-test-beams path)))
 
+(defun get-selenium-beams ()
+  (get-selenium-beams "."))
+
+(defun get-selenium-beams (path)
+  (lists:filter
+    #'selenium?/1
+    (get-test-beams path)))
+
 (defun get-system-beams ()
   (get-system-beams "."))
 
@@ -45,6 +53,9 @@
 
 (defun integration? (beam)
   (has-behaviour? beam 'ltest-integration))
+
+(defun selenium? (beam)
+  (has-behaviour? beam 'ltest-selenium))
 
 (defun system? (beam)
   (has-behaviour? beam 'ltest-system))

@@ -59,7 +59,7 @@
   using (deftestcase ...).
 
   Note that this macro is not composable with (deftestcase ...); you must
-  defined the test case and then only pass the test case name to this
+  define the test case and then only pass the test case name to this
   macro."
   (cond ((> (length funcs) 1)
          `(list

@@ -17,7 +17,7 @@ LFETOOL=$(BIN_DIR)/lfetool
 else
 LFETOOL=lfetool
 endif
-ERL_LIBS = .:..:../ltest:$(shell $(LFETOOL) info erllibs)
+ERL_LIBS=$(shell pwd):$(shell $(LFETOOL) info erllibs)
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
 		HOST=$(HOSTNAME)
@@ -60,7 +60,6 @@ debug: get-erllibs get-codepath
 get-deps:
 	@echo "Getting dependencies ..."
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) download deps
-	@-rm deps/kla/rebar.config
 
 clean-ebin:
 	@echo "Cleaning ebin dir ..."

@@ -55,7 +55,7 @@
                (ltest:get-system-beams (lutil-file:get-cwd))))
   (('selenium)
     (run-beams 'selenium
-               (ltest:get-selenium-beams (lutil-file:get-cwd))))
+               (ltest-se:get-selenium-beams (lutil-file:get-cwd))))
   (('unit)
     (run-beams 'unit
                (ltest:get-unit-beams (lutil-file:get-cwd))))

@@ -7,7 +7,7 @@
   (io:format (get-suite-header)))
 
 (defun get-suite-header ()
-  (color:greenb
+  (ltest-color:greenb
     (test-header (ltest-const:test-suite-title)
                  (ltest-const:test-suite-header))))
 
@@ -15,14 +15,14 @@
   (io:format (get-suite-footer)))
 
 (defun get-suite-footer ()
-  (io_lib:format "~s~n~n" `(,(color:greenb
+  (io_lib:format "~s~n~n" `(,(ltest-color:greenb
                                (string:copies
                                  (ltest-const:test-suite-header)
                                  (ltest-const:test-suite-width))))))
 
 (defun test-type-header (title)
   (io:format
-    (color:blueb
+    (ltest-color:blueb
       (test-header title (ltest-const:test-suite-subheader)))))
 
 (defun test-header (title char)
@@ -68,33 +68,34 @@
 (defun mod-line (desc)
   (io:format "~smodule: ~s~n"
              `(,(indent (ltest-const:mod-indent))
-               ,(color:greenb (atom_to_list (ltest-util:get-module desc))))))
+               ,(ltest-color:greenb
+                 (atom_to_list (ltest-util:get-module desc))))))
 
 (defun ok ()
-  (io:format (++ "... [" (color:greenb "ok") "]~n")))
+  (io:format (++ "... [" (ltest-color:greenb "ok") "]~n")))
 
 (defun fail (error where)
-  (io:format ". [~s]~n~n~s~s:~n" `(,(color:red "fail")
+  (io:format ". [~s]~n~n~s~s:~n" `(,(ltest-color:red "fail")
                                    ,(indent (ltest-const:error-indent))
-                                   ,(color:yellowb "Assertion failure")))
+                                   ,(ltest-color:yellowb "Assertion failure")))
   (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
                                            ,error)))
 
 (defun err (error where)
-  (io:format " [~s]~n~n~s~s:~n" `(,(color:yellow "error")
+  (io:format " [~s]~n~n~s~s:~n" `(,(ltest-color:yellow "error")
                                    ,(indent (ltest-const:error-indent))
-                                   ,(color:yellowb "Error")))
+                                   ,(ltest-color:yellowb "Error")))
   (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
                                            ,error)))
 
 (defun skip ()
-  (++ " [" (color:blue "skip") "]"))
+  (++ " [" (ltest-color:blue "skip") "]"))
 
 (defun mod-time (time)
   (io:format "~s~s ~s~s~n~n" `(,(indent (ltest-const:func-indent))
-                               ,(color:blackb "time:")
-                               ,(color:blackb (integer_to_list time))
-                               ,(color:blackb "ms"))))
+                               ,(ltest-color:blackb "time:")
+                               ,(ltest-color:blackb (integer_to_list time))
+                               ,(ltest-color:blackb "ms"))))
 
 (defun skip-lines (skipped)
   (lists:map #'skip-line/1 skipped))
@@ -122,7 +123,7 @@
   (finish-section))
 
 (defun stats-heading ()
-  (io:format (++ (color:yellow "summary:") "~n")))
+  (io:format (++ (ltest-color:yellow "summary:") "~n")))
 
 (defun display-all (state)
   (io:format "~sTests: ~p  " `(,(indent (ltest-const:func-indent))
@@ -155,7 +156,7 @@
                                     ,(state-time state))))
 
 (defun display-no-results (data state)
-  (io:format (color:yellow (get-no-results-report data state)))
+  (io:format (ltest-color:yellow (get-no-results-report data state)))
   (finish-section))
 
 (defun get-no-results-report (data state)
@@ -168,16 +169,16 @@
   (io:nl))
 
 (defun get-ok-report (state)
-  (get-report "Passed" #'color:greenb/1 (state-ok state)))
+  (get-report "Passed" #'ltest-color:greenb/1 (state-ok state)))
 
 (defun get-skip-report (state)
-  (get-report "Skipped" #'color:blue/1 (state-skip state)))
+  (get-report "Skipped" #'ltest-color:blue/1 (state-skip state)))
 
 (defun get-fail-report (state)
-  (get-report "Failed" #'color:red/1 (state-fail state)))
+  (get-report "Failed" #'ltest-color:red/1 (state-fail state)))
 
 (defun get-err-report (state)
-  (get-report "Erred" #'color:yellow/1 (state-err state)))
+  (get-report "Erred" #'ltest-color:yellow/1 (state-err state)))
 
 (defun get-report (text color-func count)
   (if (== count 0)

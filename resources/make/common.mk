@@ -145,6 +145,13 @@ check-runner-ltest: compile-no-deps compile-tests
 	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
 	-noshell
 
+check-runner-ltest-no-color: compile-no-deps compile-tests
+	@clear
+	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \
+	erl -cwd "`pwd`" -listener ltest-listener -color false -eval \
+	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
+	-noshell
+
 $(CHROMEDRIVER):
 	mkdir -p bin
 	cd bin && \

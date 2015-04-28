@@ -54,8 +54,12 @@
     (run-beams 'system
                (ltest:get-system-beams (lutil-file:get-cwd))))
   (('selenium)
-    (run-beams 'selenium
-               (lse:get-selenium-beams (lutil-file:get-cwd))))
+    ;; lfe may not be installed; let's safeguard against a bad user
+    ;; experience in that case
+    (case (code:which 'lse)
+      ('non_existing (run-beams 'selenium '()))
+      (_ (run-beams 'selenium
+           (lse:get-selenium-beams (lutil-file:get-cwd))))))
   (('unit)
     (run-beams 'unit
                (ltest:get-unit-beams (lutil-file:get-cwd))))

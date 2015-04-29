@@ -116,18 +116,10 @@ check-integration-only: clean-eunit
 check-system-only: clean-eunit
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) tests system
 
-check-selenium-only: clean-eunit compile-tests
-	@clear
-	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \
-	erl -cwd "`pwd`" -listener ltest-listener -eval \
-	"case 'ltest-runner':selenium() of ok -> halt(0); _ -> halt(127) end" \
-	-noshell
-
 check-unit-with-deps: compile compile-tests check-unit-only
 check-unit: compile-no-deps check-unit-only
 check-integration: compile check-integration-only
 check-system: compile check-system-only
-check-selenium: compile check-selenium-only
 
 check-all-with-deps: compile check-unit-only check-integration-only \
 	check-system-only
@@ -151,21 +143,6 @@ check-runner-ltest-no-color: compile-no-deps compile-tests
 	erl -cwd "`pwd`" -listener ltest-listener -color false -eval \
 	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
 	-noshell
-
-$(CHROMEDRIVER):
-	mkdir -p bin
-	cd bin && \
-	curl -O http://chromedriver.storage.googleapis.com/2.9/chromedriver_mac32.zip && \
-	unzip chromedriver_mac32.zip
-
-start-chromedriver:
-	-@$(CHROMEDRIVER) --verbose &
-
-stop-chromedriver:
-	@ps aux|grep $(CHROMEDRIVER)|grep -v grep|awk '{print $$2}'|xargs kill -15
-
-check-selenium: start-chromedriver
-	make stop-chromedriver
 
 check-runner-eunit: compile-no-deps compile-tests
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) \

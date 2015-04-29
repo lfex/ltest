@@ -1,13 +1,18 @@
 (defmodule ltest-runner
   (export all))
 
+(include-lib "lutil/include/compose.lfe")
+
 (defun all ()
   (ltest-formatter:test-suite-header)
   (unit 'combined)
   (integration 'combined)
   (system 'combined)
   (ltest-formatter:test-suite-footer)
-  (selenium 'combined)
+  ;; Add support for third-party test runners here
+  (case (code:which 'lse)
+    ('non_existing (ltest-runner:run-beams 'selenium '()))
+    (_ (lse-runner:selenium 'combined)))
   (ltest-formatter:test-suite-footer))
 
 (defun integration (_)
@@ -28,15 +33,6 @@
   (system 'solo)
   (ltest-formatter:test-suite-footer))
 
-(defun selenium (_)
-  (ltest-formatter:test-type-header "Selenium Tests")
-  (run 'selenium))
-
-(defun selenium ()
-  (ltest-formatter:test-suite-header)
-  (selenium 'solo)
-  (ltest-formatter:test-suite-footer))
-
 (defun unit (_)
   (ltest-formatter:test-type-header "Unit Tests")
   (run 'unit))
@@ -53,16 +49,14 @@
   (('system)
     (run-beams 'system
                (ltest:get-system-beams (lutil-file:get-cwd))))
-  (('selenium)
-    ;; lfe may not be installed; let's safeguard against a bad user
-    ;; experience in that case
-    (case (code:which 'lse)
-      ('non_existing (run-beams 'selenium '()))
-      (_ (run-beams 'selenium
-           (lse:get-selenium-beams (lutil-file:get-cwd))))))
   (('unit)
     (run-beams 'unit
                (ltest:get-unit-beams (lutil-file:get-cwd))))
+  ;; Add support for third-party test runners here
+  (('selenium)
+    (case (code:which 'lse)
+      ('non_existing (ltest-runner:run-beams 'selenium '()))
+      (_ (lse-runner:run-beams))))
   ((beam)
     (run-beam beam (get-listener))))
 
@@ -79,16 +73,13 @@
    * ltest-listener
    * eunit_progress
    * eunit_surefire"
-  (list_to_atom
-    (caar
-      (element 2
-        (lutil-file:get-arg
-          'listener
-          "ltest-listener")))))
+   (->> (lutil-file:get-arg 'listener "ltest-listener")
+        (element 2)
+        (caar)
+        (list_to_atom)))
 
 (defun get-options (listener)
   (get-options listener '(colored)))
-
   ;`(no_tty #(report #(,listener (colored ltest-type)))))
 
 (defun get-options (listener options)

@@ -3,15 +3,16 @@ $(error Can't find Erlang executable 'erl')
 exit 1
 endif
 
-LUTIL_VERSION = 0.6.0
+LUTIL_VERSION = 0.6.4
 LIB = $(PROJECT)
 DEPS = ./deps
-BIN_DIR = ./bin
+BIN_DIR = $(shell pwd)/bin
 SOURCE_DIR = ./src
 OUT_DIR = ./ebin
 TEST_DIR = ./test
 TEST_OUT_DIR = ./.eunit
-SCRIPT_PATH=$(DEPS)/lfe/bin:.:./bin:"$(PATH)":/usr/local/bin
+SCRIPT_PATH = $(shell pwd):$(DEPS)/lfe/bin:$(BIN_DIR):$(PATH):/usr/local/bin
+
 ifeq ($(shell which lfetool),)
 LFETOOL=$(BIN_DIR)/lfetool
 else

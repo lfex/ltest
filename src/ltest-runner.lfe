@@ -1,7 +1,7 @@
 (defmodule ltest-runner
   (export all))
 
-(include-lib "lutil/include/compose.lfe")
+(include-lib "clj/include/compose.lfe")
 
 (defun all ()
   (ltest-formatter:test-suite-header)

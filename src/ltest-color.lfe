@@ -1,7 +1,7 @@
 (defmodule ltest-color
   (export all))
 
-(include-lib "lutil/include/compose.lfe")
+(include-lib "clj/include/compose.lfe")
 
 (defun black (str)
   (case (get-color-option)

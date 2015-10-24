@@ -1,13 +1,17 @@
 # ltest
 
+[![][ltest-logo]][ltest-logo-large]
+
+[ltest-logo]: resources/images/ltest-logo-small.png
+[ltest-logo-large]: resources/images/ltest-logo-large.png
+
 *A Unit, Integration, and System Tests Framework for LFE*
 
-<img src="resources/images/ltest-logo-small.png"/>
 
-
-## Table of Contents
+## Contents
 
 * [Introduction](#introduction-)
+* [Dependencies](#dependencies-)
 * [EUnit Compatibility](#eunit-compatibility-)
 * [Features](#features-)
 * [Using ltest](#using-ltest-)
@@ -20,7 +24,7 @@
 * [Dogfood](#dogfood-)
 
 
-## Introduction [&#x219F;](#table-of-contents)
+## Introduction [&#x219F;](#contents)
 
 The original implementation of ltest (as lfeunit) was made due to some
 difficulties in parsing the Erlang include file for EUnit, ``eunit.hrl``, by
@@ -41,14 +45,22 @@ EUnit (e.g., defining tests to be skipped, using behaviours to "tag" types
 of tests, and a REALLY BEAUTIFUL test runner, etc.)
 
 
-## EUnit Compatibility [&#x219F;](#table-of-contents)
+## Dependencies [&#x219F;](#contents)
+
+As of version 0.7.0, this project assumes that you have
+[rebar3](https://github.com/rebar/rebar3) installed somwhere in your ``$PATH``.
+It no longer uses the old version of rebar. If you do not wish to use rebar3,
+you may use the most recent rebar2-compatible release of lutil: 0.6.3.
+
+
+## EUnit Compatibility [&#x219F;](#contents)
 
 The tests created with ltest are compatible with EUnit ane can be run from
 either Erlang or LFE, using the standard EUnit listener or the ltest
 listener (test runner).
 
 
-### Features [&#x219F;](#table-of-contents)
+### Features [&#x219F;](#contents)
 
 * ``(deftest ...)`` for standard unit tests
 * ``(deftestgen ...)`` for writing tests with generators, including the
@@ -66,10 +78,10 @@ listener (test runner).
 * A custom test runner that over-rides EUnit behaviour and aesthetics
 
 
-## Using ``ltest`` [&#x219F;](#table-of-contents)
+## Using ``ltest`` [&#x219F;](#contents)
 
 
-### Adding ltest to Your Project [&#x219F;](#table-of-contents)
+### Adding ltest to Your Project [&#x219F;](#contents)
 
 In order to use ltest in your project, all you need to do is add a rebar dep.
 In your ``rebar.config`` file, simply add an extra line for ``ltest``:
@@ -89,7 +101,7 @@ $ lfetool tests unit
 ```
 
 
-### Structuring Your Tests [&#x219F;](#table-of-contents)
+### Structuring Your Tests [&#x219F;](#contents)
 
 ltest doesn not support putting your unit tests directly in your modules. If
 you do this, things may break or not work properly, even though Erlang's EUnit
@@ -135,7 +147,7 @@ tests, check out the Wikipedia
 [article on testing](http://en.wikipedia.org/wiki/Software_testing#Testing_levels).
 
 
-### Naming Rules [&#x219F;](#table-of-contents)
+### Naming Rules [&#x219F;](#contents)
 
 Keep in mind that your tests will be compiled to ``.beam`` and then run with
 Erlang's eunit module. As such, your tests need to following the same
@@ -156,7 +168,7 @@ conventions that eunit establishes:
   ()`` boilerplate.
 
 
-### Creating Unit Tests [&#x219F;](#table-of-contents)
+### Creating Unit Tests [&#x219F;](#contents)
 
 ltest is entirely macro-based. ltest uses LFE to parse the Erlang macros in
 the eunit header file. It also provides its own header file which defines macros
@@ -234,7 +246,7 @@ ltest is working towards full test coverage; while not there yet, the unit
 tests for ltest itself provide the best examples of usage.
 
 
-### Running Your Tests [&#x219F;](#table-of-contents)
+### Running Your Tests [&#x219F;](#contents)
 
 The recommended way to run unit tests is to use ``lfetool``. Running
 unit tests is now as easy as doing the following:
@@ -258,7 +270,7 @@ the following:
 ```
 
 
-### The LFE Test Runner [&#x219F;](#table-of-contents)
+### The LFE Test Runner [&#x219F;](#contents)
 
 ltest now includes a test runner which overrides the EUnit handlers with its
 own. The original (and currently used) test runner functionality in lfetool
@@ -300,7 +312,7 @@ to track the progress on these, here are the related tickets:
  * https://github.com/lfe/lfetool/issues/160
 
 
-## Dogfood [&#x219F;](#table-of-contents)
+## Dogfood [&#x219F;](#contents)
 
 ``ltest`` writes its unit tests in ``ltest`` :-) You can run them from the
 project directory:

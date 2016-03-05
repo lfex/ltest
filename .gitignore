@@ -8,3 +8,4 @@ deps
 bin
 ebin
 erl_crash.dump
+_build/*

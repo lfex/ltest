@@ -1,6 +1,6 @@
 [{<<"clj">>,
   {git,"git://github.com/lfex/clj.git",
-       {ref,"2184d0f1459922145b432cfe19ac6147169383d7"}},
+       {ref,"3cc502b150ff2a631719f063c0b8a7a3643f420e"}},
   0},
  {<<"color">>,
   {git,"git://github.com/julianduque/erlang-color.git",
@@ -8,7 +8,7 @@
   0},
  {<<"kla">>,
   {git,"git://github.com/lfex/kla.git",
-       {ref,"e9ed980aec9c18b67a8b5f9c22cfebc778282d04"}},
+       {ref,"cb3cd7a263e7e6da00a7bf2f939c66179a8da7b8"}},
   1},
  {<<"lfe">>,
   {git,"git://github.com/rvirding/lfe.git",
@@ -16,5 +16,5 @@
   0},
  {<<"lutil">>,
   {git,"git://github.com/lfex/lutil.git",
-       {ref,"14fb9f5c5c6360ad7169d9bf68907747b40c0d36"}},
+       {ref,"1dd644b73da70dd3b1516c65535b61883633ce21"}},
   0}].

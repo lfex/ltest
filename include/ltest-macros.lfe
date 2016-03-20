@@ -1,13 +1,19 @@
+;; Include EUnit macros
 (include-lib "eunit/include/eunit.hrl")
+
+
+;;;===================================================================
+;;; Helper functions
+;;;===================================================================
 
 (eval-when-compile
   (defun to-unders (atm)
     (re:replace (atom_to_list atm) "-" "_" '(#(return list) global)))
   (defun list-body
-    ((body) (when (is_list body))
-      body)
-    ((body)
-      (list body)))
+    ([body] (when (is_list body))
+     body)
+    ([body]
+     (list body)))
   ;; end of eval-when-compile
   )
 

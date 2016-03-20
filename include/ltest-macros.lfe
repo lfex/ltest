@@ -160,3 +160,60 @@ is thrown, an informative exception will be generated.
 (defmacro is-not-throw (expected-term expression)
   "The inverse case of [[is-throw/2]], for convenience."
   `(is-not-exception 'throw ,expected-term ,expression))
+
+
+;;;===================================================================
+;;; Test object macros
+;;;===================================================================
+
+(defmacro is* (bool-expression)
+  "Return a test object that wraps [[is/1]]."
+  `(_assert ,bool-expression))
+
+(defmacro is-not* (bool-expression)
+  "Return a test object that wraps [[is-not/2]]."
+  `(_assertNot ,bool-expression))
+
+(defmacro is-match* (guard expression)
+  "Return a test object that wraps [[is-match/2]]."
+  `(_assertMatch ,guard ,expression))
+
+(defmacro is-not-match* (guard expression)
+  "The inverse case of [[is-match*/2]], for convenience."
+  `(_assertMatch ,guard ,expression))
+
+(defmacro is-equal* (value expression)
+  "Return a test object to assert `expression` evaluates to `value`."
+  `(_assertEqual ,bool-expression))
+
+(defmacro is-not-equal* (value expression)
+  "Return a test object to assert `expression` evaluates to `value`."
+  `(_assertNotEqual ,bool-expression))
+
+(defmacro is-exception* (expected-class expected-term expression)
+  "Return a test object that wraps [[is-exception/3]]."
+  `(_assertException ,expected-class ,expected-term ,expression))
+
+(defmacro is-error* (error body)
+  "Return a test object that wraps [[is-error/2]]."
+  `(_assertError ,error ,body))
+
+(defmacro is-not-error* (error body)
+  "Return a test object that wraps [[is-not-error/2]]."
+  `(_test (is-not-error ,error ,body)))
+
+(defmacro is-exit* (expected-term expression)
+  "Return a test object that wraps [[is-exit/2]]"
+  `(_assertExit ,expected-term ,expression))
+
+(defmacro is-not-exit* (expected-term expression)
+  "Return a test object that wraps [[is-not-exit/2]]."
+  `(_test (is-not-exit ,expected-term ,expression)))
+
+(defmacro is-throw* (expected-term expression)
+  "Return a test object that wraps [[is-throw/2]]."
+  `(_assertThrow ,expected-term ,expression))
+
+(defmacro is-not-throw* (expected-term expression)
+  "Return a test object that wraps [[is-not-throw/2]]."
+  `(_test (is-not-throw 'throw ,expected-term ,expression)))

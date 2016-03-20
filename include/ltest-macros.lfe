@@ -135,7 +135,7 @@ is thrown, an informative exception will be generated.
 
 (defmacro is-not-exception (expected-class expected-term expression)
   "The inverse case of [[is-exception/3]], for convenience."
-  `(not (is-exception ,expected-class ,expected-term ,expression)))
+  `(assertNotException ,expected-class ,expected-term ,expression))
 
 (defmacro is-error (error body)
   "Equivalent to [[is-exception/3]] with `'error` as `expected-class`."
@@ -193,6 +193,10 @@ is thrown, an informative exception will be generated.
 (defmacro is-exception* (expected-class expected-term expression)
   "Return a test object that wraps [[is-exception/3]]."
   `(_assertException ,expected-class ,expected-term ,expression))
+
+(defmacro is-not-exception* (expected-class expected-term expression)
+  "The inverse case of [[is-exception*/3]], for convenience."
+  `(_assertNotException ,expected-class ,expected-term ,expression))
 
 (defmacro is-error* (error body)
   "Return a test object that wraps [[is-error/2]]."

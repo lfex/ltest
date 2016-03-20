@@ -106,7 +106,14 @@
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_success)))))
 
-; XXX add test: is-not-exception_test
+(deftest is-not-exception
+  (is-not-exception _ _ (+ 2 2)))
+
+(deftest is-not-exception-exit
+  (is-not-exception 'exit 'badarith (/ 1 0)))
+
+(deftest is-not-exception-throw
+  (is-not-exception 'throw 'badarith (/ 1 0)))
 
 (deftest is-error
   (is-error 'badarith (/ 1 0)))
@@ -176,11 +183,10 @@
   (is-match (tuple 1 'a) #(1 a))
   (is-match (tuple 1 (tuple 2 'pull)) #(1 #(2 pull))))
 
-; XXX add test: is-match-fail_test
 (deftest is-match-fail
   (try
     (progn
       (is-match (tuple 1 'a) #(1 b))
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
       (check-failed-assert value 'assertMatch_failed)))))

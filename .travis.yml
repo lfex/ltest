@@ -1,14 +1,13 @@
 language: erlang
+install: true
 before_script:
-  - "make get-lfetool"
-  - "make copy-appsrc"
-script:
-  - "make check-travis"
-notifications:
-  irc: "irc.freenode.org#cogitat"
-  recipients:
-    - duncan@cogitat.io
+    - wget https://s3.amazonaws.com/rebar3/rebar3
+    - chmod +x rebar3
+env:
+  - PATH=".:$PATH"
+script: rebar3 eunit
 otp_release:
-  - 17.4
-  - R16B03
+  - 18.2
+  - 17.5
+  - R16B03-1
   - R15B03

@@ -41,13 +41,20 @@
       ,@body)))
 
 
+;;;===================================================================
+;;; Set-up and tear-down macros
+;;;===================================================================
 
 (defmacro defsetup (func-name)
-  "A simple wrapper macro for defining the set-up function in a fixture."
+  "Return a nullary function that calls `func-name/0`.
+
+A simple wrapper macro for defining the set-up function in a fixture."
   `(lambda () (,func-name)))
 
 (defmacro defteardown (func-name)
-  "A simple wrapper macro for defining the tear-down function in a fixture."
+  "Return a unary function that calls `func-name/1` on its argument.
+
+A simple wrapper macro for defining the tear-down function in a fixture."
   `(lambda (x) (,func-name x)))
 
 (defmacro deftestcase body

@@ -57,22 +57,25 @@ A simple wrapper macro for defining the set-up function in a fixture."
 A simple wrapper macro for defining the tear-down function in a fixture."
   `(lambda (x) (,func-name x)))
 
-(defmacro deftestcase body
+
+;;;===================================================================
+;;; Test case macros
+;;;===================================================================
+
+(defmacro deftestcase
   "This macro is for defining EUnit tests for use by fixtures which have
   particular naming convention needs."
-  (let ((func-name (car body))
-        (args (cadr body))
-        (rest (cddr body)))
-  `(defun ,(list_to_atom (++ (to-unders func-name) "_test_case")) (,@args)
-    (list
-      ,@(lists:map
-        (lambda (part)
-          `(lambda () ,part))
-        rest)))))
+  ([func-name args . rest]
+   `(defun ,(list_to_atom (++ (to-unders func-name) "_test_case")) (,@args)
+      (list
+        ,@(lists:map
+            (lambda (part)
+              `(lambda () ,part))
+            rest)))))
 
 (defmacro deftestcases funcs
   "This macro expects one or more function *names* which have been defined
-  using (deftestcase ...).
+  using [[deftestcase/255]].
 
   Note that this macro is not composable with (deftestcase ...); you must
   define the test case and then only pass the test case name to this

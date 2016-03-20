@@ -17,27 +17,30 @@
   ;; end of eval-when-compile
   )
 
-(defmacro deftest arg
-  "This macro is for defining standard EUnit tests."
-  (let ((name (car arg))
-        (body (cdr arg)))
-    `(defun ,(list_to_atom (++ (atom_to_list name) "_test")) ()
-       ,@body)))
 
-(defmacro deftestgen arg
-  "This macro is for defining EUnit tests that use test generators."
-  (let ((name (to-unders (car arg)))
-        (body (cdr arg)))
-    `(defun ,(list_to_atom (++ name "_test_")) ()
-       ,@body)))
+;;;===================================================================
+;;; Test definition macros
+;;;===================================================================
 
-(defmacro deftestskip arg
-  "This macro is for defining standard EUnit test that will be skipped (not
-  run)."
-  (let ((name (car arg))
-        (body (cdr arg)))
-    `(defun ,(list_to_atom (++ (atom_to_list name) "_skip")) ()
-       ,@body)))
+(defmacro deftest
+  "Define a standard EUnit test."
+  ([name . body]
+   `(defun ,(list_to_atom (++ (to-unders name) "_test")) ()
+      ,@body)))
+
+(defmacro deftestgen
+  "Define an EUnit test that uses test generators."
+  ([name . body]
+   `(defun ,(list_to_atom (++ (to-unders name) "_test_")) ()
+      ,@body)))
+
+(defmacro deftestskip
+  "Define a standard EUnit test that will be skipped (not run)."
+  ([name . body]
+   `(defun ,(list_to_atom (++ (to-unders name) "_skip")) ()
+      ,@body)))
+
+
 
 (defmacro defsetup (func-name)
   "A simple wrapper macro for defining the set-up function in a fixture."

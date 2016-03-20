@@ -72,68 +72,72 @@
          `(lambda (x)
             (,(list_to_atom (++ (to-unders (car funcs)) "_test_case")) x)))))
 
+
+;;;===================================================================
+;;; Assertion macros
+;;;===================================================================
+
 (defmacro is (bool-expression)
-  "This macro takes an expression that returns a boolean value. If the
-  expression does not evaluate as a truth value, an error is returned."
+  "Assert `bool-expression` evaluates to `'true`."
   `(assert ,bool-expression))
 
 (defmacro is-not (bool-expression)
-  "This macro takes an expression that returns a boolean value. If the
-  expression does not evaluate as false value, an error is returned."
+  "Assert `bool-expression` evaluates to `'false`."
   `(assertNot ,bool-expression))
 
+(defmacro is-match (guard expression)
+  "Assert `guard` matches `expression`.
+
+The main reason to use [[is-match/2]], instead of matching with `=`,
+is that it produces more detailed error messages."
+  `(assertMatch ,guard ,expression))
+
+(defmacro is-not-match (guard expression)
+  "The inverse case of [[is-match/2]], for convenience."
+  `(assertNotMatch ,guard ,expression))
+
 (defmacro is-equal (value expression)
-  "This macro checks the equality between a passed value and a quoated
-  expression."
+  "Assert `expression` evaluates to `value`."
   `(assertEqual ,value ,expression))
 
 (defmacro is-not-equal (value expression)
-  "This macro checks the inequality between an expected value and a passed
-  expression."
+  "The inverse case of [[is-equal/2]], for convenience."
   `(assertNotEqual ,value ,expression))
 
 (defmacro is-exception (expected-class expected-term expression)
-  "This macro check that the passeed expression raises the expected
-  exception class (e.g., 'error, 'throw, etc.) and term (e.g., 'undef,
-  'badarith, etc.)."
+  "Evaluate `expression`, catching any exception and testing that it matches
+`` `#(,expected-class ,expected-term) ``. If the match fails, or if no exception
+is thrown, an informative exception will be generated.
+
+[[is-error/2]], [[is-exit/2]] and [[is-throw/2]] are equivalent to using
+[[is-exception/3]] with an `expected-class` of `'error`, `'exit`, or
+`'throw`, respectively."
   `(assertException ,expected-class ,expected-term ,expression))
 
 (defmacro is-not-exception (expected-class expected-term expression)
-  "This macro check that the passeed expression does not raise the expected
-  exception class (e.g., 'error, 'throw, etc.) and term (e.g., 'undef,
-  'badarith, etc.)."
+  "The inverse case of [[is-exception/3]], for convenience."
   `(not (is-exception ,expected-class ,expected-term ,expression)))
 
 (defmacro is-error (error body)
-  "This macro is a convenience macro for is-exception with an
-  exception class of 'error."
+  "Equivalent to [[is-exception/3]] with `'error` as `expected-class`."
   `(assertError ,error ,body))
 
 (defmacro is-not-error (expected-term expression)
-  "This macro is a convenience macro for is-not-exception with an
-  exception class of 'error."
+  "The inverse case of [[is-error/2]], for convenience."
   `(is-not-exception 'error ,expected-term ,expression))
 
 (defmacro is-exit (expected-term expression)
-  "This macro is a convenience macro for is-exception with an
-  exception class of 'exit."
+  "Equivalent to [[is-exception/3]] with `'exit` as `expected-class`."
   `(assertExit ,expected-term ,expression))
 
 (defmacro is-not-exit (expected-term expression)
-  "This macro is a convenience macro for is-not-exception with an
-  exception class of 'exit."
+  "The inverse case of [[is-exit/2]], for convenience."
   `(is-not-exception 'exit ,expected-term ,expression))
 
 (defmacro is-throw (expected-term expression)
-  "This macro is a convenience macro for is-exception with an
-  exception class of 'throw."
+  "Equivalent to [[is-exception/3]] with `'throw` as `expected-class`."
   `(assertThrow ,expected-term ,expression))
 
 (defmacro is-not-throw (expected-term expression)
-  "This macro is a convenience macro for is-not-exception with an
-  exception class of 'throw."
+  "The inverse case of [[is-throw/2]], for convenience."
   `(is-not-exception 'throw ,expected-term ,expression))
-
-(defmacro is-match (guard expression)
-  ""
-  `(assertMatch ,guard ,expression))

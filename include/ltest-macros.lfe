@@ -5,21 +5,20 @@
 ;;; OTP 18 hacks
 ;;;===================================================================
 
-(defmacro otp-18? () `(=:= "18" (erlang:system_info 'otp_release)))
+(defun otp-18? () (=:= "18" (erlang:system_info 'otp_release)))
 
-(defmacro assertion-failed () `(if (otp-18?) 'assert 'assertion_failed))
+(defun assertion-failed () (if (otp-18?) 'assert 'assertion_failed))
 
-(defmacro assert-equal-failed ()
-  `(if (otp-18?) 'assertEqual 'assertEqual_failed))
+(defun assert-equal-failed () (if (otp-18?) 'assertEqual 'assertEqual_failed))
 
-(defmacro assert-not-equal-failed ()
-  `(if (otp-18?) 'assertNotEqual 'assertNotEqual_failed))
+(defun assert-not-equal-failed ()
+  (if (otp-18?) 'assertNotEqual 'assertNotEqual_failed))
 
-(defmacro assert-exception-failed ()
-  `(if (otp-18?) 'assertException 'assertException_failed))
+(defun assert-exception-failed ()
+  (if (otp-18?) 'assertException 'assertException_failed))
 
 (defmacro assert-match-failed ()
-  `(if (otp-18?) 'assertMatch 'assertMatch_failed))
+  (if (otp-18?) 'assertMatch 'assertMatch_failed))
 
 
 ;;;===================================================================

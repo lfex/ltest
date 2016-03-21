@@ -4,11 +4,9 @@
 
 (include-lib "include/ltest-macros.lfe")
 
-(defun set-up ()
-  'ok)
+(defun set-up () 'ok)
 
-(defun tear-down (set-up-result)
-  (is-equal set-up-result 'ok))
+(defun tear-down (set-up-result) (is-equal set-up-result 'ok))
 
 (deftestcase setup-tc (set-up-result)
   ;; This is called the 'Instantiator' in EUnit parlance.
@@ -20,40 +18,25 @@
   (is-equal set-up-result 'ok)
   (is-not-equal 'this-test 'very-silly))
 
-(deftestgen setup-setup
-  (tuple
-    'setup
-    (defsetup set-up)
-    (deftestcases
-      setup-tc)))
+(deftestgen setup-setup `#(setup ,(defsetup set-up) ,(deftestcases setup-tc)))
 
 (deftestgen setup-setup-cleanup
-  (tuple
-    'setup
-    (defsetup set-up)
-    (defteardown tear-down)
-    (deftestcases
-      setup-tc)))
+  `#(setup
+     ,(defsetup set-up)
+     ,(defteardown tear-down)
+     ,(deftestcases setup-tc)))
 
 ; XXX add a test for setup-where-setup
 ; XXX add a test for setup-where-setup-cleanup
 
 (deftestgen foreach-setup
-  (tuple
-    'foreach
-    (defsetup set-up)
-    (deftestcases
-      setup-tc
-      foreach-tc)))
+  `#(foreach ,(defsetup set-up) ,(deftestcases setup-tc foreach-tc)))
 
 (deftestgen foreach-setup-cleanup
-  (tuple
-    'foreach
-    (defsetup set-up)
-    (defteardown tear-down)
-    (deftestcases
-      setup-tc
-      foreach-tc)))
+  `#(foreach
+     ,(defsetup set-up)
+     ,(defteardown tear-down)
+     ,(deftestcases setup-tc foreach-tc)))
 
 ; XXX add a test for foreach-where-setup
 ; XXX add a test for foreach-where-setup-cleanup

@@ -4,24 +4,15 @@
 
 (include-lib "include/ltest-macros.lfe")
 
-(deftestgen one-lambda
-  (lambda () (is 'true)))
+(deftestgen is* (is* 'true))
 
-(deftestgen one-lambda-in-list
-  (list
-    (lambda () (is-not 'false))))
+(deftestgen is-not*-in-list `[,(is-not* 'false)])
 
-(deftestgen many-lambdas-in-list
-  (list
-    (lambda () (is 'true))
-    (lambda () (is-not 'false))
-    (lambda () (is-equal 1 1))))
+(deftestgen many-generators-in-list
+  `[,(is* 'true) ,(is-not* 'false) ,(is-equal* 1 1)])
 
-(deftestgen lambda-with-nested-testset
-  (lambda ()
-    (list (is 'true)
-          (is-not 'false)
-          (is-equal 2 2)
-          (list (is 'true)
-                (is-not 'false)
-                (is-equal 1 1)))))
+(deftestgen nested-test-set
+  `[,(is* 'true)
+    ,(is-not* 'false)
+    ,(is-equal* 2 2)
+    [,(is* 'true) ,(is-not* 'false) ,(is-equal* 1 1)]])

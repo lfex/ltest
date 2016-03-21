@@ -35,4 +35,4 @@
            (error 'unexpected-test-succes))
          (catch
            (`#(,type ,value ,_)
-            (check-failed-assert value 'assertEqual_failed))))]]])
+            (check-failed-assert value (assert-equal-failed)))))]]])

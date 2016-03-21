@@ -107,7 +107,7 @@
       (check-wrong-assert-exception value 'unexpected_success)))))
 
 (deftest is-not-exception
-  (is-not-exception _ _ (+ 2 2)))
+  (is-not-exception (+ 2 2)))
 
 (deftest is-not-exception-exit
   (is-not-exception 'exit 'badarith (/ 1 0)))

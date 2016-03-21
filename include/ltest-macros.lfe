@@ -143,7 +143,7 @@ is that it produces more detailed error messages."
   "The inverse case of [[is-equal/2]], for convenience."
   `(assertNotEqual ,value ,expression))
 
-(defmacro is-exception (expected-class expected-term expression)
+(defmacro is-exception
   "Evaluate `expression`, catching any exception and testing that it matches
 `` `#(,expected-class ,expected-term) ``. If the match fails, or if no exception
 is thrown, an informative exception will be generated.
@@ -151,35 +151,53 @@ is thrown, an informative exception will be generated.
 [[is-error/2]], [[is-exit/2]] and [[is-throw/2]] are equivalent to using
 [[is-exception/3]] with an `expected-class` of `'error`, `'exit`, or
 `'throw`, respectively."
-  `(assertException ,expected-class ,expected-term ,expression))
+  ([expression]
+   `(is-exception _ _ ,expression))
+  ([expected-class expected-term expression]
+   `(assertException ,expected-class ,expected-term ,expression)))
 
-(defmacro is-not-exception (expected-class expected-term expression)
+(defmacro is-not-exception
   "The inverse case of [[is-exception/3]], for convenience."
-  `(assertNotException ,expected-class ,expected-term ,expression))
+  ([expression]
+   `(is-not-exception _ _ ,expression))
+  ([expected-class expected-term expression]
+   `(assertNotException ,expected-class ,expected-term ,expression)))
 
-(defmacro is-error (error body)
+(defmacro is-error
   "Equivalent to [[is-exception/3]] with `'error` as `expected-class`."
-  `(assertError ,error ,body))
+  ([expression] `(is-error _ ,expression))
+  ([error body] `(assertError ,error ,body)))
 
-(defmacro is-not-error (expected-term expression)
+(defmacro is-not-error
   "The inverse case of [[is-error/2]], for convenience."
-  `(is-not-exception 'error ,expected-term ,expression))
+  ([expression]
+   `(is-not-error _ ,expression))
+  ([expected-term expression]
+   `(is-not-exception 'error ,expected-term ,expression)))
 
-(defmacro is-exit (expected-term expression)
+(defmacro is-exit
   "Equivalent to [[is-exception/3]] with `'exit` as `expected-class`."
-  `(assertExit ,expected-term ,expression))
+  ([expression]               `(is-exit _ ,expression))
+  ([expected-term expression] `(assertExit ,expected-term ,expression)))
 
-(defmacro is-not-exit (expected-term expression)
+(defmacro is-not-exit
   "The inverse case of [[is-exit/2]], for convenience."
-  `(is-not-exception 'exit ,expected-term ,expression))
+  ([expression]
+   `(is-not-exit _ ,expression))
+  ([expected-term expression]
+   `(is-not-exception 'exit ,expected-term ,expression)))
 
-(defmacro is-throw (expected-term expression)
+(defmacro is-throw
   "Equivalent to [[is-exception/3]] with `'throw` as `expected-class`."
-  `(assertThrow ,expected-term ,expression))
+  ([expression]               `(is-throw _ ,expression))
+  ([expected-term expression] `(assertThrow ,expected-term ,expression)))
 
-(defmacro is-not-throw (expected-term expression)
+(defmacro is-not-throw
   "The inverse case of [[is-throw/2]], for convenience."
-  `(is-not-exception 'throw ,expected-term ,expression))
+  ([expression]
+   `(is-not-throw _ ,expression))
+  ([expected-term expression]
+   `(is-not-exception 'throw ,expected-term ,expression)))
 
 
 ;;;===================================================================
@@ -210,34 +228,48 @@ is thrown, an informative exception will be generated.
   "Return a test object to assert `expression` evaluates to `value`."
   `(_assertNotEqual ,value ,expression))
 
-(defmacro is-exception* (expected-class expected-term expression)
+(defmacro is-exception*
   "Return a test object that wraps [[is-exception/3]]."
-  `(_assertException ,expected-class ,expected-term ,expression))
+  ([expression]
+   `(is-exception* _ _ ,expression))
+  ([expected-class expected-term expression]
+   `(_assertException ,expected-class ,expected-term ,expression)))
 
-(defmacro is-not-exception* (expected-class expected-term expression)
+(defmacro is-not-exception*
   "The inverse case of [[is-exception*/3]], for convenience."
-  `(_assertNotException ,expected-class ,expected-term ,expression))
+  ([expression]
+   `(is-not-exception* _ _ ,expression))
+  ([expected-class expected-term expression]
+   `(_assertNotException ,expected-class ,expected-term ,expression)))
 
-(defmacro is-error* (error body)
+(defmacro is-error*
   "Return a test object that wraps [[is-error/2]]."
-  `(_assertError ,error ,body))
+  ([expression] `(is-error* _ ,expression))
+  ([error body] `(_assertError ,error ,body)))
 
-(defmacro is-not-error* (error body)
+(defmacro is-not-error*
   "Return a test object that wraps [[is-not-error/2]]."
-  `(_test (is-not-error ,error ,body)))
+  ([expression] `(is-not-error* _ ,expression))
+  ([error body] `(_test (is-not-error ,error ,body))))
 
-(defmacro is-exit* (expected-term expression)
+(defmacro is-exit*
   "Return a test object that wraps [[is-exit/2]]"
-  `(_assertExit ,expected-term ,expression))
+  ([expression]               `(is-exit* _ ,expression))
+  ([expected-term expression] `(_assertExit ,expected-term ,expression)))
 
 (defmacro is-not-exit* (expected-term expression)
   "Return a test object that wraps [[is-not-exit/2]]."
-  `(_test (is-not-exit ,expected-term ,expression)))
+  ([expression]         `(is-not-exit* _ ,expression))
+  ([expected-term body] `(_test (is-not-exit ,expected-term ,expression))))
 
 (defmacro is-throw* (expected-term expression)
   "Return a test object that wraps [[is-throw/2]]."
-  `(_assertThrow ,expected-term ,expression))
+  ([expression]         `(is-throw* _ ,expression))
+  ([expected-term body] `(_assertThrow ,expected-term ,expression)))
 
 (defmacro is-not-throw* (expected-term expression)
   "Return a test object that wraps [[is-not-throw/2]]."
-  `(_test (is-not-throw 'throw ,expected-term ,expression)))
+  ([expression]
+   `(is-not-throw* _ ,expression))
+  ([expected-term body]
+   `(_test (is-not-throw 'throw ,expected-term ,expression))))

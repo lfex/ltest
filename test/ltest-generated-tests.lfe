@@ -1,10 +1,6 @@
 (defmodule ltest-generated-tests
   (behaviour ltest-unit)
-  (export all)
-  (import
-    (from ltest
-      (check-failed-assert 2)
-      (check-wrong-assert-exception 2))))
+  (export all))
 
 (include-lib "include/ltest-macros.lfe")
 

@@ -3,8 +3,7 @@
   (export all)
   (import
     (from ltest
-      (check-failed-assert 2)
-      (check-wrong-assert-exception 2))))
+      (check-failed-assert 2))))
 
 (include-lib "include/ltest-macros.lfe")
 

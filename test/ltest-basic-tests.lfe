@@ -38,7 +38,7 @@
       (is 'false)
       (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertion_failed)))))
+      (check-failed-assert value (assertion-failed))))))
 
 (deftest is-not
   (is-not 'false)
@@ -51,7 +51,7 @@
       (is-not 'true)
       (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertion_failed)))))
+      (check-failed-assert value (assertion-failed))))))
 
 (deftest is-equal
   (is-equal 1 1)
@@ -64,7 +64,7 @@
       (is-equal 1 2)
       (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertEqual_failed)))))
+      (check-failed-assert value (assert-equal-failed))))))
 
 (deftest is-not-equal
   (is-not-equal 0 1)
@@ -77,7 +77,7 @@
       (is-not-equal 1 (+ 1 0))
       (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertNotEqual_failed)))))
+      (check-failed-assert value (assert-not-equal-failed))))))
 
 (deftest is-exception
   (is-exception 'throw 'my-error (throw 'my-error)))
@@ -189,4 +189,4 @@
       (is-match (tuple 1 'a) #(1 b))
       (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertMatch_failed)))))
+      (check-failed-assert value (assert-match-failed))))))

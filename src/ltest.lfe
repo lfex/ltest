@@ -97,6 +97,6 @@
        assert-exception when an unexpected error occurs, and
     2) checks the buried failure type against an expected value, asserting
        that they are the same."
-  (let (((tuple 'assertException_failed
-    (list _ _ _ _ (tuple fail-type _))) data))
+  (let* ((reason (assert-exception-failed))
+         (`#(,reason [,_ ,_ ,_ ,_ #(,fail-type ,_)]) data))
     (is-equal fail-type expected)))

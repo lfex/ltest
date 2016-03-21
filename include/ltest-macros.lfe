@@ -184,11 +184,11 @@ is thrown, an informative exception will be generated.
 
 (defmacro is-equal* (value expression)
   "Return a test object to assert `expression` evaluates to `value`."
-  `(_assertEqual ,bool-expression))
+  `(_assertEqual ,value ,expression))
 
 (defmacro is-not-equal* (value expression)
   "Return a test object to assert `expression` evaluates to `value`."
-  `(_assertNotEqual ,bool-expression))
+  `(_assertNotEqual ,value ,expression))
 
 (defmacro is-exception* (expected-class expected-term expression)
   "Return a test object that wraps [[is-exception/3]]."

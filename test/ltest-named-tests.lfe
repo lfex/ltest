@@ -3,8 +3,7 @@
   (export all)
   (import
     (from ltest
-      (check-failed-assert 2)
-      (check-wrong-assert-exception 2))))
+      (check-failed-assert 2))))
 
 (include-lib "include/ltest-macros.lfe")
 
@@ -21,7 +20,7 @@
         (is-not 'true)
         (error 'unexpected-test-success))
       (catch ((tuple type value _)
-        (check-failed-assert value 'assertion_failed))))))
+        (check-failed-assert value (assertion-failed)))))))
 
 (deftest named-testset-with-one
   (tuple '"Testing a named test set with one entry."
@@ -64,4 +63,5 @@
                           (error 'unexpected-test-succes))
                         (catch
                           ((tuple type value _)
-                           (check-failed-assert value 'assertEqual_failed)))))))))
+                           (check-failed-assert value
+                                                (assert-equal-failed))))))))))

@@ -38,7 +38,7 @@
       (is 'false)
       (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertion_failed)))))
+      (check-failed-assert value (assertion-failed))))))
 
 (deftest is-not
   (is-not 'false)
@@ -51,7 +51,7 @@
       (is-not 'true)
       (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertion_failed)))))
+      (check-failed-assert value (assertion-failed))))))
 
 (deftest is-equal
   (is-equal 1 1)
@@ -64,7 +64,7 @@
       (is-equal 1 2)
       (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertEqual_failed)))))
+      (check-failed-assert value (assert-equal-failed))))))
 
 (deftest is-not-equal
   (is-not-equal 0 1)
@@ -77,7 +77,7 @@
       (is-not-equal 1 (+ 1 0))
       (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertNotEqual_failed)))))
+      (check-failed-assert value (assert-not-equal-failed))))))
 
 (deftest is-exception
   (is-exception 'throw 'my-error (throw 'my-error)))
@@ -106,7 +106,14 @@
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_success)))))
 
-; XXX add test: is-not-exception_test
+(deftest is-not-exception
+  (is-not-exception (+ 2 2)))
+
+(deftest is-not-exception-exit
+  (is-not-exception 'exit 'badarith (/ 1 0)))
+
+(deftest is-not-exception-throw
+  (is-not-exception 'throw 'badarith (/ 1 0)))
 
 (deftest is-error
   (is-error 'badarith (/ 1 0)))
@@ -176,11 +183,10 @@
   (is-match (tuple 1 'a) #(1 a))
   (is-match (tuple 1 (tuple 2 'pull)) #(1 #(2 pull))))
 
-; XXX add test: is-match-fail_test
 (deftest is-match-fail
   (try
     (progn
       (is-match (tuple 1 'a) #(1 b))
-      (: erlang error 'unexpected-test-success))
+      (error 'unexpected-test-success))
     (catch ((tuple type value _)
-      (check-failed-assert value 'assertMatch_failed)))))
+      (check-failed-assert value (assert-match-failed))))))

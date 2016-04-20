@@ -10,9 +10,10 @@
   (lists:append
     (list
       (filelib:wildcard (filename:join
-        (list path ".eunit" "*.beam")))
+        (list path ".eunit/*.beam")))
       (filelib:wildcard (filename:join
-        (list path "_build/*/lib/ltool/ebin/" "*.beam"))))))
+        ;; XXX this should be _build/<profile(s)>/lib/...
+        (list path "_build/*/lib/ltool/ebin/*.beam"))))))
 
 (defun get-posible-test-beams (path)
   "Get the compiled .beam files, but without the .beam extension. The list of

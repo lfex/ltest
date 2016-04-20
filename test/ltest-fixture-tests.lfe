@@ -1,67 +1,37 @@
 (defmodule ltest-fixture-tests
   (behaviour ltest-unit)
-  (export all)
-  (import
-    (from ltest
-      (check-failed-assert 2)
-      (check-wrong-assert-exception 2))))
+  (export all))
 
 (include-lib "include/ltest-macros.lfe")
 
-(defun set-up ()
-  'ok)
+(defun set-up () 'ok)
 
-(defun tear-down (set-up-result)
-  (is-equal set-up-result 'ok))
+(defun tear-down (set-up-result) (is-equal set-up-result 'ok))
 
 (defun setup_test_case (set-up-result)
   "This is called the 'Instantiator' in EUnit parlance."
-  (list
-    (lambda ()
-      (is-equal set-up-result 'ok))
-    (lambda ()
-      (is-not-equal 'this-test 'very-silly))))
+  `[,(is-equal* set-up-result 'ok)
+    ,(is-not-equal* 'this-test 'very-silly)])
 
 (defun foreach_test_case (set-up-result)
   "This is called the 'Instantiator' in EUnit parlance."
-  (list
-    (lambda ()
-      (is-equal set-up-result 'ok))
-    (lambda ()
-      (is-not-equal 'this-test 'very-silly))))
+  `[,(is-equal* set-up-result 'ok)
+    ,(is-not-equal* 'this-test 'very-silly)])
 
-(deftestgen setup-setup
-  (tuple
-    'setup
-    (lambda () (set-up))
-    (lambda (x) (setup_test_case x))))
+(deftestgen setup-setup `#(setup ,(defsetup set-up) ,#'setup_test_case/1))
 
 (deftestgen setup-setup-cleanup
-  (tuple
-    'setup
-    (lambda () (set-up))
-    (lambda (x) (tear-down x))
-    (lambda (x) (setup_test_case x))))
+  `#(setup ,(defsetup set-up) ,(defteardown tear-down) ,#'setup_test_case/1))
 
 ; XXX add a test for setup-where-setup
 ; XXX add a test for setup-where-setup-cleanup
 
 (deftestgen foreach-setup
-  (tuple
-    'foreach
-    (lambda () (set-up))
-    (list
-      (lambda (x) (setup_test_case x))
-      (lambda (x) (foreach_test_case x)))))
+  `#(foreach ,(defsetup set-up) [,#'setup_test_case/1 ,#'foreach_test_case/1]))
 
 (deftestgen foreach-setup-cleanup
-  (tuple
-    'foreach
-    (lambda () (set-up))
-    (lambda (x) (tear-down x))
-    (list
-      (lambda (x) (setup_test_case x))
-      (lambda (x) (foreach_test_case x)))))
+  `#(foreach ,(defsetup set-up) ,(defteardown tear-down)
+             [,#'setup_test_case/1 ,#'foreach_test_case/1]))
 
 ; XXX add a test for foreach-where-setup
 ; XXX add a test for foreach-where-setup-cleanup

@@ -3,9 +3,8 @@ install: true
 before_script:
     - wget https://s3.amazonaws.com/rebar3/rebar3
     - chmod +x rebar3
-env:
-  - PATH=".:$PATH"
-script: rebar3 eunit
+env: PATH=".:$PATH"
+script: make check-runner-ltest
 otp_release:
   - 18.2
   - 17.5

@@ -2,8 +2,8 @@
 
 [![][ltest-logo]][ltest-logo-large]
 
-[ltest-logo]: resources/images/ltest-logo-small.png
-[ltest-logo-large]: resources/images/ltest-logo-large.png
+[ltest-logo]: priv/images/ltest-logo-small.png
+[ltest-logo-large]: priv/images/ltest-logo-large.png
 
 *A Unit, Integration, and System Tests Framework for LFE*
 
@@ -291,19 +291,19 @@ check-runner-eunit: compile-no-deps compile-tests
 
 Here's what the output looks like with failing and skipped tests:
 
-<img src="resources/images/screen-2-1.png"/>
+<img src="priv/images/screen-2-1.png"/>
 
 End:
 
-<img src="resources/images/screen-2-2.png"/>
+<img src="priv/images/screen-2-2.png"/>
 
 And here's what passing tests looks like:
 
-<img src="resources/images/screen-1-1.png"/>
+<img src="priv/images/screen-1-1.png"/>
 
 End:
 
-<img src="resources/images/screen-1-2.png"/>
+<img src="priv/images/screen-1-2.png"/>
 
 The rest of the ``make`` targets still use lfetool, and will continue to do
 so, since lfetool will be updating to use ltest's new runner. If you'd like

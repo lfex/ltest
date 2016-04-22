@@ -12,6 +12,8 @@
       (filelib:wildcard (filename:join
         (list path ".eunit/*.beam")))
       (filelib:wildcard (filename:join
+        (list path "_build/test/lib/ltest/ebin/*.beam")))
+      (filelib:wildcard (filename:join
         ;; XXX this should be _build/<profile(s)>/lib/...
         (list path "_build/*/lib/*/ebin/*.beam"))))))
 

@@ -10,7 +10,7 @@
 (defun setup_test_case (set-up-result)
   "This is called the 'Instantiator' in EUnit parlance."
   `[,(is-equal* set-up-result 'ok)
-    ,(is-not-equal* 'this-test 'very-silly)])
+    ,(tuple "Silly test" (is-not-equal* 'this-test 'very-silly))])
 
 (defun foreach_test_case (set-up-result)
   "This is called the 'Instantiator' in EUnit parlance."

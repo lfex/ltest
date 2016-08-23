@@ -87,6 +87,35 @@ A simple wrapper macro for defining the tear-down function in a fixture."
 ;;; Test case macros
 ;;;===================================================================
 
+(eval-when-compile
+  (defun is-named-tuple (t)
+    (progn ;(lfe_io:format "~p" (list t)) ;for debugging
+           (is-named-tuple1 t)))
+
+  ;Return true if we have (tuple "name"...) or #("Name"...)
+  (defun is-named-tuple1
+    ((t) (when (is_tuple t))
+      (if (io_lib:printable_list (element 1 t))
+        'true
+        'false))
+    ((t) (when (is_list t))
+      (if (andalso (== 'tuple (hd t))
+                   (io_lib:printable_list (cadr t)))
+        'true
+        'false))
+    ((other) 'false))
+
+  ;Return (tuple "Name" lambda() ...) from (tuple "Name" ...)
+  (defun mk-named-tuple
+    ((t) (when (is_tuple t))
+      `(tuple ,(element 1 t)
+              (lambda ()
+                ,(list_to_tuple (tl (tuple_to_list t))))))
+    ((t) (when (is_list t))
+      `(tuple ,(cadr t)
+              (lambda ()
+                ,(list_to_tuple (cdr t)))))))
+
 (defmacro deftestcase
   "This macro is for defining EUnit tests for use by fixtures which have
   particular naming convention needs."
@@ -95,7 +124,12 @@ A simple wrapper macro for defining the tear-down function in a fixture."
       (list
         ,@(lists:map
             (lambda (part)
-              `(lambda () ,part))
+              (if (is-named-tuple part)
+                ;Make a named tuple if part is a tuple and its
+                ;1st element is printable
+                (mk-named-tuple part)
+                ;Otherwise just make a lamdba
+                `(lambda () ,part)))
             rest)))))
 
 (defmacro deftestcases funcs

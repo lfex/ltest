@@ -91,14 +91,10 @@ A simple wrapper macro for defining the tear-down function in a fixture."
   ;;Return true if we have (tuple "name"...) or #("Name"...)
   (defun is-named-tuple
     ((t) (when (is_tuple t))
-      (if (io_lib:printable_list (element 1 t))
-        'true
-        'false))
+      (io_lib:printable_list (element 1 t)))
     ((t) (when (is_list t))
-      (if (andalso (== 'tuple (hd t))
-                   (io_lib:printable_list (cadr t)))
-        'true
-        'false))
+      (andalso (== 'tuple (hd t))
+               (io_lib:printable_list (cadr t))))
     ((other) 'false))
 
   ;;Return (tuple "Name" lambda() ...) from (tuple "Name" ...)

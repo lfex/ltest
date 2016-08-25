@@ -88,12 +88,8 @@ A simple wrapper macro for defining the tear-down function in a fixture."
 ;;;===================================================================
 
 (eval-when-compile
-  (defun is-named-tuple (t)
-    (progn ;(lfe_io:format "~p" (list t)) ;for debugging
-           (is-named-tuple1 t)))
-
-  ;Return true if we have (tuple "name"...) or #("Name"...)
-  (defun is-named-tuple1
+  ;;Return true if we have (tuple "name"...) or #("Name"...)
+  (defun is-named-tuple
     ((t) (when (is_tuple t))
       (if (io_lib:printable_list (element 1 t))
         'true
@@ -105,7 +101,7 @@ A simple wrapper macro for defining the tear-down function in a fixture."
         'false))
     ((other) 'false))
 
-  ;Return (tuple "Name" lambda() ...) from (tuple "Name" ...)
+  ;;Return (tuple "Name" lambda() ...) from (tuple "Name" ...)
   (defun mk-named-tuple
     ((t) (when (is_tuple t))
       `(tuple ,(element 1 t)

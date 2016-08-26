@@ -11,12 +11,14 @@
 (deftestcase setup-tc (set-up-result)
   ;; This is called the 'Instantiator' in EUnit parlance.
   (is-equal set-up-result 'ok)
-  (is-not-equal 'this-test 'very-silly))
+  (is-not-equal 'this-test 'very-silly)
+  (tuple "Named test in setup-tc" (is-not-equal 'good 'evil)))
 
 (deftestcase foreach-tc (set-up-result)
   ;; This is called the 'Instantiator' in EUnit parlance.
   (is-equal set-up-result 'ok)
-  (is-not-equal 'this-test 'very-silly))
+  (is-not-equal 'this-test 'very-silly)
+  (tuple "Named foreach-tc test" (is-not-equal 'people  'things)))
 
 (deftestgen setup-setup `#(setup ,(defsetup set-up) ,(deftestcases setup-tc)))
 

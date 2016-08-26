@@ -6,7 +6,7 @@ before_script:
 env: PATH=".:$PATH"
 script: make check-runner-ltest
 otp_release:
-  - 18.2
+  - 18.3
   - 17.5
   - R16B03-1
   - R15B03

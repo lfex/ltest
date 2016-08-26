@@ -25,7 +25,8 @@
     ; (io:format "\tstate: ~p~n" (list state))
     state)
   (('test (= `(,_ ,_ #(source #(,mod ,func ,arity)) ,_) data) state)
-    (ltest-formatter:func-line func)
+    (ltest-formatter:func-line func
+                               (proplists:get_value 'desc data 'undefined))
     ;(io:format "\t\tdata: ~p~n" (list data))
     ;(io:format "\t\tstate: ~p~n" (list state))
     state)

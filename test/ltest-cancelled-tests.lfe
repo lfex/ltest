@@ -1,9 +1,19 @@
 (defmodule ltest-cancel-tests
-  ;Take the number one out of the next line
-  ;and  run make check-runner-ltest
-  ; you should get one errored test and
-  ; a message saying
-  ; "One or more tests were cancelled."
+  "This module is meant to test
+   the ability to recognize cancelled
+   tests (e.g.  fixture tests that
+   have bad contents).
+
+   In order to enable this test, take the
+   number one (1) out of the behaviour name
+   below, and you should see
+   \"One or more tests were cancelled.\" in
+   the runner output.
+
+   It is disabled because normally you want
+   to see the test suite finishing without
+   errors.
+  "
   (behaviour ltest-unit1))
 
 (include-lib "include/ltest-macros.lfe")

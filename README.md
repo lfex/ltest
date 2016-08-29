@@ -84,20 +84,21 @@ listener (test runner).
 ### Adding ltest to Your Project [&#x219F;](#contents)
 
 In order to use ltest in your project, all you need to do is add a rebar dep.
-In your ``rebar.config`` file, simply add an extra line for ``ltest``:
+In your ``rebar.config`` file, simply add an extra line for ``ltest`` and one for where to take your tests from:
 
 ```erlang
 {deps, [
     {lfe, ".*", {git, "git://github.com/rvirding/lfe.git", "master"}},
     {ltest, ".*", {git, "git://github.com/lfex/ltest.git", "master"}}
   ]}.
+
+{eunit_compile_opts, [{src_dirs, ["src", "test"]}]}.
 ```
 
 Once you write some tests (see below for how to do that), you can then do this:
 
 ```bash
-$ lfetool tests build
-$ lfetool tests unit
+$ rebar3 eunit
 ```
 
 

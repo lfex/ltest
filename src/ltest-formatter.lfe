@@ -166,6 +166,27 @@
   (io:format (ltest-color:yellow (get-no-results-report data state)))
   (finish-section))
 
+(defun display-test-cancel (reason)
+  (io:format (format-cancel reason)))
+
+(defun format-cancel
+  (('undefined)  "*skipped*~n")
+  (('timeout)    "*timed out*~n")
+
+  ((`#(startup ,reason))
+    (io_lib:format "*could not start test process*~n::~tP~n~n"
+                   (list reason 15)))
+
+  ((`#(blame ,_subid))
+    "*cancelled because of subtask*~n")
+
+  ((`#(exit ,reason))
+    (io_lib:format "*unexpected termination of test process*~n::~tP~n~n"
+                   (list reason 15)))
+
+  ((`#(abort ,reason))
+    (eunit_lib:format_error reason)))
+
 (defun get-no-results-report (data state)
   (io_lib:format
     "There were no ~s tests found.~n"

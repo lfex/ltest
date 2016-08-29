@@ -76,8 +76,10 @@
     state))
 
 (defun handle_cancel
-  ((_ data state)
-    state))
+  ((_group_or_test data state)
+    (ltest-formatter:display-test-cancel (proplists:get_value 'reason data))
+    ;;This counts groups and tests together
+    (set-state-err state (+ 1 (state-err state)))))
 
 (defun terminate
   ((`#(ok ,data) state)
@@ -85,6 +87,10 @@
     (if (> (ltest-util:all-tests state) 0)
         (ltest-formatter:display-results data state)
         (ltest-formatter:display-no-results data state))
+    ;;error out if tests were cancelled
+    (if (> (proplists:get_value 'cancel data 0) 0)
+        (io:format (ltest-color:red "One or more tests were cancelled.\n"))
+        (sync_end 'error));same behaviour as eunit
     `#(ok ,data ,state))
   ((`#(error ,reason) state)
     (io:nl)

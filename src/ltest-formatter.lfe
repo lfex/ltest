@@ -40,8 +40,11 @@
 (defun indent (count)
   (string:copies " " count))
 
-(defun func-line (raw-func)
-  (let ((func (get-func-name raw-func)))
+(defun func-line (raw-func desc)
+  (let ((func
+           (if (!= 'undefined desc)
+               desc
+               (get-func-name raw-func))))
     (io:format "~s~s ~s" `(,(indent (ltest-const:func-indent))
                            ,func
                            ,(get-elision func)))))
@@ -57,13 +60,17 @@
     "_test(_)?$" "" '(global #(return list))))
 
 
-(defun get-elision (func-name)
-  (let* ((init-len (+ (ltest-const:func-indent)
-                      (length func-name)))
-         (end-len (length " [fail]"))
-         (elide-len (- (ltest-const:test-suite-width)
-                       (+ init-len end-len))))
-    (string:copies "." elide-len)))
+(defun get-elision
+  ((func-name) (when (is_list func-name))
+    (let* ((init-len (+ (ltest-const:func-indent)
+                        (length func-name)))
+           (end-len (length " [fail]"))
+           (elide-len (- (ltest-const:test-suite-width)
+                         (+ init-len end-len))))
+      (string:copies "." elide-len)))
+  ;Named tests send description as binary
+  ((desc) (when (is_binary desc))
+    (get-elision (binary_to_list desc))))
 
 (defun mod-line (desc)
   (io:format "~smodule: ~s~n"
@@ -158,6 +165,27 @@
 (defun display-no-results (data state)
   (io:format (ltest-color:yellow (get-no-results-report data state)))
   (finish-section))
+
+(defun display-test-cancel (reason)
+  (io:format (format-cancel reason)))
+
+(defun format-cancel
+  (('undefined)  "*skipped*~n")
+  (('timeout)    "*timed out*~n")
+
+  ((`#(startup ,reason))
+    (io_lib:format "*could not start test process*~n::~tP~n~n"
+                   (list reason 15)))
+
+  ((`#(blame ,_subid))
+    "*cancelled because of subtask*~n")
+
+  ((`#(exit ,reason))
+    (io_lib:format "*unexpected termination of test process*~n::~tP~n~n"
+                   (list reason 15)))
+
+  ((`#(abort ,reason))
+    (eunit_lib:format_error reason)))
 
 (defun get-no-results-report (data state)
   (io_lib:format

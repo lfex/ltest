@@ -24,22 +24,22 @@
 (defmacro assert-match-failed ()
   `(if (otp>=18?) 'assertMatch 'assertMatch_failed))
 
-
 ;;;===================================================================
 ;;; Helper functions
 ;;;===================================================================
 
 (eval-when-compile
+
   (defun to-unders (atm)
     (re:replace (atom_to_list atm) "-" "_" '(#(return list) global)))
+
   (defun list-body
     ((body) (when (is_list body))
      body)
     ((body)
      (list body)))
-  ;; end of eval-when-compile
-  )
 
+  ) ; end of eval-when-compile
 
 ;;;===================================================================
 ;;; Test definition macros
@@ -73,13 +73,13 @@
 (defmacro defsetup (func-name)
   "Return a nullary function that calls `func-name/0`.
 
-A simple wrapper macro for defining the set-up function in a fixture."
+  A simple wrapper macro for defining the set-up function in a fixture."
   `(lambda () (,func-name)))
 
 (defmacro defteardown (func-name)
   "Return a unary function that calls `func-name/1` on its argument.
 
-A simple wrapper macro for defining the tear-down function in a fixture."
+  A simple wrapper macro for defining the tear-down function in a fixture."
   `(lambda (x) (,func-name x)))
 
 
@@ -229,7 +229,6 @@ A simple wrapper macro for defining the tear-down function in a fixture."
    `(is-not-throw _ ,expression))
   ((expected-term expression)
    `(is-not-exception 'throw ,expected-term ,expression)))
-
 
 ;;;===================================================================
 ;;; Test object macros

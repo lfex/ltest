@@ -17,3 +17,11 @@ clean:
 
 clean-all: clean
 	@rebar3 as dev lfe clean
+
+push:
+	git push github master
+	git push gitlab master
+
+push-all: push
+	git push github --tags
+	git push gitlab --tags

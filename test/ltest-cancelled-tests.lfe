@@ -8,8 +8,7 @@
 ;;;; It is disabled because normally you want to see the test suite finishing
 ;;;; without errors.
 (defmodule ltest-cancelled-tests
-  (behaviour ltest-unit)
-  (export all))
+  (behaviour ltest-unit))
 
 (include-lib "include/ltest-macros.lfe")
 

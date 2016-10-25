@@ -1,6 +1,5 @@
 (defmodule ltest-generated-tests
-  (behaviour ltest-unit)
-  (export all))
+  (behaviour ltest-unit))
 
 (include-lib "include/ltest-macros.lfe")
 

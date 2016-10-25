@@ -1,6 +1,5 @@
 (defmodule ltest-named-tests
   (behaviour ltest-unit)
-  (export all)
   (import
     (from ltest
       (check-failed-assert 2))))

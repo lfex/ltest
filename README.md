@@ -22,6 +22,7 @@
   * [Running Your Tests](#running-your-tests-)
   * [The LFE Test Runner](#the-lfe-test-runner-)
 * [Dogfood](#dogfood-)
+* [License](#license-)
 
 
 ## Introduction [&#x219F;](#contents)
@@ -403,3 +404,21 @@ Which will give you output similar to the following:
     =======================================================
       All 56 tests passed.
 ```
+
+
+## License [&#x219F;](#contents)
+
+BSD 3-Clause License
+
+Copyright © 2013-2016, Duncan McGreggor <oubiwann@gmail.com>
+
+Copyright © 2014, Døkkarr Hirðisson <dokkarr@lfe.io>
+
+Copyright © 2014, Joshua Schairbaum <joshua.schairbaum@gmail.com>
+
+Copyright © 2016, Eric Bailey <eric@ericb.me>
+
+Copyright © 2016, jsc <jonas.skovsgaard.christensen@gmail.com>
+
+Copyright © 2016, skovsgaard <jonas.skovsgaard.christensen@gmail.com>
+

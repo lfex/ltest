@@ -5,7 +5,7 @@
   {description, "A Testing Framework for LFE"},
 
   %% The version of the application
-  {vsn, "0.9.0"},
+  {vsn, "0.10.0-rc1"},
 
   %% All modules used by the application.
   {modules,
@@ -35,6 +35,15 @@
 
   %% configuration parameters similar to those in the config file specified
   %% on the command line. can be fetched with gas:get_env
-  {env, []}
+  {env, []},
+  %% Hex.pm metadata
+  {pkg_name, ltest},
+  {maintainers, ["Duncan McGreggor"]},
+  {licenses, ["BSD-3"]},
+  {links,
+   [{"GitHub", "https://github.com/lfex/ltest"},
+    {"Gitlab", "https://gitlab.com/lfex/ltest"},
+    {"Hex", "https://hex.pm/packages/ltest"}
+   ]}
  ]
 }.

@@ -26,6 +26,17 @@ push-all: push
 	git push github --tags
 	git push gitlab --tags
 
+build-github: clean
+	rebar3 compile
+
+build-gitlab: clean
+	rebar3 as gitlab compile
+
+build-hexpm: clean
+	rebar3 as hexpm compile
+
+build-all: build-github build-gitlab build-hexpm
+
 publish:
 	rebar3 as hexpm hex publish
 

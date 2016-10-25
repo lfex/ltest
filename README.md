@@ -96,7 +96,7 @@ take your tests from (``eunit_compile_otps``). In your ``rebar.config``:
   {test, [
     {deps, [
       {eunit_compile_opts, [{src_dirs, ["src", "test"]}]},
-      {ltest, {git, "git://github.com/lfex/ltest.git", {tag, "0.9.0"}}}
+      {ltest, {git, "git://github.com/lfex/ltest.git", {tag, "0.10.0-rc1"}}}
     ]}
   ]}
 ]}.
@@ -326,85 +326,147 @@ to track the progress on these, here are the related tickets:
 project directory:
 
 ```bash
-    $ make check
+    $ make check-runner-ltest
 ```
 
 Which will give you output similar to the following:
 
 ```
-    ------------------
-    Running unit tests ...
-    ------------------
+================================ ltest =================================
 
-    ======================== EUnit ========================
-    module 'ltest-basic-tests'
-      is ............................................. [ok]
-      is-with-one-phrase-deftest ..................... [ok]
-      is-with-two-phrase-deftest ..................... [ok]
-      is-with-many-phrase-deftest .................... [ok]
-      is-fail .............................. [0.003 s] [ok]
-      is-not ......................................... [ok]
-      is-not-fail .................................... [ok]
-      is-equal ....................................... [ok]
-      is-equal-fail .................................. [ok]
-      is-not-equal ................................... [ok]
-      is-not-equal-fail .............................. [ok]
-      is-exception ................................... [ok]
-      is-exception-wrong-class ....................... [ok]
-      is-exception-wrong-term ........................ [ok]
-      is-exception-unexpected-success ................ [ok]
-      is-error ....................................... [ok]
-      is-error-wrong-term ............................ [ok]
-      is-error-unexpected-success .................... [ok]
-      is-throw ....................................... [ok]
-      is-throw-wrong-term ............................ [ok]
-      is-throw-unexpected-success .................... [ok]
-      is-exit ........................................ [ok]
-      is-exit-wrong-term ............................. [ok]
-      is-exit-unexpected-success ..................... [ok]
-      is-match ....................................... [ok]
-      is-match-fail .................................. [ok]
-      Total module test time: 0.081 s
-    module 'ltest-fixture-tests'
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      foreach-test-case .............................. [ok]
-      foreach-test-case .............................. [ok]
-      setup-test-case ................................ [ok]
-      setup-test-case ................................ [ok]
-      foreach-test-case .............................. [ok]
-      foreach-test-case .............................. [ok]
-      Total module test time: 0.035 s
-    module 'ltest-generated-tests'
-      one-lambda ..................................... [ok]
-      one-lambda-in-list ............................. [ok]
-      many-lambdas-in-list ........................... [ok]
-      many-lambdas-in-list ........................... [ok]
-      many-lambdas-in-list ........................... [ok]
-      lambda-with-nested-testset ..................... [ok]
-      Total module test time: 0.017 s
-    module 'ltest-named-tests'
-      named-is ....................................... [ok]
-      named-is-not-fail .............................. [ok]
-      named-testset-with-one ......................... [ok]
-      named-testset-with-two ......................... [ok]
-      named-testset-with-three ....................... [ok]
-      named-testset-nested ........................... [ok]
-      named-testset-deeply-nested .................... [ok]
-      Total module test time: 0.021 s
-    module 'ltest-testset-tests'
-      testset-with-one ............................... [ok]
-      testset-with-two ............................... [ok]
-      testset-with-three ............................. [ok]
-      testset-nested ................................. [ok]
-      testset-deeply-nested .......................... [ok]
-      Total module test time: 0.015 s
-    =======================================================
-      All 56 tests passed.
+------------------------------ Unit Tests ------------------------------
+
+module: ltest-basic-tests
+  is ................................................................ [ok]
+  is_with_one_phrase_deftest ........................................ [ok]
+  is_with_two_phrase_deftest ........................................ [ok]
+  is_with_many_phrase_deftest ....................................... [ok]
+  is_fail ........................................................... [ok]
+  is_not ............................................................ [ok]
+  is_not_fail ....................................................... [ok]
+  is_equal .......................................................... [ok]
+  is_equal_fail ..................................................... [ok]
+  is_not_equal ...................................................... [ok]
+  is_not_equal_fail ................................................. [ok]
+  is_exception ...................................................... [ok]
+  is_exception_wrong_class .......................................... [ok]
+  is_exception_wrong_term ........................................... [ok]
+  is_exception_unexpected_success ................................... [ok]
+  is_not_exception .................................................. [ok]
+  is_not_exception_exit ............................................. [ok]
+  is_not_exception_throw ............................................ [ok]
+  is_error .......................................................... [ok]
+  is_error_wrong_term ............................................... [ok]
+  is_error_unexpected_success ....................................... [ok]
+  is_throw .......................................................... [ok]
+  is_throw_wrong_term ............................................... [ok]
+  is_throw_unexpected_success ....................................... [ok]
+  is_exit ........................................................... [ok]
+  is_exit_wrong_term ................................................ [ok]
+  is_exit_unexpected_success ........................................ [ok]
+  is_match .......................................................... [ok]
+  is_match_fail ..................................................... [ok]
+  time: 92ms
+
+module: ltest-cancelled-tests
+  setup_test_case ................................................... [ok]
+  Another unused test ............................................... [ok]
+  time: 7ms
+
+module: ltest-fixture-tests
+  setup_test_case ................................................... [ok]
+  setup_test_case ................................................... [ok]
+  Named setup test .................................................. [ok]
+  setup_test_case ................................................... [ok]
+  setup_test_case ................................................... [ok]
+  Named setup test .................................................. [ok]
+  setup_test_case ................................................... [ok]
+  setup_test_case ................................................... [ok]
+  Named setup test .................................................. [ok]
+  foreach_test_case ................................................. [ok]
+  foreach_test_case ................................................. [ok]
+  setup_test_case ................................................... [ok]
+  setup_test_case ................................................... [ok]
+  Named setup test .................................................. [ok]
+  foreach_test_case ................................................. [ok]
+  foreach_test_case ................................................. [ok]
+  time: 49ms
+
+module: ltest-fixturecase-tests
+  setup_tc_test_case ................................................ [ok]
+  setup_tc_test_case ................................................ [ok]
+  Named test in setup-tc ............................................ [ok]
+  setup_tc_test_case ................................................ [ok]
+  setup_tc_test_case ................................................ [ok]
+  Named test in setup-tc ............................................ [ok]
+  setup_tc_test_case ................................................ [ok]
+  setup_tc_test_case ................................................ [ok]
+  Named test in setup-tc ............................................ [ok]
+  foreach_tc_test_case .............................................. [ok]
+  foreach_tc_test_case .............................................. [ok]
+  Named foreach-tc test ............................................. [ok]
+  setup_tc_test_case ................................................ [ok]
+  setup_tc_test_case ................................................ [ok]
+  Named test in setup-tc ............................................ [ok]
+  foreach_tc_test_case .............................................. [ok]
+  foreach_tc_test_case .............................................. [ok]
+  Named foreach-tc test ............................................. [ok]
+  time: 55ms
+
+module: ltest-generated-tests
+  is* ............................................................... [ok]
+  is_not*_in_list ................................................... [ok]
+  many_generators_in_list ........................................... [ok]
+  many_generators_in_list ........................................... [ok]
+  many_generators_in_list ........................................... [ok]
+  nested_test_set ................................................... [ok]
+  nested_test_set ................................................... [ok]
+  nested_test_set ................................................... [ok]
+  nested_test_set ................................................... [ok]
+  nested_test_set ................................................... [ok]
+  nested_test_set ................................................... [ok]
+  time: 34ms
+
+module: ltest-named-tests
+  named_is .......................................................... [ok]
+  named_is_not_fail ................................................. [ok]
+  named_testset_with_one ............................................ [ok]
+  named_testset_with_two ............................................ [ok]
+  named_testset_with_three .......................................... [ok]
+  named_testset_nested .............................................. [ok]
+  named_testset_deeply_nested ....................................... [ok]
+  time: 22ms
+
+module: ltest-testset-tests
+  testset_with_one .................................................. [ok]
+  testset_with_two .................................................. [ok]
+  testset_with_three ................................................ [ok]
+  testset_nested .................................................... [ok]
+  testset_deeply_nested ............................................. [ok]
+  time: 18ms
+
+summary:
+  Tests: 88  Passed: 88  Skipped: 0  Failed: 0 Erred: 0
+  Total time: 277ms
+
+
+-------------------------- Integration Tests ---------------------------
+
+There were no integration tests found.
+
+
+----------------------------- System Tests -----------------------------
+
+There were no system tests found.
+
+
+========================================================================
+
+There were no selenium tests found.
+
+
+========================================================================
+
 ```
 
 

@@ -1,8 +1,6 @@
 (defmodule ltest-runner
   (export all))
 
-(include-lib "clj/include/compose.lfe")
-
 (defun all ()
   (ltest-formatter:test-suite-header)
   (unit 'combined)
@@ -73,10 +71,10 @@
    * ltest-listener
    * eunit_progress
    * eunit_surefire"
-   (->> (lutil-file:get-arg 'listener "ltest-listener")
-        (element 2)
-        (caar)
-        (list_to_atom)))
+   (clj:->> (lutil-file:get-arg 'listener "ltest-listener")
+            (element 2)
+            (caar)
+            (list_to_atom)))
 
 (defun get-options (listener)
   (get-options listener '(colored)))
@@ -103,3 +101,4 @@
 
 (defun run-modules (modules listener)
   (eunit:test modules (get-options listener)))
+

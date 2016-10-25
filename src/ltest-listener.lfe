@@ -2,7 +2,6 @@
   (behaviour eunit_listener)
   (export all))
 
-(include-lib "clj/include/seq.lfe")
 (include-lib "ltest/include/ltest-records.lfe")
 
 (defun start ()

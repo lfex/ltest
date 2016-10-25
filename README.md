@@ -1,5 +1,7 @@
 # ltest
 
+[![Build Status][travis badge]][travis] [![LFE Versions][lfe badge]][lfe] [![Erlang Versions][erlang badge]][versions] [![Tags][github tags badge]][github tags] [![Downloads][hex downloads]][hex package]
+
 [![][ltest-logo]][ltest-logo-large]
 
 [ltest-logo]: priv/images/ltest-logo-small.png
@@ -421,4 +423,24 @@ Copyright © 2016, Eric Bailey <eric@ericb.me>
 Copyright © 2016, jsc <jonas.skovsgaard.christensen@gmail.com>
 
 Copyright © 2016, skovsgaard <jonas.skovsgaard.christensen@gmail.com>
+
+
+<!-- Named page links below: /-->
+
+[lr3-logo]: priv/images/logo.png
+[org]: https://github.com/lfe-rebar3
+[github]: https://github.com/lfex/ltest
+[gitlab]: https://gitlab.com/lfex/ltest
+[travis]: https://travis-ci.org/lfex/ltest
+[travis badge]: https://img.shields.io/travis/lfex/ltest.svg
+[lfe]: https://github.com/rvirding/lfe
+[lfe badge]: https://img.shields.io/badge/lfe-1.2.0-blue.svg
+[erlang badge]: https://img.shields.io/badge/erlang-R15%20to%2019.1-blue.svg
+[versions]: https://github.com/lfex/ltest/blob/master/.travis.yml
+[github tags]: https://github.com/lfex/ltest/tags
+[github tags badge]: https://img.shields.io/github/tag/lfex/ltest.svg
+[github downloads]: https://img.shields.io/github/downloads/atom/atom/total.svg
+[hex badge]: https://img.shields.io/hexpm/v/ltest.svg?maxAge=2592000
+[hex package]: https://hex.pm/packages/ltest
+[hex downloads]: https://img.shields.io/hexpm/dt/ltest.svg
 

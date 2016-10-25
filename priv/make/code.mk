@@ -25,3 +25,6 @@ push:
 push-all: push
 	git push github --tags
 	git push gitlab --tags
+
+publish:
+	rebar3 as hexpm hex publish

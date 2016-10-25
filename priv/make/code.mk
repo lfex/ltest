@@ -28,3 +28,6 @@ push-all: push
 
 publish:
 	rebar3 as hexpm hex publish
+
+show-versions:
+	rebar3 as dev lfe version

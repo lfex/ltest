@@ -46,3 +46,15 @@
      (state-skip state)
      (state-fail state)
      (state-cancel state)))
+
+(defun rebar-debug (msg)
+  (rebar-debug msg '()))
+
+(defun rebar-debug (msg args)
+  "For use in the context of rebar3 plugins."
+  (case (code:ensure_loaded 'rebar_api)
+    (`#(error ,_)
+      'undefined)
+    (`#(module ,_)
+      (rebar_api:debug msg args))))
+

@@ -42,16 +42,29 @@
 
 (defun run
   (('integration)
-    (run-beams 'integration
-               (ltest:get-integration-beams (lutil-file:get-cwd))))
+    (ltest-util:rebar-debug "Running integration tests ...")
+    (let* ((cwd (lutil-file:get-cwd))
+           (beams (ltest:get-integration-beams cwd)))
+      (ltest-util:rebar-debug "Got cwd: ~p" `(,cwd))
+      (ltest-util:rebar-debug "Got beams: ~p" `(,beams))
+      (run-beams 'integration beams)))
   (('system)
-    (run-beams 'system
-               (ltest:get-system-beams (lutil-file:get-cwd))))
+    (ltest-util:rebar-debug "Running system tests ...")
+    (let* ((cwd (lutil-file:get-cwd))
+           (beams (ltest:get-system-beams cwd)))
+      (ltest-util:rebar-debug "Got cwd: ~p" `(,cwd))
+      (ltest-util:rebar-debug "Got beams: ~p" `(,beams))
+      (run-beams 'system beams)))
   (('unit)
-    (run-beams 'unit
-               (ltest:get-unit-beams (lutil-file:get-cwd))))
+    (ltest-util:rebar-debug "Running unit tests ...")
+    (let* ((cwd (lutil-file:get-cwd))
+           (beams (ltest:get-unit-beams cwd)))
+      (ltest-util:rebar-debug "Got cwd: ~p" `(,cwd))
+      (ltest-util:rebar-debug "Got beams: ~p" `(,beams))
+      (run-beams 'unit beams)))
   ;; Add support for third-party test runners here
   (('selenium)
+    (ltest-util:rebar-debug "Running selenium tests ...")
     (case (code:which 'lse)
       ('non_existing (ltest-runner:run-beams 'selenium '()))
       (_ (lse-runner:run-beams))))

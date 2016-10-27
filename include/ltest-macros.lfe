@@ -7,10 +7,11 @@
 
 (defmacro otp>=18? ()
   `(try
-     (=< 18 (list_to_integer (erlang:system_info 'otp_release)))
+     (>= (list_to_integer (erlang:system_info 'otp_release)) 18)
      (catch (_ 'false))))
 
-(defmacro assertion-failed () `(if (otp>=18?) 'assert 'assertion_failed))
+(defmacro assertion-failed ()
+  `(if (otp>=18?) 'assert 'assertion_failed))
 
 (defmacro assert-equal-failed ()
   `(if (otp>=18?) 'assertEqual 'assertEqual_failed))

@@ -96,7 +96,7 @@ take your tests from (``eunit_compile_otps``). In your ``rebar.config``:
   {test, [
     {deps, [
       {eunit_compile_opts, [{src_dirs, ["src", "test"]}]},
-      {ltest, {git, "git://github.com/lfex/ltest.git", {tag, "0.10.0-rc1"}}}
+      {ltest, {git, "git://github.com/lfex/ltest.git", {tag, "0.10.0-rc2"}}}
     ]}
   ]}
 ]}.

@@ -1,15 +1,23 @@
 language: erlang
 install: true
 before_script:
-    - wget https://s3.amazonaws.com/rebar3/rebar3
-    - chmod +x rebar3
-env: PATH=".:$PATH"
+  - make setup-rebar3
+  - make setup-hexpm
+env:
+  - REBAR_BUILD=github
+  - REBAR_BUILD=gitlab
+  - REBAR_BUILD=hexpm
 script:
-  - make build-all
-  - make check-runner-ltest
+  - make travis
+  #- make check-hexpm # XXX disabled due to Hex.pm failing on R15
 otp_release:
   - 19.1
   - 18.3
   - 17.5
   - R16B03-1
   - R15B03
+matrix:
+  # disabled due to Hex.pm failing on R15
+  exclude:
+  - otp_release: R15B03
+    env: REBAR_BUILD=hexpm

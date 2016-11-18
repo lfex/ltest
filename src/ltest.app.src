@@ -10,10 +10,16 @@
   %% All modules used by the application.
   {modules,
    [
-    ltest,
+    'ltest-color',
+    'ltest-const',
+    'ltest-formatter',
     'ltest-integration',
+    'ltest',
+    'ltest-listener',
+    'ltest-runner',
     'ltest-system',
-    'ltest-unit'
+    'ltest-unit',
+    'ltest-util'
    ]},
 
   %% All of the registered names the application uses. This can be ignored.
@@ -25,7 +31,9 @@
   {applications,
    [
     kernel,
-    stdlib
+    stdlib,
+    color,
+    lutil
    ]},
 
   %% OTP application loader will load, but not start, included apps. Again

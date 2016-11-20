@@ -1,5 +1,5 @@
 compile:
-	$(REBAR3) compile
+	$(REBAR3) as dev compile
 
 repl:
 	$(REBAR3) as $(REBAR_PROFILE) compile

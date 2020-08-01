@@ -30,7 +30,7 @@ check:
 	@echo "Running tests using Github Sources ..."
 	@echo "=================================="
 	@echo
-	$(REBAR3) as test lfe test
+	$(REBAR3) as test eunit
 
 check-gitlab:
 	@echo
@@ -38,7 +38,7 @@ check-gitlab:
 	@echo "Running tests using Gitlab Sources ..."
 	@echo "=================================="
 	@echo
-	$(REBAR3) as gitlab lfe test
+	$(REBAR3) as gitlab eunit
 
 check-hexpm: clean
 	@echo
@@ -47,7 +47,7 @@ check-hexpm: clean
 	@echo "==================================="
 	@echo
 	@$(REBAR3) as hexpm lfe clean
-	$(REBAR3) as hexpm lfe test
+	$(REBAR3) as hexpm eunit
 
 check-all: check check-gitlab check-hexpm
 

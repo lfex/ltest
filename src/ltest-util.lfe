@@ -4,14 +4,10 @@
 (include-lib "ltest/include/ltest-records.lfe")
 
 (defun get-version ()
-  (lr3-ver-util:get-app-version 'ltest))
+  (rebar3_lfe_version:app_version 'ltest))
 
 (defun get-versions ()
-  (++ (lr3-ver-util:get-versions)
-      `(#(kla ,(lr3-ver-util:get-app-version 'kla))
-        #(clj ,(lr3-ver-util:get-app-version 'clj))
-        #(lutil ,(lr3-ver-util:get-app-version 'lutil))
-        #(ltest ,(get-version)))))
+  (rebar3_lfe_version:versions '(ltest)))
 
 (defun get-module (bin-data)
   (lutil-file:beam->module (get-beam bin-data)))
@@ -22,9 +18,45 @@
          (len (- end start)))
     (binary_to_list (binary:part bin-data `#(,start ,len)))))
 
+(defun get-behaviour (attrs)
+  (proplists:get_value
+    'behaviour
+    attrs
+    (proplists:get_value 'behavior attrs)))
+
+(defun get-beam-attrs (beam)
+  "Given an atom representing a plugin's name, return its module
+  attributes."
+  (let (((tuple 'ok (tuple _ (list (tuple 'attributes attrs))))
+         (beam_lib:chunks beam '(attributes))))
+    attrs))
+
+(defun get-beam-behaviours (beam)
+  "Given an atom representing a plugin's name, return its module
+  attributes."
+  (let ((behavs (get-behaviour (get-beam-attrs beam))))
+    (case behavs
+      ('undefined '())
+      (_ behavs))))
+
+(defun get-beam-exports (beam)
+  "Given a beam path, return its exported functions."
+  (let (((tuple 'ok (tuple _ (list (tuple 'exports exports))))
+         (beam_lib:chunks beam '(exports))))
+    exports))
+
+(defun filtered (func beams)
+  (lists:filter-files
+    (lambda (x) (=/= x 'false))
+    (funcall func beams)))
+
+(defun get-module-exports (module)
+  "Given an atom representing a module's name, return its exported functions."
+  (get-beam-exports (code:which module)))
+
 (defun get-skip-tests (bin-data)
   (filter-skipped
-    (lutil-file:get-beam-exports
+    (get-beam-exports
       (get-beam bin-data))))
 
 (defun filter-skipped (funcs)
@@ -57,4 +89,3 @@
       'undefined)
     (`#(module ,_)
       (rebar_api:debug msg args))))
-

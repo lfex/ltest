@@ -32,8 +32,7 @@
    [
     kernel,
     stdlib,
-    color,
-    lutil
+    color
    ]},
 
   %% OTP application loader will load, but not start, included apps. Again

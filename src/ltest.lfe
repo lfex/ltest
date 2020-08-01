@@ -49,7 +49,7 @@
 (defun has-behaviour? (beam type)
   (lists:member
     type
-    (lutil-file:get-beam-behaviors beam)))
+    (ltest-util:get-beam-behaviors beam)))
 
 (defun integration? (beam)
   (has-behaviour? beam 'ltest-integration))
@@ -81,14 +81,14 @@
     funcs))
 
 (defun get-skip-funcs (module)
-  (lutil-file:filtered
+  (ltest-util:filter-files
     #'check-skip-funcs/1
-    (lutil-file:get-module-exports module)))
+    (ltest-util:get-module-exports module)))
 
 (defun get-skipped-tests (module)
-  (lutil-file:filtered
+  (ltest-util:filter-files
     #'check-skipped-tests/1
-    (lutil-file:get-module-exports module)))
+    (ltest-util:get-module-exports module)))
 
 (defun check-failed-assert (data expected)
   "This function

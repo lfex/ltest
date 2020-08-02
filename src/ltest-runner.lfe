@@ -75,6 +75,8 @@
   (run-beams test-type beams (get-listener)))
 
 (defun run-beams (test-type beams listener)
+  (ltest-util:rebar-debug "Running ~p beams using ~p ..."
+                          `(,test-type ,listener))
   (eunit:test (ltest-util:beams->files beams)
               (get-options listener `(#(color true)
                                       #(test-type ,test-type)))))

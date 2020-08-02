@@ -49,7 +49,7 @@
 (defun has-behaviour? (beam type)
   (lists:member
     type
-    (ltest-util:get-beam-behaviors beam)))
+    (ltest-util:get-beam-behaviours beam)))
 
 (defun integration? (beam)
   (has-behaviour? beam 'ltest-integration))

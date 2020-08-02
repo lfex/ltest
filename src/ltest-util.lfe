@@ -3,12 +3,6 @@
 
 (include-lib "ltest/include/ltest-records.lfe")
 
-(defun get-version ()
-  (rebar3_lfe_version:app_version 'ltest))
-
-(defun get-versions ()
-  (rebar3_lfe_version:versions '(ltest)))
-
 (defun get-module (bin-data)
   (beam->module (get-beam bin-data)))
 
@@ -22,6 +16,29 @@
   (let (((tuple 'ok (tuple module _))
          (beam_lib:chunks beam '())))
     module))
+
+(defun beams->files (beam-data)
+  "Given a list of beams (no .beam extension), return a list of files (with
+  the .beam extension)."
+  (lists:map
+    (match-lambda
+      (((tuple mod beam))
+        `#(,mod ,(++ beam ".beam")))
+      ((beam)
+        (++ beam ".beam")))
+    beam-data))
+
+(defun beams->modules (beams-list)
+  (lists:map
+    #'beam->module/1
+    beams-list))
+
+(defun modules->beams (module-list)
+  (lists:usort
+    (lists:map
+      (lambda (x)
+        (filename:rootname (code:which x)))
+      module-list)))
 
 (defun get-behaviour (attrs)
   (proplists:get_value

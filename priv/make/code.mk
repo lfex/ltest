@@ -1,21 +1,27 @@
 compile:
-	$(REBAR3) as dev compile
+	@$(REBAR3) compile
+
+# repl:
+# 	$(REBAR3) as $(REBAR_PROFILE) compile
+# 	$(LFE) -pa `$(REBAR3) as $(REBAR_PROFILE) path -s " -pa "`
 
 repl:
-	$(REBAR3) as $(REBAR_PROFILE) compile
-	$(LFE) -pa `$(REBAR3) as $(REBAR_PROFILE) path -s " -pa "`
+	@$(REBAR3) as repl compile
+	@$(REBAR3) as repl lfe repl
 
 shell:
 	@$(REBAR3) shell
 
 clean:
-	@$(REBAR3) clean
-	@rm -rf ebin/* _build/default/lib/$(PROJECT) rebar.lock \
-		rebar3.crashdump \
-		$(HOME)/.cache/rebar3/hex/default/packages/*
+	@rm -rf rebar3.crashdump rebar.lock \
+	_build/default/*/$(PROJECT) \
+	_build/repl/*/$(PROJECT)
 
 clean-all: clean
-	@$(REBAR3) as dev lfe clean
+	@rm -rf \
+	./_build \
+	$(HOME)/.cache/rebar3/hex/default/packages/* \
+	$(HOME)/.cache/rebar3/*/$(PROJ)
 
 push:
 	git push github master
@@ -26,40 +32,3 @@ push-tags:
 	git push gitlab --tags
 
 push-all: push push-tags
-
-build-github: clean
-	@echo
-	@echo "============================="
-	@echo "Building using Github Sources ..."
-	@echo "============================="
-	@echo
-	$(REBAR3) compile
-	@$(REBAR3) lock
-
-build-gitlab: clean
-	@echo
-	@echo "============================="
-	@echo "Building using Gitlab Sources ..."
-	@echo "============================="
-	@echo
-	$(REBAR3) as gitlab compile
-	@$(REBAR3) as gitlab lock
-
-build-hexpm: clean
-	@echo
-	@echo "=============================="
-	@echo "Building using Hex.pm Packages ..."
-	@echo "=============================="
-	@echo
-	$(REBAR3) as hexpm compile
-	@$(REBAR3) as hexpm lock
-
-build-all: build-github build-gitlab build-hexpm
-
-publish: clean
-	$(REBAR3) as hexpm hex publish
-
-setup-hexpm: REBAR_HOME_CONFIG = ~/.config/rebar3
-setup-hexpm:
-	mkdir -p $(REBAR_HOME_CONFIG)
-	echo "{plugins, [rebar3_hex]}." > $(REBAR_HOME_CONFIG)/rebar.config

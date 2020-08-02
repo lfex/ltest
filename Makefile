@@ -5,6 +5,8 @@ REBAR_PROFILE ?= dev
 LFE = _build/$(REBAR_PROFILE)/lib/lfe/bin/lfe
 REBAR3 = PATH=.:$(PATH) rebar3
 
+default: compile
+
 include priv/make/code.mk
 include priv/make/docs.mk
 include priv/make/test.mk

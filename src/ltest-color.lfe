@@ -62,8 +62,7 @@
     ('true (color:blueb str))))
 
 (defun get-color-option ()
-  (clj:->> (lutil-file:get-arg 'color "true")
+  (clj:->> (ltest-util:get-arg 'color "true")
            (element 2)
            (caar)
            (list_to_atom)))
-

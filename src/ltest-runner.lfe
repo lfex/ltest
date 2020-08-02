@@ -43,21 +43,21 @@
 (defun run
   (('integration)
     (ltest-util:rebar-debug "Running integration tests ...")
-    (let* ((cwd (lutil-file:get-cwd))
+    (let* ((`#(ok ,cwd) (file:get_cwd))
            (beams (ltest:get-integration-beams cwd)))
       (ltest-util:rebar-debug "Got cwd: ~p" `(,cwd))
       (ltest-util:rebar-debug "Got beams: ~p" `(,beams))
       (run-beams 'integration beams)))
   (('system)
     (ltest-util:rebar-debug "Running system tests ...")
-    (let* ((cwd (lutil-file:get-cwd))
+    (let* ((`#(ok ,cwd) (file:get_cwd))
            (beams (ltest:get-system-beams cwd)))
       (ltest-util:rebar-debug "Got cwd: ~p" `(,cwd))
       (ltest-util:rebar-debug "Got beams: ~p" `(,beams))
       (run-beams 'system beams)))
   (('unit)
     (ltest-util:rebar-debug "Running unit tests ...")
-    (let* ((cwd (lutil-file:get-cwd))
+    (let* ((`#(ok ,cwd) (file:get_cwd))
            (beams (ltest:get-unit-beams cwd)))
       (ltest-util:rebar-debug "Got cwd: ~p" `(,cwd))
       (ltest-util:rebar-debug "Got beams: ~p" `(,beams))
@@ -75,7 +75,7 @@
   (run-beams test-type beams (get-listener)))
 
 (defun run-beams (test-type beams listener)
-  (eunit:test (lutil-file:beams->files beams)
+  (eunit:test (ltest-util:beams->files beams)
               (get-options listener `(#(color true)
                                       #(test-type ,test-type)))))
 
@@ -84,7 +84,7 @@
    * ltest-listener
    * eunit_progress
    * eunit_surefire"
-   (clj:->> (lutil-file:get-arg 'listener "ltest-listener")
+   (clj:->> (ltest-util:get-arg 'listener "ltest-listener")
             (element 2)
             (caar)
             (list_to_atom)))
@@ -103,7 +103,7 @@
   (run-beam beam (get-listener)))
 
 (defun run-beam (beam listener)
-  (run-module (lutil-file:beam->module beam) listener))
+  (run-module (ltest-util:beam->module beam) listener))
 
 (defun run-module (module listener)
   (eunit:test `(,module)
@@ -114,4 +114,3 @@
 
 (defun run-modules (modules listener)
   (eunit:test modules (get-options listener)))
-

@@ -10,13 +10,18 @@
   (rebar3_lfe_version:versions '(ltest)))
 
 (defun get-module (bin-data)
-  (lutil-file:beam->module (get-beam bin-data)))
+  (beam->module (get-beam bin-data)))
 
 (defun get-beam (bin-data)
   (let* ((`#(,_ ,start) (binary:match bin-data (binary "file \"")))
          (`#(,end ,_) (binary:match bin-data (binary ".beam\"")))
          (len (- end start)))
     (binary_to_list (binary:part bin-data `#(,start ,len)))))
+
+(defun beam->module (beam)
+  (let (((tuple 'ok (tuple module _))
+         (beam_lib:chunks beam '())))
+    module))
 
 (defun get-behaviour (attrs)
   (proplists:get_value
@@ -89,3 +94,10 @@
       'undefined)
     (`#(module ,_)
       (rebar_api:debug msg args))))
+
+(defun get-arg (arg-name default)
+  (let ((arg-value (init:get_argument arg-name)))
+    (case arg-value
+      ('error
+        `#(default ((,default))))
+      (_ arg-value))))

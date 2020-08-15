@@ -1,7 +1,7 @@
 (defmodule ltest-util
   (export all))
 
-(include-lib "ltest/include/ltest-records.lfe")
+(include-lib "include/ltest-records.lfe")
 
 (defun get-module (bin-data)
   (beam->module (get-beam bin-data)))

@@ -34,6 +34,7 @@
   (defun to-unders (atm)
     (re:replace (atom_to_list atm) "-" "_" '(#(return list) global)))
 
+  ;; XXX this is no longer used anywhere, right? remove it!
   (defun list-body
     ((body) (when (is_list body))
      body)
@@ -89,7 +90,7 @@
 ;;;===================================================================
 
 (eval-when-compile
-  ;;Return true if we have (tuple "name"...) or #("Name"...)
+  ;; Return true if we have (tuple "name"...) or #("Name"...)
   (defun is-named-tuple
     ((t) (when (is_tuple t))
       (io_lib:printable_list (element 1 t)))
@@ -98,7 +99,7 @@
                (io_lib:printable_list (cadr t))))
     ((other) 'false))
 
-  ;;Return (tuple "Name" lambda() ...) from (tuple "Name" ...)
+  ;; Return (tuple "Name" lambda() ...) from (tuple "Name" ...)
   (defun mk-named-tuple
     ((t) (when (is_tuple t))
       `(tuple ,(element 1 t)
@@ -209,7 +210,7 @@
 
 (defmacro is-exit
   "Equivalent to [[is-exception/3]] with `'exit` as `expected-class`."
-  (`(,expression)               `(is-exit _ ,expression))
+  (`(,expression) `(is-exit _ ,expression))
   (`(,expected-term ,expression) `(assertExit ,expected-term ,expression)))
 
 (defmacro is-not-exit
@@ -221,7 +222,7 @@
 
 (defmacro is-throw
   "Equivalent to [[is-exception/3]] with `'throw` as `expected-class`."
-  (`(,expression)               `(is-throw _ ,expression))
+  (`(,expression) `(is-throw _ ,expression))
   (`(,expected-term ,expression) `(assertThrow ,expected-term ,expression)))
 
 (defmacro is-not-throw
@@ -285,17 +286,17 @@
 
 (defmacro is-exit*
   "Return a test object that wraps [[is-exit/2]]"
-  (`(,expression)               `(is-exit* _ ,expression))
+  (`(,expression) `(is-exit* _ ,expression))
   (`(,expected-term ,expression) `(_assertExit ,expected-term ,expression)))
 
 (defmacro is-not-exit* (expected-term expression)
   "Return a test object that wraps [[is-not-exit/2]]."
-  (`(,expression)         `(is-not-exit* _ ,expression))
+  (`(,expression) `(is-not-exit* _ ,expression))
   (`(,expected-term ,body) `(_test (is-not-exit ,expected-term ,expression))))
 
 (defmacro is-throw* (expected-term expression)
   "Return a test object that wraps [[is-throw/2]]."
-  (`(,expression)         `(is-throw* _ ,expression))
+  (`(,expression) `(is-throw* _ ,expression))
   (`(,expected-term ,body) `(_assertThrow ,expected-term ,expression)))
 
 (defmacro is-not-throw* (expected-term expression)

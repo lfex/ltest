@@ -1,6 +1,6 @@
 # ltest
 
-[![Build Status][travis badge]][travis] [![LFE Versions][lfe badge]][lfe] [![Erlang Versions][erlang badge]][versions] [![Tags][github tags badge]][github tags] [![Downloads][hex downloads]][hex package]
+[![Build Status][gh-actions-badge]][gh-actions] [![LFE Versions][lfe badge]][lfe] [![Erlang Versions][erlang badge]][versions] [![Tags][github tags badge]][github tags] [![Downloads][hex downloads]][hex package]
 
 [![][ltest-logo]][ltest-logo-large]
 
@@ -474,7 +474,7 @@ There were no selenium tests found.
 
 BSD 3-Clause License
 
-Copyright © 2013-2016, Duncan McGreggor <oubiwann@gmail.com>
+Copyright © 2013-2020, Duncan McGreggor <oubiwann@gmail.com>
 
 Copyright © 2014, Døkkarr Hirðisson <dokkarr@lfe.io>
 
@@ -493,8 +493,8 @@ Copyright © 2016, skovsgaard <jonas.skovsgaard.christensen@gmail.com>
 [org]: https://github.com/lfe-rebar3
 [github]: https://github.com/lfex/ltest
 [gitlab]: https://gitlab.com/lfex/ltest
-[travis]: https://travis-ci.org/lfex/ltest
-[travis badge]: https://img.shields.io/travis/lfex/ltest.svg
+[gh-actions-badge]: https://github.com/lfex/ltest/workflows/ci%2Fcd/badge.svg
+[gh-actions]: https://github.com/lfex/ltest/actions
 [lfe]: https://github.com/rvirding/lfe
 [lfe badge]: https://img.shields.io/badge/lfe-1.3.0-blue.svg
 [erlang badge]: https://img.shields.io/badge/erlang-17.5%20to%2022.0-blue.svg

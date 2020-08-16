@@ -3,6 +3,14 @@
 
 (include-lib "include/ltest-macros.lfe")
 
+(defun run ()
+  (run 'all))
+
+(defun run
+  (('all)
+   (ltest-runner:all))
+  ((type) (ltest-runner:run type)))
+
 (defun skip-test-patt () ".*_skip")
 (defun skip-test-group-patt () "(.*)(_skip)")
 

@@ -34,6 +34,7 @@
   (defun to-unders (atm)
     (re:replace (atom_to_list atm) "-" "_" '(#(return list) global)))
 
+  ;; XXX this is no longer used anywhere, right? remove it!
   (defun list-body
     ((body) (when (is_list body))
      body)
@@ -66,7 +67,6 @@
    `(defun ,(list_to_atom (++ (to-unders name) "_skip")) ()
       ,@body)))
 
-
 ;;;===================================================================
 ;;; Set-up and tear-down macros
 ;;;===================================================================
@@ -89,7 +89,7 @@
 ;;;===================================================================
 
 (eval-when-compile
-  ;;Return true if we have (tuple "name"...) or #("Name"...)
+  ;; Return true if we have (tuple "name"...) or #("Name"...)
   (defun is-named-tuple
     ((t) (when (is_tuple t))
       (io_lib:printable_list (element 1 t)))
@@ -98,7 +98,7 @@
                (io_lib:printable_list (cadr t))))
     ((other) 'false))
 
-  ;;Return (tuple "Name" lambda() ...) from (tuple "Name" ...)
+  ;; Return (tuple "Name" lambda() ...) from (tuple "Name" ...)
   (defun mk-named-tuple
     ((t) (when (is_tuple t))
       `(tuple ,(element 1 t)
@@ -209,7 +209,7 @@
 
 (defmacro is-exit
   "Equivalent to [[is-exception/3]] with `'exit` as `expected-class`."
-  (`(,expression)               `(is-exit _ ,expression))
+  (`(,expression) `(is-exit _ ,expression))
   (`(,expected-term ,expression) `(assertExit ,expected-term ,expression)))
 
 (defmacro is-not-exit
@@ -221,7 +221,7 @@
 
 (defmacro is-throw
   "Equivalent to [[is-exception/3]] with `'throw` as `expected-class`."
-  (`(,expression)               `(is-throw _ ,expression))
+  (`(,expression) `(is-throw _ ,expression))
   (`(,expected-term ,expression) `(assertThrow ,expected-term ,expression)))
 
 (defmacro is-not-throw
@@ -235,9 +235,40 @@
 ;;; Test object macros
 ;;;===================================================================
 
+;; Based on clojure.walk
+(eval-when-compile
+  ;; FIXME: walk more data structures
+  (defun walk
+    ([inner outer form] (when (is_list form))
+     (funcall outer (lists:map inner form)))
+    ([_inner outer form] (funcall outer form)))
+  (defun postwalk (f form)
+    ;; N.B. Due to implementation details, we can't use
+    ;;          (clj:partial #'postwalk/2 f)
+    (walk (lambda (inner-form) (postwalk f inner-form)) f form))
+  (defun postwalk-replace (proplist form)
+    (postwalk (lambda (|-X-|) (proplists:get_value |-X-| proplist |-X-|)) form))
+  (defun apply-template (arglist expr values)
+    (orelse (is_list arglist) (error 'badarg (list arglist expr values)))
+    (orelse (lists:all #'is_atom/1 arglist))
+    (postwalk-replace (lists:zip arglist values) expr))
+  ;; Based on #'clojure.template/do-template
+  (defmacro do-template
+    (`(,arglist ,expr . ,values)
+     (let ((|-LEN-| (length arglist)))
+       `(list ,@(lists:map (lambda (|-A-|) (apply-template arglist expr |-A-|))
+                  (clj:partition |-LEN-| values)))))))
+
 (defmacro is* (bool-expression)
   "Return a test object that wraps [[is/1]]."
   `(_assert ,bool-expression))
+
+;; Based on #'clojure.test/are
+(defmacro are*
+  (`(() ,expr) `(is* 'true))
+  (`(,arglist ,expr . ,args)
+   `(do-template ,arglist (is ,expr) ,@args))
+  (_ (error 'badarg (list* arglist expr args))))
 
 (defmacro is-not* (bool-expression)
   "Return a test object that wraps [[is-not/2]]."
@@ -285,17 +316,17 @@
 
 (defmacro is-exit*
   "Return a test object that wraps [[is-exit/2]]"
-  (`(,expression)               `(is-exit* _ ,expression))
+  (`(,expression) `(is-exit* _ ,expression))
   (`(,expected-term ,expression) `(_assertExit ,expected-term ,expression)))
 
 (defmacro is-not-exit* (expected-term expression)
   "Return a test object that wraps [[is-not-exit/2]]."
-  (`(,expression)         `(is-not-exit* _ ,expression))
+  (`(,expression) `(is-not-exit* _ ,expression))
   (`(,expected-term ,body) `(_test (is-not-exit ,expected-term ,expression))))
 
 (defmacro is-throw* (expected-term expression)
   "Return a test object that wraps [[is-throw/2]]."
-  (`(,expression)         `(is-throw* _ ,expression))
+  (`(,expression) `(is-throw* _ ,expression))
   (`(,expected-term ,body) `(_assertThrow ,expected-term ,expression)))
 
 (defmacro is-not-throw* (expected-term expression)

@@ -2,7 +2,7 @@
   (behaviour eunit_listener)
   (export all))
 
-(include-lib "ltest/include/ltest-records.lfe")
+(include-lib "include/ltest-records.lfe")
 
 (defun start ()
   (start '()))
@@ -11,7 +11,9 @@
   (eunit_listener:start (MODULE) options))
 
 (defun init (options)
-  (make-state test-type (proplists:get_value 'test-type options)))
+  (make-state
+   status (orddict:new)
+   test-type (proplists:get_value 'test-type options)))
 
 (defun handle_begin
   (('group (= `(,_ #(desc undefined) ,_ ,_) data) state)
@@ -103,9 +105,11 @@
       `#(ok ,result))))
 
 (defun handle-module-end (desc time data state)
+  (logger:debug "desc: ~p, data: ~p, statee: ~p" (list desc data state))
   (let ((skipped-tests (ltest-util:get-skip-tests desc))
         (`#(,data-1 ,_) (lists:split 2 data))
         (`#(,_ ,data-2) (lists:split 3 data)))
+    (logger:debug "skipped: ~p" (list skipped-tests))
     (ltest-formatter:skip-lines skipped-tests)
     (ltest-formatter:mod-time time)
     (update-skips

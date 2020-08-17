@@ -1,11 +1,15 @@
 (defmodule ltest-runner
   (export all))
 
+(defun INT_TEST_HEADER () "Integration Tests")
+(defun SYS_TEST_HEADER () "System Tests")
+(defun UNIT_TEST_HEADER () "Unit Tests")
+
 (defun all ()
   (ltest-formatter:test-suite-header)
-  (unit 'combined)
-  (integration 'combined)
-  (system 'combined)
+  (unit 'no-suite-headers)
+  (integration 'no-suite-headers)
+  (system 'no-suite-headers)
   (ltest-formatter:test-suite-footer)
   ;; Add support for third-party test runners here
   (case (code:which 'lse)
@@ -13,87 +17,82 @@
     (_ (lse-runner:selenium 'combined)))
   (ltest-formatter:test-suite-footer))
 
-(defun integration (_)
-  (ltest-formatter:test-type-header "Integration Tests")
-  (run 'integration))
+(defun test-title (test-type)
+  (case test-type
+   ('integration (INT_TEST_HEADER))
+   ('system (SYS_TEST_HEADER))
+   ('unit (UNIT_TEST_HEADER))))
 
-(defun integration ()
-  (ltest-formatter:test-suite-header)
-  (integration 'solo)
-  (ltest-formatter:test-suite-footer))
+(defun run-formatted
+  ((test-type 'no-suite-headers)
+   (ltest-formatter:test-type-header (test-title test-type))
+   (run test-type))
+  ((test-type 'suite-headers)
+   (ltest-formatter:test-suite-header)
+   (run test-type)
+   (ltest-formatter:test-suite-footer)))
 
-(defun system (_)
-  (ltest-formatter:test-type-header "System Tests")
-  (run 'system))
+(defun integration () (integration 'suite-headers))
+(defun system () (system 'suite-headers))
+(defun unit () (unit 'suite-headers))
 
-(defun system ()
-  (ltest-formatter:test-suite-header)
-  (system 'solo)
-  (ltest-formatter:test-suite-footer))
+(defun integration (flag) (run-formatted 'integration flag))
+(defun system (flag) (run-formatted 'system flag))
+(defun unit (flag) (run-formatted 'unit flag))
 
-(defun unit (_)
-  (ltest-formatter:test-type-header "Unit Tests")
-  (run 'unit))
+(defun run ()
+  (logger:debug "Running with no args ...")
+  (run (ltest-const:default-test-type)))
 
-(defun unit ()
-  (ltest-formatter:test-suite-header)
-  (unit 'solo)
-  (ltest-formatter:test-suite-footer))
+(defun run (test-type)
+  (logger:debug "Running for type ~p ..." (list test-type))
+  (run (list (ltest-util:app-name)) test-type))
+
+(defun run (apps test-type)
+  (logger:debug "Running for apps ~p, type ~p ..." (list apps test-type))
+  (run (ltest-const:default-test-profile) apps test-type))
 
 (defun run
-  (('integration)
-   (ltest-util:rebar-debug "Running integration tests ...")
-   (let* ((`#(ok ,cwd) (file:get_cwd))
-          (beams (ltest:get-integration-beams cwd)))
-     (ltest-util:rebar-debug "Got cwd: ~p" `(,cwd))
-     (ltest-util:rebar-debug "Got beams: ~p" `(,beams))
-     (run-beams 'integration beams)))
-  (('system)
-   (ltest-util:rebar-debug "Running system tests ...")
-   (let* ((`#(ok ,cwd) (file:get_cwd))
-          (beams (ltest:get-system-beams cwd)))
-     (ltest-util:rebar-debug "Got cwd: ~p" `(,cwd))
-     (ltest-util:rebar-debug "Got beams: ~p" `(,beams))
-     (run-beams 'system beams)))
-  (('unit)
-   (ltest-util:rebar-debug "Running unit tests ...")
-   (let* ((`#(ok ,cwd) (file:get_cwd))
-          (beams (ltest:get-unit-beams cwd)))
-     (ltest-util:rebar-debug "Got cwd: ~p" `(,cwd))
-     (ltest-util:rebar-debug "Got beams: ~p" `(,beams))
-     (run-beams 'unit beams)))
-  ;; Add support for third-party test runners here
-  (('selenium)
-   (ltest-util:rebar-debug "Running selenium tests ...")
+  ;; Add ant third-party test runners first:
+  ((_ _ 'selenium)
+   (logger:debug "Running selenium tests ...")
    (case (code:which 'lse)
      ('non_existing (ltest-runner:run-beams 'selenium '()))
      (_ (lse-runner:run-beams))))
-  ((beam)
-   (run-beam beam (get-listener))))
+  ;; Lastly, check standard test runners:
+  ((profile apps test-type)
+   (logger:debug "Running for profile ~p, apps ~p, type ~p ..."
+                   (list profile apps test-type))
+   (let ((beams (ltest:get-test-beams profile apps test-type)))
+     (logger:debug "Got beams: ~~p" (list profile apps test-type beams))
+     (run-beams test-type beams))))
 
 (defun run-beams (test-type beams)
   (run-beams test-type beams (get-listener)))
 
 (defun run-beams (test-type beams listener)
-  (ltest-util:rebar-debug "Running ~p beams using ~p ..."
+  (logger:debug "Running ~p beams using ~p ..."
                           `(,test-type ,listener))
   (eunit:test (ltest-util:beams->files beams)
               (get-options listener `(#(color true)
                                       #(test-type ,test-type)))))
 
 (defun get-listener ()
+  (get-listener (ltest-const:default-listener)))
+
+(defun get-listener (listener)
   "Valid listeners include:
    * ltest-listener
    * eunit_progress
    * eunit_surefire"
-  (clj:->> (ltest-util:get-arg 'listener "ltest-listener")
+  (clj:->> (ltest-util:get-arg 'listener listener)
            (element 2)
            (caar)
            (list_to_atom)))
 
 (defun get-options (listener)
   (get-options listener '(colored)))
-          ;`(no_tty #(report #(,listener (colored ltest-type)))))
+  ;`(no_tty #(report #(,listener (colored ltest-type)))))
 
 (defun get-options (listener options)
   `(no_tty ,(get-report-options listener options)))
@@ -107,9 +106,11 @@
 (defun run-beam (beam listener)
   (run-module (ltest-util:beam->module beam) listener))
 
+(defun run-module (module)
+  (run-module module (get-listener)))
+
 (defun run-module (module listener)
-  (eunit:test `(,module)
-              (get-options listener)))
+  (run-modules `(,module) listener))
 
 (defun run-modules (modules)
   (run-modules modules (get-listener)))

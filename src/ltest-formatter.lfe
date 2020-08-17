@@ -64,16 +64,18 @@
   ((func-name) (when (is_list func-name))
     (let* ((init-len (+ (ltest-const:func-indent)
                         (length func-name)))
+           (padding 2)
            (end-len (length " [fail]"))
            (elide-len (- (ltest-const:test-suite-width)
-                         (+ init-len end-len))))
+                         (+ init-len end-len)
+                         padding)))
       (string:copies "." elide-len)))
-  ;Named tests send description as binary
+  ;; Named tests send description as binary
   ((desc) (when (is_binary desc))
     (get-elision (binary_to_list desc))))
 
 (defun mod-line (desc)
-  (io:format "~smodule: ~s~n"
+  (io:format "~s~s~n"
              `(,(indent (ltest-const:mod-indent))
                ,(ltest-color:greenb
                  (atom_to_list (ltest-util:get-module desc))))))

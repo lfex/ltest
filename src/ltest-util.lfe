@@ -3,6 +3,29 @@
 
 (include-lib "include/ltest-records.lfe")
 
+(defun log-level (level)
+  (application:start 'ltest)
+  (logger:set_application_level 'ltest level))
+
+(defun app-data (base-dir)
+  (file:consult
+    (filelib:wildcard
+      (filename:join base-dir "src/*.app.src"))))
+
+(defun proj-dir (base-dir)
+  (list_to_atom
+    (filename:basename base-dir)))
+
+(defun app-name ()
+  (case (file:get_cwd)
+    (`#(ok ,cwd) (app-name cwd))
+    (_ 'undefined)))
+
+(defun app-name (base-dir)
+  (case (app-data base-dir)
+   (`#(ok (#(application ,app ,_))) app)
+   (_ (proj-dir base-dir))))
+
 (defun get-module (bin-data)
   (beam->module (get-beam bin-data)))
 
@@ -87,7 +110,7 @@
 (defun skipped?
   ((`#(,func ,_))
     (skip-match?
-      (re:run (atom_to_list func) "_skip$"))))
+      (re:run (atom_to_list func) (ltest-const:skip-test-patt)))))
 
 (defun skip-match?
   ((`#(match ,_))
@@ -100,17 +123,6 @@
      (state-skip state)
      (state-fail state)
      (state-cancel state)))
-
-(defun rebar-debug (msg)
-  (rebar-debug msg '()))
-
-(defun rebar-debug (msg args)
-  "For use in the context of rebar3 plugins."
-  (case (code:ensure_loaded 'rebar_api)
-    (`#(error ,_)
-      'undefined)
-    (`#(module ,_)
-      (rebar_api:debug msg args))))
 
 (defun get-arg (arg-name default)
   (let ((arg-value (init:get_argument arg-name)))

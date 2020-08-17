@@ -98,7 +98,7 @@
                                            ,error)))
 
 (defun skip ()
-  (++ " [" (ltest-color:blue "skip") "]"))
+  (++ ". [" (ltest-color:blue "skip") "]"))
 
 (defun mod-time (time)
   (io:format "~s~s ~s~s~n~n" `(,(indent (ltest-const:func-indent))

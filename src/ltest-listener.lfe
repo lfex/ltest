@@ -105,9 +105,11 @@
       `#(ok ,result))))
 
 (defun handle-module-end (desc time data state)
+  (logger:debug "desc: ~p, data: ~p, statee: ~p" (list desc data state))
   (let ((skipped-tests (ltest-util:get-skip-tests desc))
         (`#(,data-1 ,_) (lists:split 2 data))
         (`#(,_ ,data-2) (lists:split 3 data)))
+    (logger:debug "skipped: ~p" (list skipped-tests))
     (ltest-formatter:skip-lines skipped-tests)
     (ltest-formatter:mod-time time)
     (update-skips

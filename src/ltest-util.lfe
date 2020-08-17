@@ -105,6 +105,7 @@
       (get-beam bin-data))))
 
 (defun filter-skipped (funcs)
+  (logger:debug "funcs: ~p" (list funcs))
   (lists:filter #'skipped?/1 funcs))
 
 (defun skipped?

@@ -82,12 +82,13 @@
       (get-beam bin-data))))
 
 (defun filter-skipped (funcs)
+  (logger:debug "funcs: ~p" (list funcs))
   (lists:filter #'skipped?/1 funcs))
 
 (defun skipped?
   ((`#(,func ,_))
     (skip-match?
-      (re:run (atom_to_list func) "_skip$"))))
+      (re:run (atom_to_list func) "_skip"))))
 
 (defun skip-match?
   ((`#(match ,_))

@@ -68,7 +68,7 @@
            (elide-len (- (ltest-const:test-suite-width)
                          (+ init-len end-len))))
       (string:copies "." elide-len)))
-  ;Named tests send description as binary
+  ;; Named tests send description as binary
   ((desc) (when (is_binary desc))
     (get-elision (binary_to_list desc))))
 
@@ -96,7 +96,7 @@
                                            ,error)))
 
 (defun skip ()
-  (++ " [" (ltest-color:blue "skip") "]"))
+  (++ ". [" (ltest-color:blue "skip") "]"))
 
 (defun mod-time (time)
   (io:format "~s~s ~s~s~n~n" `(,(indent (ltest-const:func-indent))

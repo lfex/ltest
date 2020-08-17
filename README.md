@@ -54,7 +54,7 @@ listener (test runner).
 * `(deftest ...)` for standard unit tests
 * `(deftestgen ...)` for writing tests with generators, including the
   standard EUnit test fixtures (see naming caveat below)
-* `(deftestskip ...)` for skipping unit tests
+* `(deftestskip ...)` for skipping unit tests; note that for a test to show up as skipped in the test runner, it has to be `export`ed in the module
 * `(list ...)`-wrapped tests (of arbitrary depth) for use as test sets
 * `(tuple ...)`-wrapped tests for naming/describing tests (first element
   of tuple)
@@ -318,12 +318,12 @@ module: ltest-basic-tests
   is_exit_unexpected_success ........................................ [ok]
   is_match .......................................................... [ok]
   is_match_fail ..................................................... [ok]
-  time: 100ms
+  time: 94ms
 
 module: ltest-cancelled-tests
   setup_test_case ................................................... [ok]
   Another unused test ............................................... [ok]
-  time: 21ms
+  time: 17ms
 
 module: ltest-fixture-tests
   setup_test_case ................................................... [ok]
@@ -342,7 +342,7 @@ module: ltest-fixture-tests
   Named setup test .................................................. [ok]
   foreach_test_case ................................................. [ok]
   foreach_test_case ................................................. [ok]
-  time: 58ms
+  time: 48ms
 
 module: ltest-fixturecase-tests
   setup_tc_test_case ................................................ [ok]
@@ -363,7 +363,7 @@ module: ltest-fixturecase-tests
   foreach_tc_test_case .............................................. [ok]
   foreach_tc_test_case .............................................. [ok]
   Named foreach-tc test ............................................. [ok]
-  time: 65ms
+  time: 54ms
 
 module: ltest-generated-tests
   is* ............................................................... [ok]
@@ -377,7 +377,7 @@ module: ltest-generated-tests
   nested_test_set ................................................... [ok]
   nested_test_set ................................................... [ok]
   nested_test_set ................................................... [ok]
-  time: 49ms
+  time: 34ms
 
 module: ltest-named-tests
   named_is .......................................................... [ok]
@@ -387,7 +387,7 @@ module: ltest-named-tests
   named_testset_with_three .......................................... [ok]
   named_testset_nested .............................................. [ok]
   named_testset_deeply_nested ....................................... [ok]
-  time: 36ms
+  time: 21ms
 
 module: ltest-testset-tests
   testset_with_one .................................................. [ok]
@@ -395,7 +395,7 @@ module: ltest-testset-tests
   testset_with_three ................................................ [ok]
   testset_nested .................................................... [ok]
   testset_deeply_nested ............................................. [ok]
-  time: 26ms
+  time: 16ms
 
 module: ltest-basic-tests
   is ................................................................ [ok]
@@ -428,12 +428,12 @@ module: ltest-basic-tests
   is_exit_unexpected_success ........................................ [ok]
   is_match .......................................................... [ok]
   is_match_fail ..................................................... [ok]
-  time: 99ms
+  time: 91ms
 
 module: ltest-cancelled-tests
   setup_test_case ................................................... [ok]
   Another unused test ............................................... [ok]
-  time: 20ms
+  time: 6ms
 
 module: ltest-fixture-tests
   setup_test_case ................................................... [ok]
@@ -452,7 +452,7 @@ module: ltest-fixture-tests
   Named setup test .................................................. [ok]
   foreach_test_case ................................................. [ok]
   foreach_test_case ................................................. [ok]
-  time: 61ms
+  time: 48ms
 
 module: ltest-fixturecase-tests
   setup_tc_test_case ................................................ [ok]
@@ -473,7 +473,7 @@ module: ltest-fixturecase-tests
   foreach_tc_test_case .............................................. [ok]
   foreach_tc_test_case .............................................. [ok]
   Named foreach-tc test ............................................. [ok]
-  time: 65ms
+  time: 55ms
 
 module: ltest-generated-tests
   is* ............................................................... [ok]
@@ -487,7 +487,7 @@ module: ltest-generated-tests
   nested_test_set ................................................... [ok]
   nested_test_set ................................................... [ok]
   nested_test_set ................................................... [ok]
-  time: 45ms
+  time: 33ms
 
 module: ltest-named-tests
   named_is .......................................................... [ok]
@@ -497,7 +497,11 @@ module: ltest-named-tests
   named_testset_with_three .......................................... [ok]
   named_testset_nested .............................................. [ok]
   named_testset_deeply_nested ....................................... [ok]
-  time: 32ms
+  time: 21ms
+
+module: ltest-skipped-tests
+  bogus_test_will_be_skipped ...................................... [skip]
+  time: 0ms
 
 module: ltest-testset-tests
   testset_with_one .................................................. [ok]
@@ -505,11 +509,11 @@ module: ltest-testset-tests
   testset_with_three ................................................ [ok]
   testset_nested .................................................... [ok]
   testset_deeply_nested ............................................. [ok]
-  time: 25ms
+  time: 16ms
 
 summary:
-  Tests: 178  Passed: 178  Skipped: 0  Failed: 0 Erred: 0
-  Total time: 702ms
+  Tests: 179  Passed: 178  Skipped: 1  Failed: 0 Erred: 0
+  Total time: 554ms
 
 
 -------------------------- Integration Tests ---------------------------

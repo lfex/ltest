@@ -12,6 +12,11 @@
   (is (not 'false))
   (is (not (not 'true))))
 
+(deftest are*
+  (are* (x y) (== x y)
+    2 (+ 1 1)
+    4 (* 2 2)))
+
 (deftest is-with-one-phrase-deftest
   "This unit tests was originally testing the deftest macro with just one
   phrase."

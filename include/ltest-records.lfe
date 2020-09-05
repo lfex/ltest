@@ -8,7 +8,7 @@
   (cancel 0)
   (time 0))
 
-(defun loaded-ltest-records ()
+(defun --loaded-ltest-records-- ()
   "This is just a dummy function for display purposes when including from the
   REPL (the last function loaded has its name printed in stdout).
 

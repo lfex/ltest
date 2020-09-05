@@ -336,7 +336,7 @@
   (`(,expected-term ,body)
    `(_test (is-not-throw 'throw ,expected-term ,expression))))
 
-(defun loaded-ltest-macros ()
+(defun --loaded-ltest-macros-- ()
   "This is just a dummy function for display purposes when including from the
   REPL (the last function loaded has its name printed in stdout).
 

@@ -1,6 +1,7 @@
 .eunit
 rebar/*
 .rebar/*
+rebar3.crashdump
 deps
 *.sublime-project
 *.sublime-workspace
@@ -10,3 +11,10 @@ ebin
 erl_crash.dump
 _build/*
 *~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*

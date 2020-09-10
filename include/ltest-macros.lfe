@@ -8,7 +8,7 @@
 (defmacro otp>=18? ()
   `(try
      (>= (list_to_integer (erlang:system_info 'otp_release)) 18)
-     (catch (_ 'false))))
+     (catch ((tuple _ _ _) 'false))))
 
 (defmacro assertion-failed ()
   `(if (otp>=18?) 'assert 'assertion_failed))

@@ -4,9 +4,6 @@
 
 [![][ltest-logo]][ltest-logo-large]
 
-[ltest-logo]: priv/images/ltest-logo-small.png
-[ltest-logo-large]: priv/images/ltest-logo-large.png
-
 *A Unit, Integration, and System Tests Framework for LFE*
 
 
@@ -440,6 +437,8 @@ Copyright © 2016, Eric Bailey <eric@ericb.me>,
 
 <!-- Named page links below: /-->
 
+[ltest-logo]: priv/images/ltest-logo-small.png
+[ltest-logo-large]: priv/images/ltest-logo-large.png
 [lr3-logo]: priv/images/logo.png
 [org]: https://github.com/lfe-rebar3
 [github]: https://github.com/lfex/ltest

@@ -2,6 +2,7 @@
   (export all))
 
 (include-lib "include/ltest-macros.lfe")
+(include-lib "include/ltest-records.lfe")
 
 (defun skip-test-patt () ".*_skip")
 (defun skip-test-group-patt () "(.*)(_skip)")
@@ -145,3 +146,122 @@
   (let* ((reason (assert-exception-failed))
          (`#(,reason (,_ ,_ ,_ ,_ #(,fail-type ,_))) data))
     (is-equal fail-type expected)))
+
+;;; New API for running tests
+;;;
+;;; Each of the following functions takes an options data structure as its single
+;;; argument. The options are of this form:
+;;;
+;;; #m(color         boolean
+;;;    suite-headers boolean
+;;;    test-listener atom    ; one of ltest-listener, eunit_surefire
+;;;    test-type     atom    ; one of all, unit, system, integration
+;;;    verbose       boolean ; only applicable to eunit_surefire
+;;;
+(defun run ()
+  (run (default-opts)))
+
+(defun run
+  (((= `#m(test-type all) opts))
+   (all opts))
+  (((= `#m(test-type unit) opts))
+   (unit opts))
+  (((= `#m(test-type system) opts))
+   (system opts))
+  (((= `#m(test-type integration) opts))
+   (integration opts))
+  ((`#m(test-type ,test-type))
+   `#(error ,(io_lib:format "Unknown test type: ~p" `(,test-type)))))
+
+(defun all ()
+  (all (default-opts)))
+
+(defun all (opts)
+  (let* ((merged-opts (maps:merge (default-opts) opts))
+         (opts (maps:merge merged-opts #m(test-type all)))
+         (state (make-state color? (mref opts 'color)))
+         (test-type-opts (maps:merge opts #m(suite-headers false))))
+    (maybe-suite-header opts state)
+    (unit test-type-opts)
+    (system test-type-opts)
+    (integration test-type-opts)
+    (maybe-suite-footer opts state)))
+
+(defun unit ()
+  (unit (default-opts)))
+
+(defun unit (opts)
+  (ltest-util:rebar-debug "Running unit tests ..." '())
+  (ltest-util:rebar-debug "Got opts: ~p~n" `(,opts))
+  (let ((state (make-state color? (mref opts 'color)
+                           test-type 'unit)))
+    (ltest-util:rebar-debug "Got state: ~p~n" `(,state))
+    (maybe-suite-header opts state)
+    (ltest-formatter:test-type-header "Unit Tests" state)
+    (ltest-util:rebar-debug "Running beams ...~n" '())
+    (run-beams 'unit #'get-unit-beams/1 opts)
+    (maybe-suite-footer opts state)))
+
+(defun system ()
+  (system (default-opts)))
+
+(defun system (opts)
+  (ltest-util:rebar-debug "Running system tests ..." '())
+  (let ((state (make-state color? (mref opts 'color)
+                           test-type 'system)))
+    (maybe-suite-header opts state)
+    (ltest-formatter:test-type-header "System Tests" state)
+    (run-beams 'unit #'get-system-beams/1 opts)
+    (maybe-suite-footer opts state)))
+
+(defun integration ()
+  (integration (default-opts)))
+
+(defun integration (opts)
+  (ltest-util:rebar-debug "Running integration tests ..." '())
+  (let ((state (make-state color? (mref opts 'color)
+                           test-type 'integration)))
+    (maybe-suite-header opts state)
+    (ltest-formatter:test-type-header "Integration Tests" state)
+    (run-beams 'unit #'get-integration-beams/1 opts)
+    (maybe-suite-footer opts state)))
+
+;;; New API support functions
+
+(defun default-opts ()
+  #m(color true
+     suite-headers true
+     test-listener ltest-listener
+     test-type unit
+     verbose true))
+
+(defun maybe-suite-header (opts state)
+  (if (mref opts 'suite-headers)
+    (ltest-formatter:test-suite-header state)))
+
+(defun maybe-suite-footer (opts state)
+  (if (mref opts 'suite-headers)
+    (ltest-formatter:test-suite-footer state)))
+
+(defun eunit-opts (opts)
+  (let* ((listener (mref opts 'test-listener))
+         (tty (case listener
+                ('eunit_surefire '())
+                (_ '(no_tty))))
+         (verbose (if (and (== listener 'eunit_surefire)
+                           (mref opts 'verbose))
+                    '(verbose)
+                    '()))
+         (report `(#(report #(,listener ,(ltest-opts opts))))))
+    (lists:append `(,tty ,verbose ,report))))
+
+(defun ltest-opts (opts)
+  `(#(color ,(mref opts 'color))
+    #(test-type ,(mref opts 'test-type))))
+
+(defun run-beams (test-type test-fn opts)
+  (let* ((`#(ok ,cwd) (file:get_cwd))
+         (beams (funcall test-fn cwd))
+         (beam-files (ltest-util:beams->files beams)))
+    (eunit:test beam-files (eunit-opts opts))))
+

@@ -1,6 +1,7 @@
 (defrecord state
   status
   test-type
+  color?
   (ok 0)
   (fail 0)
   (err 0)

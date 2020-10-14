@@ -13,7 +13,8 @@
 (defun init (options)
   (make-state
    status (orddict:new)
-   test-type (proplists:get_value 'test-type options)))
+   test-type (proplists:get_value 'test-type options)
+   color?  (proplists:get_value 'color options)))
 
 (defun handle_begin
   (('group (= `(,_ #(desc undefined) ,_ ,_) data) state)
@@ -21,7 +22,7 @@
   (('group (= `(,_ #(desc ,desc) ,_ ,_) data) state)
     (case (binary:match desc (binary "file"))
       ('nomatch 'skipping)
-      (_ (ltest-formatter:mod-line desc)))
+      (_ (ltest-formatter:mod-line desc state)))
     ;; (io:format "\tdata: ~p~n" (list data))
     ;; (io:format "\tstate: ~p~n" (list state))
     state)
@@ -54,15 +55,15 @@
     ;; (io:format "\tstate: ~p~n" (list state))
     state)
   (('test (= `(,_ #(status #(error #(error ,error ,where))) ,_ ,_ ,_ ,_ ,_) data) state)
-    (ltest-formatter:fail error where)
+    (ltest-formatter:fail error where state)
     (set-state-fail state (+ 1 (state-fail state))))
   (('test (= `(,_ #(status #(error #(exit ,error ,where))) ,_ ,_ ,_ ,_ ,_) data) state)
     (ltest-formatter:err
-      (element 2 (proplists:get_value 'status data)) where)
+      (element 2 (proplists:get_value 'status data)) where state)
     ;; XXX maybe change this to set-state-cancel?
     (set-state-err state (+ 1 (state-err state))))
   (('test `(,_ #(status ok) ,_ ,_ ,_ ,_ ,_) state)
-    (ltest-formatter:ok)
+    (ltest-formatter:ok state)
     (set-state-ok state (+ 1 (state-ok state))))
   (('test data state)
     (io:format "\tltest ERROR: unhandled data!~n" '())
@@ -83,14 +84,15 @@
     (set-state-err state (+ 1 (state-err state)))))
 
 (defun terminate
-  ((`#(ok ,data) state)
+  ((`#(ok ,data) (= (match-state color? color?) state))
     ;; (io:format "Terminating ...~n")
     (if (> (ltest-util:all-tests state) 0)
         (ltest-formatter:display-results data state)
         (ltest-formatter:display-no-results data state))
     ;; error out if tests were cancelled
     (if (> (proplists:get_value 'cancel data 0) 0)
-        (io:format (ltest-color:red "One or more tests were cancelled.\n"))
+      (io:format (ltest-color:red
+                  "One or more tests were cancelled.\n" color?))
         (sync_end 'error)) ;same behaviour as eunit
     `#(ok ,data ,state))
   ((`#(error ,reason) state)
@@ -110,8 +112,8 @@
         (`#(,data-1 ,_) (lists:split 2 data))
         (`#(,_ ,data-2) (lists:split 3 data)))
     (logger:debug "skipped: ~p" (list skipped-tests))
-    (ltest-formatter:skip-lines skipped-tests)
-    (ltest-formatter:mod-time time)
+    (ltest-formatter:skip-lines skipped-tests state)
+    (ltest-formatter:mod-time time state)
     (update-skips
       (update-time state time)
       (length skipped-tests))))

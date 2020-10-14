@@ -3,27 +3,33 @@
 
 (include-lib "include/ltest-records.lfe")
 
-(defun test-suite-header ()
-  (io:format (get-suite-header)))
+(defun test-suite-header (state)
+  (io:format (get-suite-header state)))
 
-(defun get-suite-header ()
-  (ltest-color:greenb
+(defun get-suite-header
+  (((match-state color? color?))
+   (ltest-color:greenb
     (test-header (ltest-const:test-suite-title)
-                 (ltest-const:test-suite-header))))
+                 (ltest-const:test-suite-header))
+    color?)))
 
-(defun test-suite-footer ()
-  (io:format (get-suite-footer)))
+(defun test-suite-footer (state)
+  (io:format (get-suite-footer state)))
 
-(defun get-suite-footer ()
-  (io_lib:format "~s~n~n" `(,(ltest-color:greenb
+(defun get-suite-footer
+  (((match-state color? color?))
+   (io_lib:format "~s~n~n" `(,(ltest-color:greenb
                                (string:copies
-                                 (ltest-const:test-suite-header)
-                                 (ltest-const:test-suite-width))))))
+                                (ltest-const:test-suite-header)
+                                (ltest-const:test-suite-width))
+                               color?)))))
 
-(defun test-type-header (title)
-  (io:format
+(defun test-type-header
+  ((title (match-state color? color?))
+   (io:format
     (ltest-color:blueb
-      (test-header title (ltest-const:test-suite-subheader)))))
+     (test-header title (ltest-const:test-suite-subheader))
+     color?))))
 
 (defun test-header (title char)
   (let* ((title (++ " " title " "))
@@ -72,52 +78,61 @@
   ((desc) (when (is_binary desc))
     (get-elision (binary_to_list desc))))
 
-(defun mod-line (desc)
-  (io:format "~smodule: ~s~n"
-             `(,(indent (ltest-const:mod-indent))
-               ,(ltest-color:greenb
-                 (atom_to_list (ltest-util:get-module desc))))))
+(defun mod-line
+  ((desc (match-state color? color?))
+   (io:format "~smodule: ~s~n"
+              `(,(indent (ltest-const:mod-indent))
+                ,(ltest-color:greenb
+                  (atom_to_list (ltest-util:get-module desc))
+                  color?)))))
 
-(defun ok ()
-  (io:format (++ "... [" (ltest-color:greenb "ok") "]~n")))
+(defun ok
+  (((match-state color? color?))
+   (io:format (++ "... [" (ltest-color:greenb "ok" color?) "]~n"))))
 
-(defun fail (error where)
-  (io:format ". [~s]~n~n~s~s:~n" `(,(ltest-color:red "fail")
+(defun fail
+  ((error where (match-state color? color?))
+   (io:format ". [~s]~n~n~s~s:~n" `(,(ltest-color:red "fail" color?)
                                    ,(indent (ltest-const:error-indent))
-                                   ,(ltest-color:yellowb "Assertion failure")))
+                                   ,(ltest-color:yellowb
+                                     "Assertion failure" color?)))
   (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
-                                           ,error)))
+                                           ,error))))
 
-(defun err (error where)
-  (io:format " [~s]~n~n~s~s:~n" `(,(ltest-color:yellow "error")
+(defun err
+  ((error where (match-state color? color?))
+   (io:format " [~s]~n~n~s~s:~n" `(,(ltest-color:yellow "error" color?)
                                    ,(indent (ltest-const:error-indent))
-                                   ,(ltest-color:yellowb "Error")))
-  (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
-                                           ,error)))
+                                   ,(ltest-color:yellowb "Error" color?)))
+   (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
+                                            ,error))))
 
-(defun skip ()
-  (++ ". [" (ltest-color:blue "skip") "]"))
+(defun skip
+  (((match-state color? color?))
+   (++ ". [" (ltest-color:blue "skip" color?) "]")))
 
-(defun mod-time (time)
-  (io:format "~s~s ~s~s~n~n" `(,(indent (ltest-const:func-indent))
-                               ,(ltest-color:blackb "time:")
-                               ,(ltest-color:blackb (integer_to_list time))
-                               ,(ltest-color:blackb "ms"))))
+(defun mod-time
+  ((time (match-state color? color?))
+   (io:format "~s~s ~s~s~n~n"
+              `(,(indent (ltest-const:func-indent))
+                ,(ltest-color:blackb "time:" color?)
+                ,(ltest-color:blackb (integer_to_list time) color?)
+                ,(ltest-color:blackb "ms" color?)))))
 
-(defun skip-lines (skipped)
-  (lists:map #'skip-line/1 skipped))
+(defun skip-lines (skipped state)
+  (lists:map (lambda (s) (skip-line s state)) skipped))
 
 (defun skip-line
-  ((`#(,raw-func ,_))
+  ((`#(,raw-func ,_) state)
     (let ((func (get-skip-func-name raw-func)))
       (io:format "~s~s ~s~s~n" `(,(indent (ltest-const:func-indent))
                                  ,func
                                  ,(get-elision func)
-                                 ,(skip))))))
+                                 ,(skip state))))))
 
 
 (defun display-results (data state)
-  (stats-heading)
+  (stats-heading state)
   (display-all state)
   (display-successes state)
   (display-skips state)
@@ -129,8 +144,9 @@
   ;;(ltest-formatter:display-results data state)
   (finish-section))
 
-(defun stats-heading ()
-  (io:format (++ (ltest-color:yellow "summary:") "~n")))
+(defun stats-heading
+  (((match-state color? color?))
+   (io:format (++ (ltest-color:yellow "summary:" color?) "~n"))))
 
 (defun display-all (state)
   (io:format "~sTests: ~p  " `(,(indent (ltest-const:func-indent))
@@ -162,9 +178,10 @@
   (io:format "~sTotal time: ~pms~n" `(,(indent (ltest-const:func-indent))
                                     ,(state-time state))))
 
-(defun display-no-results (data state)
-  (io:format (ltest-color:yellow (get-no-results-report data state)))
-  (finish-section))
+(defun display-no-results
+  ((data (= (match-state color? color?) state))
+   (io:format (ltest-color:yellow (get-no-results-report data state) color?))
+   (finish-section)))
 
 (defun display-test-cancel (reason)
   (io:format (format-cancel reason)))
@@ -172,18 +189,14 @@
 (defun format-cancel
   (('undefined)  "*skipped*~n")
   (('timeout)    "*timed out*~n")
-
   ((`#(startup ,reason))
     (io_lib:format "*could not start test process*~n::~tP~n~n"
                    (list reason 15)))
-
   ((`#(blame ,_subid))
     "*cancelled because of subtask*~n")
-
   ((`#(exit ,reason))
     (io_lib:format "*unexpected termination of test process*~n::~tP~n~n"
                    (list reason 15)))
-
   ((`#(abort ,reason))
     (eunit_lib:format_error reason)))
 
@@ -196,19 +209,23 @@
   (io:nl)
   (io:nl))
 
-(defun get-ok-report (state)
-  (get-report "Passed" #'ltest-color:greenb/1 (state-ok state)))
+(defun get-ok-report
+  (((match-state color? color? ok ok))  
+   (get-report "Passed" #'ltest-color:greenb/2 ok color?)))
 
-(defun get-skip-report (state)
-  (get-report "Skipped" #'ltest-color:blue/1 (state-skip state)))
+(defun get-skip-report
+  (((match-state color? color? skip skip))
+   (get-report "Skipped" #'ltest-color:blue/2 skip color?)))
 
-(defun get-fail-report (state)
-  (get-report "Failed" #'ltest-color:red/1 (state-fail state)))
+(defun get-fail-report
+  (((match-state color? color? fail fail))
+   (get-report "Failed" #'ltest-color:red/2 fail color?)))
 
-(defun get-err-report (state)
-  (get-report "Erred" #'ltest-color:yellow/1 (state-err state)))
+(defun get-err-report
+  (((match-state color? color? err err))
+   (get-report "Erred" #'ltest-color:yellow/2 err color?)))
 
-(defun get-report (text color-func count)
+(defun get-report (text color-func count color?)
   (if (== count 0)
       text
-      (funcall color-func text)))
+      (funcall color-func text color?)))

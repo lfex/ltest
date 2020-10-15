@@ -178,13 +178,12 @@
 
 (defun all (opts)
   (let* ((merged-opts (maps:merge (default-opts) opts))
-         (opts (maps:merge merged-opts #m(test-type all)))
-         (state (make-state color? (mref opts 'color)))
-         (test-type-opts (maps:merge opts #m(suite-headers false))))
+         (test-opts (maps:merge merged-opts #m(suite-headers false)))
+         (state (make-state color? (mref opts 'color))))
     (maybe-suite-header opts state)
-    (unit test-type-opts)
-    (system test-type-opts)
-    (integration test-type-opts)
+    (unit (maps:merge test-opts #m(test-type unit)))
+    (system (maps:merge test-opts #m(test-type system)))
+    (integration (maps:merge test-opts #m(test-type integration)))
     (maybe-suite-footer opts state)))
 
 (defun unit ()

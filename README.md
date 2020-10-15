@@ -424,11 +424,18 @@ There were no integration tests found.
 
 BSD 3-Clause License
 
+```
 Copyright © 2013-2020, Duncan McGreggor <oubiwann@gmail.com>
 
-Copyright © 2014, Døkkarr Hirðisson <dokkarr@lfe.io>, Joshua Schairbaum <joshua.schairbaum@gmail.com>
+Copyright © 2014, Døkkarr Hirðisson <dokkarr@lfe.io>,
+                  Joshua Schairbaum <joshua.schairbaum@gmail.com>
 
-Copyright © 2016, Eric Bailey <eric@ericb.me>, jsc <jonas.skovsgaard.christensen@gmail.com>
+Copyright © 2016, Eric Bailey <eric@ericb.me>, 
+                  jsc <jonas.skovsgaard.christensen@gmail.com>
+```
+
+
+
 
 
 <!-- Named page links below: /-->

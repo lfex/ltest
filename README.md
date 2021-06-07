@@ -83,7 +83,7 @@ take your tests from (`eunit_compile_otps`). In your `rebar.config`:
     {deps, [
       {ltest, {git, "git://github.com/lfex/ltest.git", {tag, "0.11.0"}}}
     ]}
-    {src_dirs, ["src", "test"]},
+    {src_dirs, ["src", "test"]}
   ]}
 ]}.
 ```

@@ -2,9 +2,9 @@ name: ci/cd
 
 on:
   push:
-    branches: [ master, release/*]
+    branches: [ master, release/*, task/*, feature/*]
   pull_request:
-    branches: [ master, release/*]
+    branches: [ master, release/*, task/*, feature/*]
 
 jobs:
 
@@ -14,8 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        otp_version: [19, 20, 21, 22, 23]
-        # otp_version: [22]
+        otp_version: [19, 20, 21, 22, 23, 24]
         os: [ubuntu-latest]
 
     container:
@@ -29,3 +28,5 @@ jobs:
       run: rebar3 xref
     - name: Run Tests
       run: rebar3 as test eunit
+    - name: Run Tests (ltest runner)
+      run: make check-runner-ltest

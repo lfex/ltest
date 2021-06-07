@@ -5,28 +5,24 @@ compile-tests:
 
 check-runner-ltest: export CODE_PATH = _build/test/lib/*/ebin _build/test/lib/*/ebin _build/test/plugins/*/ebin
 check-runner-ltest: compile-tests
-	@clear
 	@erl -pa ${CODE_PATH} -eval \
 	"case ltest:all() of ok -> halt(0); _ -> halt(127) end" \
 	-noshell
 
 check-runner-ltest-old: export CODE_PATH = _build/test/lib/*/ebin _build/test/lib/*/ebin _build/test/plugins/*/ebin
 check-runner-ltest-old: compile-tests
-	#@clear
 	@erl -pa ${CODE_PATH} -cwd "${CWD}" -listener ltest-listener -eval \
 	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \
 	-noshell
 
 check-runner-ltest-no-color: export CODE_PATH = _build/test/lib/*/ebin _build/test/lib/*/ebin _build/test/plugins/*/ebin
 check-runner-ltest-no-color: compile-tests
-	@clear
 	@erl -pa ${CODE_PATH} -eval \
 	"case ltest:all(#{color => false}) of ok -> halt(0); _ -> halt(127) end" \
 	-noshell
 
 check-runner-ltest-no-color-old: export CODE_PATH = _build/test/lib/*/ebin _build/test/lib/*/ebin _build/test/plugins/*/ebin
 check-runner-ltest-no-color-old: compile-tests
-	@clear
 	@erl -pa ${CODE_PATH} \
 	-cwd "${CWD}" -listener ltest-listener -color false -eval \
 	"case 'ltest-runner':all() of ok -> halt(0); _ -> halt(127) end" \

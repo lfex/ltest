@@ -81,9 +81,9 @@ take your tests from (`eunit_compile_otps`). In your `rebar.config`:
 {profiles, [
   {test, [
     {deps, [
-      {eunit_compile_opts, [{src_dirs, ["src", "test"]}]},
       {ltest, {git, "git://github.com/lfex/ltest.git", {tag, "0.11.0"}}}
     ]}
+    {src_dirs, ["src", "test"]},
   ]}
 ]}.
 ```
@@ -91,7 +91,7 @@ take your tests from (`eunit_compile_otps`). In your `rebar.config`:
 Once you write some tests (see below for how to do that), you can then do this:
 
 ```bash
-$ rebar3 eunit
+$ rebar3 as test lfe ltest
 ```
 
 ### Structuring Your Tests [&#x219F;](#contents)
@@ -239,7 +239,7 @@ The recommended way to run unit tests is to use the LFE plugin got `rebar3`.
 Running tests is now as easy as doing the following:
 
 ```bash
-    $ rebar3 lfe ltest
+    $ rebar3 as test lfe ltest
 ```
 
 That will run any unit, integration, and system tests you hsve defined.
@@ -425,7 +425,7 @@ There were no integration tests found.
 BSD 3-Clause License
 
 ```
-Copyright © 2013-2020, Duncan McGreggor <oubiwann@gmail.com>
+Copyright © 2013-2021, Duncan McGreggor <oubiwann@gmail.com>
 
 Copyright © 2014, Døkkarr Hirðisson <dokkarr@lfe.io>,
                   Joshua Schairbaum <joshua.schairbaum@gmail.com>

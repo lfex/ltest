@@ -48,7 +48,10 @@
   (('group (= `(,_ ,_ #(desc ,desc) ,_ ,_ #(time ,time) ,_) data) state)
     (case (binary:match desc (binary "file"))
       ('nomatch state)
-      (_ (ltest-formatter:mod-line-end desc time data state))))
+      (_ (ltest-formatter:mod-line-end desc time data state)))
+    (update-skips
+     (update-time state time)
+     (length (ltest-util:get-skip-tests desc))))
   (('group data state)
     state)
   (('test (= `(,_ #(status #(error #(error ,error ,where))) ,_ ,_ ,_ ,_ ,_) data) state)
@@ -95,3 +98,9 @@
     (`#(stop ,reference ,reply-to)
       (! reply-to `#(result ,reference ,result))
       `#(ok ,result))))
+
+(defun update-time (state time)
+  (set-state-time state (+ time (state-time state))))
+
+(defun update-skips (state skips)
+  (set-state-skip state (+ skips (state-skip state))))

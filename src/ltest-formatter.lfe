@@ -78,10 +78,9 @@
   ((desc) (when (is_binary desc))
     (get-elision (binary_to_list desc))))
 
-  ;;(((binary (prefix bytes (size 7)) (mod bitstring))) (when (=:= prefix "module "))
-
 (defun mod-line-check
   (((= (binary (prefix bytes (size 5)) (file bitstring)) desc) (match-state color? color?)) (when (=:= prefix #"file "))
+  ;;(((= (binary "file " (mod bitstring)) desc) (match-state color? color?))
    (ltest-util:rebar-debug "Getting mod-line-begin (file) ..." '())
    (ltest-util:rebar-debug "desc: ~p" (list desc))
    (ltest-util:rebar-debug "module (mod-line-begin): ~p" (list (ltest-util:file->module desc)))

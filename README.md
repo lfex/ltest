@@ -239,8 +239,19 @@ Running tests is now as easy as doing the following:
     $ rebar3 as test lfe ltest
 ```
 
-That will run any unit, integration, and system tests you hsve defined.
+That will run any unit tests you have defined. To run integration or system tests
+in your project:
 
+``` bash
+    $ rebar3 as test lfe ltest -tintegration
+    $ rebar3 as test lfe ltest -tsystem
+```
+
+To run all tests for your project:
+
+``` bash
+    $ rebar3 as test lfe ltest -tall
+```
 
 ### The LFE Test Runner [&#x219F;](#contents)
 

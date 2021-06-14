@@ -78,13 +78,58 @@
   ((desc) (when (is_binary desc))
     (get-elision (binary_to_list desc))))
 
-(defun mod-line
-  ((desc (match-state color? color?))
+  ;;(((binary (prefix bytes (size 7)) (mod bitstring))) (when (=:= prefix "module "))
+
+(defun mod-line-begin
+  (((= (binary (prefix bytes (size 5)) (file bitstring)) desc) (match-state color? color?)) (when (=:= prefix #"file "))
+   (ltest-util:rebar-debug "Getting mod-line-begin (file) ..." '())
+   (ltest-util:rebar-debug "desc: ~p" (list desc))
+   (ltest-util:rebar-debug "module (mod-line-begin): ~p" (list (ltest-util:file->module desc)))
    (io:format "~smodule: ~s~n"
               `(,(indent (ltest-const:mod-indent))
                 ,(ltest-color:greenb
-                  (atom_to_list (ltest-util:get-module desc))
-                  color?)))))
+                  (atom_to_list (ltest-util:file->module desc))
+                  color?))))
+  (((= (binary (prefix bytes (size 7)) (mod bitstring)) desc) (match-state color? color?)) (when (=:= prefix #"module "))
+   (ltest-util:rebar-debug "Getting mod-line-begin (module) ..." '())
+   (ltest-util:rebar-debug "desc: ~p" (list desc))
+   (ltest-util:rebar-debug "module (mod-line-begin): ~p" (list mod))
+   (io:format "~smodule: ~s~n"
+              `(,(indent (ltest-const:mod-indent))
+                ,(ltest-color:greenb
+                  (ltest-util:binary-mod->str mod)
+                  color?))))
+  (((= (binary (prefix bytes (size 7)) (rest bitstring)) desc) (match-state color? color?))
+   (ltest-util:rebar-debug "Getting mod-line-begin (???) ..." '())
+   (ltest-util:rebar-debug "Unexecpted desc: ~p" (list desc))
+   (ltest-util:rebar-debug "prefix: ~p" (list prefix))
+   (ltest-util:rebar-debug "rest: ~p" (list rest))
+   (ltest-util:rebar-debug "Skipping ..." '())
+   'skipping)
+  ((desc (match-state color? color?))
+   (ltest-util:rebar-debug "Getting mod-line-begin (???) ..." '())
+   (ltest-util:rebar-debug "Unexecpted desc: ~p" (list desc))
+   (ltest-util:rebar-debug "Skipping ..." '())
+   'skipping))
+
+(defun mod-line-end (desc time data state)
+  (ltest-util:rebar-debug "Getting mod-line-end (file) ..." '())
+  (ltest-util:rebar-debug "desc: ~p, time: ~p, data: ~p, state: ~p" (list desc time data state))
+  (let ((skipped-tests (ltest-util:get-skip-tests desc))
+        (`#(,data-1 ,_) (lists:split 2 data))
+        (`#(,_ ,data-2) (lists:split 3 data)))
+    (logger:debug "skipped: ~p" (list skipped-tests))
+    (ltest-formatter:skip-lines skipped-tests state)
+    (ltest-formatter:mod-time time state)
+    (update-skips
+      (update-time state time)
+      (length skipped-tests))))
+
+(defun update-time (state time)
+  (set-state-time state (+ time (state-time state))))
+
+(defun update-skips (state skips)
+  (set-state-skip state (+ skips (state-skip state))))
 
 (defun ok
   (((match-state color? color?))

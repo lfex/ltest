@@ -1,6 +1,6 @@
 # ltest
 
-[![Build Status][gh-actions-badge]][gh-actions] [![LFE Versions][lfe badge]][lfe] [![Erlang Versions][erlang badge]][versions] [![Tags][github tags badge]][github tags] [![Downloads][hex downloads]][hex package]
+[![Build Status][gh-actions-badge]][gh-actions] [![LFE Versions][lfe badge]][lfe] [![Erlang Versions][erlang badge]][versions] [![Tags][github tags badge]][github tags]
 
 [![][ltest-logo]][ltest-logo-large]
 
@@ -457,8 +457,8 @@ Copyright © 2016, Eric Bailey <eric@ericb.me>,
 [gh-actions-badge]: https://github.com/lfex/ltest/workflows/ci%2Fcd/badge.svg
 [gh-actions]: https://github.com/lfex/ltest/actions
 [lfe]: https://github.com/rvirding/lfe
-[lfe badge]: https://img.shields.io/badge/lfe-1.3.0-blue.svg
-[erlang badge]: https://img.shields.io/badge/erlang-17.5%20to%2022.0-blue.svg
+[lfe badge]: https://img.shields.io/badge/lfe-2.0-blue.svg
+[erlang badge]: https://img.shields.io/badge/erlang-19%20to%2024-blue.svg
 [versions]: https://github.com/lfex/ltest/blob/master/.travis.yml
 [github tags]: https://github.com/lfex/ltest/tags
 [github tags badge]: https://img.shields.io/github/tag/lfex/ltest.svg

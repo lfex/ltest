@@ -3,19 +3,32 @@
 
 (include-lib "include/ltest-records.lfe")
 
-(defun get-module (bin-data)
-  (beam->module (get-beam bin-data)))
-
-(defun get-beam (bin-data)
+(defun file->beam (bin-data)
+  (ltest-util:rebar-debug "bin-data (file->beam): ~p" (list bin-data))
   (let* ((`#(,_ ,start) (binary:match bin-data (binary "file \"")))
          (`#(,end ,_) (binary:match bin-data (binary ".beam\"")))
          (len (- end start)))
+    (ltest-util:rebar-debug "start: ~p, end (file->beam): ~p" (list start end))
     (binary_to_list (binary:part bin-data `#(,start ,len)))))
 
+(defun file->module
+  (((binary (prefix bytes (size 7)) (mod bitstring))) (when (=:= prefix "module "))
+   (ltest-util:rebar-debug "pass-through (file->module): ~p" (list mod))
+   (ltest-util:rebar-debug "binary? ~p" (list (is_binary mod)))
+   (file->module (list_to_binary `("file \"" ,(code:which mod) "\""))))
+  ((bin-data)
+   (ltest-util:rebar-debug "binary? ~p" (list (is_binary bin-data)))
+   (ltest-util:rebar-debug "bin-data (file->module): ~p" (list bin-data))
+   (ltest-util:rebar-debug "str-data (file->module): ~p" (list (binary_to_list bin-data)))
+   (ltest-util:rebar-debug "result (file->module): ~p" (list (beam->module (file->beam bin-data))))
+   (beam->module (file->beam bin-data))))
+  
 (defun beam->module (beam)
-  (let (((tuple 'ok (tuple module _))
-         (beam_lib:chunks beam '())))
-    module))
+   (ltest-util:rebar-debug "beam (beam->module): ~p" (list beam))
+   (ltest-util:rebar-debug "module (beam->module): ~p" (list (beam_lib:chunks beam '())))
+   (let (((tuple 'ok (tuple module _))
+          (beam_lib:chunks beam '())))
+     module))
 
 (defun beams->files (beam-data)
   "Given a list of beams (no .beam extension), return a list of files (with
@@ -33,12 +46,14 @@
     #'beam->module/1
     beams-list))
 
+(defun module->beam (module)
+  (filename:rootname (code:which module)))
+
 (defun modules->beams (module-list)
   (lists:usort
-    (lists:map
-      (lambda (x)
-        (filename:rootname (code:which x)))
-      module-list)))
+   (lists:map
+    #'module->beam/1
+    module-list)))
 
 (defun get-behaviour (attrs)
   (proplists:get_value
@@ -76,10 +91,28 @@
   "Given an atom representing a module's name, return its exported functions."
   (get-beam-exports (code:which module)))
 
-(defun get-skip-tests (bin-data)
-  (filter-skipped
+(defun binary-mod->str (mod)
+  (string:strip (binary_to_list mod) 'both #\'))
+
+(defun binary-mod->atom (mod)
+  (list_to_atom (binary-mod->str mod)))
+
+(defun get-skip-tests
+  (((= (binary (prefix bytes (size 5)) (file bitstring)) bin-data)) (when (=:= prefix #"file "))
+   (ltest-util:rebar-debug "Getting skip tests (file) ..." '())
+   (filter-skipped
     (get-beam-exports
-      (get-beam bin-data))))
+     (file->beam bin-data))))
+  (((binary (prefix bytes (size 7)) (mod bitstring))) (when (=:= prefix #"module "))
+   (ltest-util:rebar-debug "Getting skip tests (module) ..." '())
+   (filter-skipped
+    (get-beam-exports
+     (module->beam (binary-mod->atom mod)))))
+  ((bin-data)
+   (ltest-util:rebar-debug "Getting skip tests (???)..." '())
+   (ltest-util:rebar-debug "Unexpected bin-data: ~p" `(,bin-data))
+   (ltest-util:rebar-debug "Skipping ..." '())
+   '()))
 
 (defun filter-skipped (funcs)
   (logger:debug "funcs: ~p" (list funcs))

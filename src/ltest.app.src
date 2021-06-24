@@ -48,8 +48,17 @@
   {licenses, ["BSD-3"]},
   {links,
    [{"GitHub", "https://github.com/lfex/ltest"},
-    {"Gitlab", "https://gitlab.com/lfex/ltest"},
     {"Hex", "https://hex.pm/packages/ltest"}
-   ]}
+   ]},
+  {exclude_files, ["priv/images/ltest-logo-large.png",
+                   "priv/images/ltest-logo-small.png",
+                   "priv/images/screen-1-1.png",
+                   "priv/images/screen-1-2.png",
+                   "priv/images/screen-2-1.png",
+                   "priv/images/screen-2-2.png",
+                   "priv/make/code.mk",
+                   "priv/make/docs.mk",
+                   "priv/make/test.mk"
+  ]}
  ]
 }.

@@ -42,7 +42,7 @@ you may use the most recent rebar2-compatible release of ltest: 0.6.3.
 
 ## EUnit Compatibility [&#x219F;](#contents)
 
-The tests created with ltest are compatible with EUnit ane can be run from
+The tests created with ltest are compatible with EUnit and can be run from
 either Erlang or LFE, using the standard EUnit listener or the ltest
 listener (test runner).
 
@@ -51,7 +51,8 @@ listener (test runner).
 * `(deftest ...)` for standard unit tests
 * `(deftestgen ...)` for writing tests with generators, including the
   standard EUnit test fixtures (see naming caveat below)
-* `(deftestskip ...)` for skipping unit tests; note that for a test to show up as skipped in the test runner, it has to be `export`ed in the module
+* `(deftestskip ...)` for skipping unit tests; note that for a test to show up
+  as skipped in the test runner, it has to be `export`ed in the module
 * `(list ...)`-wrapped tests (of arbitrary depth) for use as test sets
 * `(tuple ...)`-wrapped tests for naming/describing tests (first element
   of tuple)

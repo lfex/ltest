@@ -1,13 +1,8 @@
 compile:
 	@$(REBAR3) compile
 
-# repl:
-# 	$(REBAR3) as $(REBAR_PROFILE) compile
-# 	$(LFE) -pa `$(REBAR3) as $(REBAR_PROFILE) path -s " -pa "`
-
 repl:
-	@$(REBAR3) as repl compile
-	@$(REBAR3) as repl lfe repl
+	@$(REBAR3) lfe repl
 
 shell:
 	@$(REBAR3) shell

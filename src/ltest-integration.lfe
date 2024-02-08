@@ -3,7 +3,7 @@
 
 (defun behaviour_info
   (('callbacks)
-    'undefined)
+    '())
   ((_)
     'undefined))
 

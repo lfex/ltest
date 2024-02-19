@@ -15,8 +15,8 @@ jobs:
 
     strategy:
       matrix:
-        otp_version: [19, 20, 21, 22, 23, 24, 25]
-        # otp_version: [22]
+        # otp_version: [19, 20] Removed due to an incompatibility with rebar3_lfe
+        otp_version: [21, 22, 23, 24, 25, 26]
         os: [ubuntu-latest]
 
     container:

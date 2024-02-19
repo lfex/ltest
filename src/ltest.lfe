@@ -123,12 +123,12 @@
     funcs))
 
 (defun get-skip-funcs (module)
-  (ltest-util:filter-files
+  (lists:filter
     #'check-skip-funcs/1
     (ltest-util:get-module-exports module)))
 
 (defun get-skipped-tests (module)
-  (ltest-util:filter-files
+  (lists:filter
     #'check-skipped-tests/1
     (ltest-util:get-module-exports module)))
 

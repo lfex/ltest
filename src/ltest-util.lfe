@@ -75,7 +75,7 @@
     exports))
 
 (defun filtered (func beams)
-  (lists:filter-files
+  (lists:filter
     (lambda (x) (=/= x 'false))
     (funcall func beams)))
 

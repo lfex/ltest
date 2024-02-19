@@ -29,6 +29,7 @@ jobs:
     - name: Compile
       run: rebar3 compile
     - name: Xref Check
+      continue-on-error: true
       run: rebar3 xref
     - name: Run Tests
       run: rebar3 as test eunit

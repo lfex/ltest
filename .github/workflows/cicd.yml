@@ -23,7 +23,7 @@ jobs:
       image: erlang:${{ matrix.otp_version }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Check rebar3 Version
       run: DEBUG=1 rebar3 --version
     - name: Compile

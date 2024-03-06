@@ -1,8 +1,8 @@
 (defmodule ltest-formatter-tests
   (behaviour ltest-unit))
 
-(include-lib "include/ltest-macros.lfe")
-(include-lib "include/ltest-records.lfe")
+(include-lib "ltest/include/ltest-macros.lfe")
+(include-lib "ltest/include/ltest-records.lfe")
 
 (defun test-file ()
   "_build/test/lib/ltest/ebin/ltest-util.beam")

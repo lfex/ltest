@@ -5,7 +5,7 @@
       (check-failed-assert 2)
       (check-wrong-assert-exception 2))))
 
-(include-lib "include/ltest-macros.lfe")
+(include-lib "ltest/include/ltest-macros.lfe")
 
 (deftest is
   (is 'true)

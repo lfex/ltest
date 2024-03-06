@@ -4,7 +4,7 @@
     (from ltest
       (check-failed-assert 2))))
 
-(include-lib "include/ltest-macros.lfe")
+(include-lib "ltest/include/ltest-macros.lfe")
 
 (deftest testset-with-one `[,(is 'true)])
 

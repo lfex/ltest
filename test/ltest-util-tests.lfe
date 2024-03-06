@@ -1,7 +1,7 @@
 (defmodule ltest-util-tests
   (behaviour ltest-unit))
 
-(include-lib "include/ltest-macros.lfe")
+(include-lib "ltest/include/ltest-macros.lfe")
 
 (defun test-file ()
   "_build/test/lib/ltest/ebin/ltest-util.beam")

@@ -2,7 +2,7 @@
   (behaviour ltest-system)
   (export all))
 
-(include-lib "include/ltest-macros.lfe")
+(include-lib "ltest/include/ltest-macros.lfe")
 
 (deftest testing-behaviour-use-true
   (is 'true))

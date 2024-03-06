@@ -2,7 +2,7 @@
   (behaviour ltest-unit)
   (export all))
 
-(include-lib "include/ltest-macros.lfe")
+(include-lib "ltest/include/ltest-macros.lfe")
 
 (deftestskip bogus-test-will-be-skipped
   (is 'true)

@@ -5,7 +5,7 @@
   {description, "A Testing Framework for LFE"},
 
   %% The version of the application
-  {vsn, "0.13.6"},
+  {vsn, "0.13.7"},
 
   %% All modules used by the application.
   {modules,

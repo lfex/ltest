@@ -9,21 +9,46 @@ on:
 
 jobs:
 
-  build:
-    name: Build on OTP ${{ matrix.otp_version }} / ${{ matrix.os }}
+  builds:
+    name: Erlang ${{ matrix.otp_version }} build
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        # otp_version: [19, 20] Removed due to an incompatibility with rebar3_lfe
-        otp_version: [21, 22, 23, 24, 25, 26]
-        os: [ubuntu-latest]
-
-    container:
-      image: erlang:${{ matrix.otp_version }}
+        otp_version: ['24', '25', '26']
 
     steps:
     - uses: actions/checkout@v4
+    - uses: erlef/setup-beam@v1
+      with:
+        otp-version: ${{ matrix.otp_version }}
+        rebar3-version: '3.22'
+    - name: Check rebar3 Version
+      run: DEBUG=1 rebar3 --version
+    - name: Compile
+      run: rebar3 compile
+    #- name: Xref Check
+    #  continue-on-error: true
+    #  run: rebar3 xref
+    - name: Run Tests
+      run: rebar3 as test eunit
+    - name: Run Tests (ltest runner)
+      run: make check-runner-ltest
+
+  old-builds:
+    name: Erlang ${{ matrix.otp_version }} build (old)
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        otp_version: ['21', '22', '23']
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: erlef/setup-beam@v1
+      with:
+        otp-version: ${{ matrix.otp_version }}
+        rebar3-version: '3.15'
     - name: Check rebar3 Version
       run: DEBUG=1 rebar3 --version
     - name: Compile

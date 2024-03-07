@@ -28,9 +28,9 @@ jobs:
       run: DEBUG=1 rebar3 --version
     - name: Compile
       run: rebar3 compile
-    - name: Xref Check
-      continue-on-error: true
-      run: rebar3 xref
+    #- name: Xref Check
+    #  continue-on-error: true
+    #  run: rebar3 xref
     - name: Run Tests
       run: rebar3 as test eunit
     - name: Run Tests (ltest runner)

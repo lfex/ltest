@@ -1,7 +1,7 @@
 (defmodule ltest-formatter
   (export all))
 
-(include-lib "include/ltest-records.lfe")
+(include-lib "ltest/include/ltest-records.lfe")
 
 (defun test-suite-header (state)
   (io:format (get-suite-header state)))

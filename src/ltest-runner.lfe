@@ -1,7 +1,7 @@
 (defmodule ltest-runner
   (export all))
 
-(include-lib "include/ltest-records.lfe")
+(include-lib "ltest/include/ltest-records.lfe")
 
 (defun all ()
   (let ((state (make-state color? 'true)))

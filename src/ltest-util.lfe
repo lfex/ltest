@@ -1,7 +1,7 @@
 (defmodule ltest-util
   (export all))
 
-(include-lib "include/ltest-records.lfe")
+(include-lib "ltest/include/ltest-records.lfe")
 
 (defun file->beam (bin-data)
   (ltest-util:rebar-debug "bin-data (file->beam): ~p" (list bin-data))

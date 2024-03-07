@@ -1,8 +1,8 @@
 (defmodule ltest
   (export all))
 
-(include-lib "include/ltest-macros.lfe")
-(include-lib "include/ltest-records.lfe")
+(include-lib "ltest/include/ltest-macros.lfe")
+(include-lib "ltest/include/ltest-records.lfe")
 
 (defun skip-test-patt () ".*_skip")
 (defun skip-test-group-patt () "(.*)(_skip)")

@@ -2,7 +2,7 @@
   (behaviour eunit_listener)
   (export all))
 
-(include-lib "include/ltest-records.lfe")
+(include-lib "ltest/include/ltest-records.lfe")
 
 (defun start ()
   (start '()))

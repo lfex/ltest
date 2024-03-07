@@ -79,7 +79,7 @@ take your tests from (`eunit_compile_otps`). In your `rebar.config`:
 {profiles, [
   {test, [
     {deps, [
-      {ltest, {git, "git://github.com/lfex/ltest.git", {tag, "0.12.0"}}}
+      {ltest, "0.13.7"}
     ]}
     {src_dirs, ["src", "test"]}
   ]}

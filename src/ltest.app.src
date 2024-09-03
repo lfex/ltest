@@ -45,10 +45,13 @@
   %% Hex.pm metadata
   {pkg_name, ltest},
   {licenses, ["BSD-3"]},
-  {links,
-   [{"GitHub", "https://github.com/lfex/ltest"},
+  {links, [
+    {"GitHub", "https://github.com/lfex/ltest"},
     {"Hex", "https://hex.pm/packages/ltest"}
-   ]},
-  {exclude_paths, ["priv"]}
+  ]},
+  {exclude_files, [
+    "priv/images/*",
+    "priv/make/*"
+   ]}
  ]
 }.

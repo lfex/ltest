@@ -48,7 +48,7 @@
 
 (defun func-line (raw-func desc)
   (let ((func
-           (if (!= 'undefined desc)
+           (if (=/= 'undefined desc)
                desc
                (get-func-name raw-func))))
     (io:format "~s~s ~s" `(,(indent (ltest-const:func-indent))

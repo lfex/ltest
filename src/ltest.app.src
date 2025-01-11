@@ -50,8 +50,7 @@
     {"Hex", "https://hex.pm/packages/ltest"}
   ]},
   {exclude_files, [
-    "priv/images/*",
-    "priv/make/*"
+    "priv"
    ]}
  ]
 }.

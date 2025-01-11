@@ -42,7 +42,7 @@
   {env, []},
   %% Hex.pm metadata
   {pkg_name, ltest},
-  {licenses, ["BSD-3"]},
+  {licenses, ["BSD-3-Clause"]},
   {links, [
     {"GitHub", "https://github.com/lfex/ltest"},
     {"Hex", "https://hex.pm/packages/ltest"}

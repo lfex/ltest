@@ -1,11 +1,14 @@
 # ltest
 
-[![Build Status][gh-actions-badge]][gh-actions] [![LFE Versions][lfe badge]][lfe] [![Erlang Versions][erlang badge]][versions] [![Tags][github tags badge]][github tags]
-
-[![][ltest-logo]][ltest-logo-large]
+[![Build Status][gh-actions-badge]][gh-actions]
+[![LFE Versions][lfe-badge]][lfe]
+[![Erlang Versions][erlang-badge]][versions]
+[![Tags][github-tags-badge]][github-tags]
+[![Downloads][hex-downloads]][hex-package]
 
 *A Unit, Integration, and System Tests Framework for LFE*
 
+[![][ltest-logo]][ltest-logo-large]
 
 ## Contents
 
@@ -22,7 +25,6 @@
   * [The LFE Test Runner](#the-lfe-test-runner-)
 * [Dogfood](#dogfood-)
 * [License](#license-)
-
 
 ## Introduction [&#x219F;](#contents)
 
@@ -64,9 +66,7 @@ listener (test runner).
   system test
 * A custom test runner that over-rides EUnit behaviour and aesthetics
 
-
 ## Using `ltest` [&#x219F;](#contents)
-
 
 ### Adding ltest to Your Project [&#x219F;](#contents)
 
@@ -229,7 +229,6 @@ Here is a more complete example:
 
 ltest is working towards full test coverage; while not there yet, the unit
 tests for ltest itself provide the best examples of usage.
-
 
 ### Running Your Tests [&#x219F;](#contents)
 
@@ -428,7 +427,6 @@ There were no integration tests found.
 ========================================================================
 ```
 
-
 ## License [&#x219F;](#contents)
 
 BSD 3-Clause License
@@ -443,11 +441,7 @@ Copyright © 2016, Eric Bailey <eric@ericb.me>,
                   jsc <jonas.skovsgaard.christensen@gmail.com>
 ```
 
-
-
-
-
-<!-- Named page links below: /-->
+[//]: ---Named-Links---
 
 [ltest-logo]: priv/images/ltest-logo-small.png
 [ltest-logo-large]: priv/images/ltest-logo-large.png
@@ -458,12 +452,12 @@ Copyright © 2016, Eric Bailey <eric@ericb.me>,
 [gh-actions-badge]: https://github.com/lfex/ltest/workflows/ci%2Fcd/badge.svg
 [gh-actions]: https://github.com/lfex/ltest/actions
 [lfe]: https://github.com/lfe/lfe
-[lfe badge]: https://img.shields.io/badge/lfe-2.1.0-blue.svg
-[erlang badge]: https://img.shields.io/badge/erlang-19%20to%2025-blue.svg
+[lfe-badge]: https://img.shields.io/badge/lfe-2.1.0-blue.svg
+[erlang-badge]: https://img.shields.io/badge/erlang-19%20to%2025-blue.svg
 [versions]: https://github.com/lfex/ltest/blob/master/.travis.yml
-[github tags]: https://github.com/lfex/ltest/tags
-[github tags badge]: https://img.shields.io/github/tag/lfex/ltest.svg
-[github downloads]: https://img.shields.io/github/downloads/atom/atom/total.svg
-[hex badge]: https://img.shields.io/hexpm/v/ltest.svg?maxAge=2592000
-[hex package]: https://hex.pm/packages/ltest
-[hex downloads]: https://img.shields.io/hexpm/dt/ltest.svg
+[github-tags]: https://github.com/lfex/ltest/tags
+[github-tags-badge]: https://img.shields.io/github/tag/lfex/ltest.svg
+[github-downloads]: https://img.shields.io/github/downloads/atom/atom/total.svg
+[hex-badge]: https://img.shields.io/hexpm/v/ltest.svg?maxAge=2592000
+[hex-package]: https://hex.pm/packages/ltest
+[hex-downloads]: https://img.shields.io/hexpm/dt/ltest.svg

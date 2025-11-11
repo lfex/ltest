@@ -1,5 +1,7 @@
 (defmodule ltest-integration
-  (export all))
+  (export
+   (behaviour_info 1)
+   (get-modules 0)))
 
 (defun behaviour_info
   (('callbacks)

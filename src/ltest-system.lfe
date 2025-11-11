@@ -1,6 +1,8 @@
 (defmodule ltest-system
   "Define the marker behavior used to select system test modules."
-  (export all))
+  (export
+   (behaviour_info 1)
+   (get-modules 0)))
 
 (defun behaviour_info
   "Report no callbacks for the marker behavior; unsupported queries return

@@ -62,10 +62,12 @@ formatter_eval(LongText) ->
       "State = {state, undefined, unit, false, 0, 0, 0, 0, 0, 0}, ",
       "'ltest-formatter':'func-line'(lambda_test, ~s), ",
       "'ltest-formatter':'func-line'(lambda_test, ",
-      "<<\"λ description Ж\"/utf8>>), ",
+      "unicode:characters_to_binary([955, \" description \", 1046])), ",
       "'ltest-formatter':'func-line'(short_test, undefined), ",
-      "'ltest-formatter':'func-line'('λ_test', undefined), ",
-      "'ltest-formatter':'skip-line'({'λ_skip', 0}, State), ",
+      "'ltest-formatter':'func-line'(list_to_atom([955 | ",
+      "\"_test\"]), undefined), ",
+      "'ltest-formatter':'skip-line'({list_to_atom([955 | ",
+      "\"_skip\"]), 0}, State), ",
       "io:put_chars(\"literal ~~ newline\\n tab\\t\\n\"), halt(0)."]),
     lists:flatten(io_lib:format(Format, [Long])).
 
@@ -73,10 +75,11 @@ run_erl(Eval) ->
     Erl = os:find_executable("erl"),
     AppEbin = filename:dirname(code:which('ltest-formatter')),
     PathArgs = ["-pa", AppEbin],
+    EvalArg = binary_to_list(unicode:characters_to_binary(Eval)),
     Port = open_port({spawn_executable, Erl},
                      [binary, exit_status, use_stdio, stderr_to_stdout,
                       {args, ["-noshell", "-noinput"] ++ PathArgs
-                             ++ ["-eval", Eval]}]),
+                             ++ ["-eval", EvalArg]}]),
     collect(Port, []).
 
 collect(Port, Chunks) ->

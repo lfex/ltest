@@ -59,7 +59,7 @@ unicode_formatter_output_test() ->
 formatter_eval(LongText) ->
     Long = io_lib:format("~p", [LongText]),
     Format = lists:flatten([
-      "State = 'ltest-listener':init([{color, false}, {'test-type', unit}]), ",
+      "State = {state, undefined, unit, false, 0, 0, 0, 0, 0, 0}, ",
       "'ltest-formatter':'func-line'(lambda_test, ~s), ",
       "'ltest-formatter':'func-line'(lambda_test, ",
       "<<\"λ description Ж\"/utf8>>), ",
@@ -71,9 +71,8 @@ formatter_eval(LongText) ->
 
 run_erl(Eval) ->
     Erl = os:find_executable("erl"),
-    Paths = lists:usort([filename:absname(Path)
-                         || Path <- code:get_path()]),
-    PathArgs = lists:append([["-pa", Path] || Path <- Paths]),
+    AppEbin = filename:dirname(code:which('ltest-formatter')),
+    PathArgs = ["-pa", AppEbin],
     Port = open_port({spawn_executable, Erl},
                      [binary, exit_status, use_stdio, stderr_to_stdout,
                       {args, ["-noshell", "-noinput"] ++ PathArgs

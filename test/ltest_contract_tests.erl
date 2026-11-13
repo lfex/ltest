@@ -73,6 +73,7 @@ unicode_formatter_output_test() ->
 formatter_eval(LongText) ->
     Long = lists:flatten(io_lib:format("~p", [LongText])),
     lists:flatten([
+      "ok = io:setopts([{encoding, unicode}]), ",
       "State = {state, undefined, unit, false, 0, 0, 0, 0, 0, 0}, ",
       "BinaryText = unicode:characters_to_binary([955 | ",
       "\" BIN~line\\n\\tend\"]), ",

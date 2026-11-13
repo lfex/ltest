@@ -106,29 +106,28 @@
   (lists:map
     (match-lambda
       (((tuple func arity))
-        (case (re:run (atom_to_list func) (skip-test-patt))
-          ((tuple 'match _) `#(,func ,arity))
-          (_ 'false))))
+        (if (ltest-util:skipped? (tuple func arity))
+          `#(,func ,arity)
+          'false)))
     funcs))
 
 (defun check-skipped-tests (funcs)
   (lists:map
     (match-lambda
       (((tuple func arity))
-        (case (re:split (atom_to_list func)
-                        (++ (skip-test-group-patt))
-                        '(#(return list)))
-          ((list '() test-name _ '()) test-name)
-          (_ 'false))))
+        (if (ltest-util:skipped? (tuple func arity))
+          (lists:sublist (atom_to_list func)
+                         (- (length (atom_to_list func)) 5))
+          'false)))
     funcs))
 
 (defun get-skip-funcs (module)
-  (lists:filter
+  (ltest-util:filtered
     #'check-skip-funcs/1
     (ltest-util:get-module-exports module)))
 
 (defun get-skipped-tests (module)
-  (lists:filter
+  (ltest-util:filtered
     #'check-skipped-tests/1
     (ltest-util:get-module-exports module)))
 

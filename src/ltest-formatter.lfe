@@ -51,19 +51,27 @@
            (if (=/= 'undefined desc)
                desc
                (get-func-name raw-func))))
-    (io:format "~s~s ~s" `(,(indent (ltest-const:func-indent))
-                           ,func
-                           ,(get-elision func)))))
+    (io:put_chars
+      (unicode:characters_to_binary
+        (list (indent (ltest-const:func-indent))
+              func
+              " "
+              (get-elision func))))))
 
 (defun get-skip-func-name (func-name)
-  (re:replace
-    (atom_to_list func-name)
-    "_skip$" "" '(global #(return list))))
+  (let ((name (atom_to_list func-name)))
+    (if (lists:suffix "_skip" name)
+      (lists:sublist name (- (length name) 5))
+      name)))
 
 (defun get-func-name (func-name)
-  (re:replace
-    (atom_to_list func-name)
-    "_test(_)?$" "" '(global #(return list))))
+  (let ((name (atom_to_list func-name)))
+    (cond
+      ((lists:suffix "_test_" name)
+       (lists:sublist name (- (length name) 6)))
+      ((lists:suffix "_test" name)
+       (lists:sublist name (- (length name) 5)))
+      ('true name))))
 
 
 (defun get-elision
@@ -73,10 +81,10 @@
            (end-len (length " [fail]"))
            (elide-len (- (ltest-const:test-suite-width)
                          (+ init-len end-len))))
-      (string:copies "." elide-len)))
+      (string:copies "." (max 0 elide-len))))
   ;; Named tests send description as binary
   ((desc) (when (is_binary desc))
-    (get-elision (binary_to_list desc))))
+    (get-elision (unicode:characters_to_list desc))))
 
 (defun mod-line-check
   (((= (binary (prefix bytes (size 5)) (file bitstring)) desc) (match-state color? color?)) (when (=:= prefix #"file "))
@@ -165,10 +173,14 @@
 (defun skip-line
   ((`#(,raw-func ,_) state)
     (let ((func (get-skip-func-name raw-func)))
-      (io:format "~s~s ~s~s~n" `(,(indent (ltest-const:func-indent))
-                                 ,func
-                                 ,(get-elision func)
-                                 ,(skip state))))))
+      (io:put_chars
+        (unicode:characters_to_binary
+          (list (indent (ltest-const:func-indent))
+                func
+                " "
+                (get-elision func)
+                (skip state)
+                "\n"))))))
 
 
 (defun display-results (data state)

@@ -291,8 +291,8 @@
   `(_assertMatch ,guard ,expression))
 
 (defmacro is-not-match* (guard expression)
-  "The inverse case of [[is-match*/2]], for convenience."
-  `(_assertMatch ,guard ,expression))
+  "Return a test object asserting that `guard` does not match `expression`."
+  `(_assertNotMatch ,guard ,expression))
 
 (defmacro is-equal* (value expression)
   "Return a test object to assert `expression` evaluates to `value`."
@@ -331,22 +331,22 @@
   (`(,expression) `(is-exit* _ ,expression))
   (`(,expected-term ,expression) `(_assertExit ,expected-term ,expression)))
 
-(defmacro is-not-exit* (expected-term expression)
+(defmacro is-not-exit*
   "Return a test object that wraps [[is-not-exit/2]]."
   (`(,expression) `(is-not-exit* _ ,expression))
-  (`(,expected-term ,body) `(_test (is-not-exit ,expected-term ,expression))))
+  (`(,expected-term ,body) `(_test (is-not-exit ,expected-term ,body))))
 
-(defmacro is-throw* (expected-term expression)
+(defmacro is-throw*
   "Return a test object that wraps [[is-throw/2]]."
   (`(,expression) `(is-throw* _ ,expression))
-  (`(,expected-term ,body) `(_assertThrow ,expected-term ,expression)))
+  (`(,expected-term ,body) `(_assertThrow ,expected-term ,body)))
 
-(defmacro is-not-throw* (expected-term expression)
+(defmacro is-not-throw*
   "Return a test object that wraps [[is-not-throw/2]]."
   (`(,expression)
    `(is-not-throw* _ ,expression))
   (`(,expected-term ,body)
-   `(_test (is-not-throw 'throw ,expected-term ,expression))))
+   `(_test (is-not-throw ,expected-term ,body))))
 
 (defun --loaded-ltest-macros-- ()
   "This is just a dummy function for display purposes when including from the

@@ -17,6 +17,14 @@
     2 (+ 1 1)
     4 (* 2 2)))
 
+(deftest are-fail
+  (try
+    (progn
+      (are* (x y) (== x y) 2 3)
+      (error 'unexpected-test-success))
+    (catch ((tuple type value _)
+      (check-failed-assert value (assertion-failed))))))
+
 (deftest is-with-one-phrase-deftest
   "This unit tests was originally testing the deftest macro with just one
   phrase."
@@ -138,7 +146,17 @@
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_success)))))
 
-; XXX add test: is-not-error_test
+(deftest is-not-error
+  (is-not-error (+ 1 2))
+  (is-not-error 'undef (/ 1 0)))
+
+(deftest is-not-error-fail
+  (try
+    (progn
+      (is-not-error 'badarith (/ 1 0))
+      (error 'unexpected-test-success))
+    (catch ((tuple type value _)
+      (check-wrong-assert-exception value 'unexpected_exception)))))
 
 (deftest is-throw
   (is-throw 'my-error (throw 'my-error)))
@@ -159,7 +177,17 @@
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_success)))))
 
-; XXX add test: is-not-throw_test
+(deftest is-not-throw
+  (is-not-throw (+ 1 2))
+  (is-not-throw 'other (throw 'expected)))
+
+(deftest is-not-throw-fail
+  (try
+    (progn
+      (is-not-throw 'expected (throw 'expected))
+      (error 'unexpected-test-success))
+    (catch ((tuple type value _)
+      (check-wrong-assert-exception value 'unexpected_exception)))))
 
 (deftest is-exit
   (is-exit 'my-error (exit 'my-error)))
@@ -180,12 +208,33 @@
     (catch ((tuple type value _)
       (check-wrong-assert-exception value 'unexpected_success)))))
 
-; XXX add test: is-not-exit_test
+(deftest is-not-exit
+  (is-not-exit (+ 1 2))
+  (is-not-exit 'other (throw 'expected)))
+
+(deftest is-not-exit-fail
+  (try
+    (progn
+      (is-not-exit 'expected (exit 'expected))
+      (error 'unexpected-test-success))
+    (catch ((tuple type value _)
+      (check-wrong-assert-exception value 'unexpected_exception)))))
 
 ; XXX add test: is-match_test
 (deftest is-match
   (is-match (tuple 1 'a) #(1 a))
   (is-match (tuple 1 (tuple 2 'pull)) #(1 #(2 pull))))
+
+(deftest is-not-match
+  (is-not-match (tuple 1 'a) #(1 b)))
+
+(deftest is-not-match-fail
+  (try
+    (progn
+      (is-not-match (tuple 1 'a) #(1 a))
+      (error 'unexpected-test-success))
+    (catch ((tuple type value _)
+      (check-failed-assert value 'assertNotMatch)))))
 
 (deftest is-match-fail
   (try

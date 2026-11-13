@@ -111,9 +111,10 @@
   (lists:filter #'skipped?/1 funcs))
 
 (defun skipped?
-  ((`#(,func ,_))
-    (skip-match?
-      (re:run (atom_to_list func) "_skip"))))
+  ((`#(,func 0))
+    (lists:suffix "_skip" (atom_to_list func)))
+  ((_)
+    'false))
 
 (defun skip-match?
   ((`#(match ,_))

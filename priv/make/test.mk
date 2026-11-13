@@ -65,3 +65,9 @@ travis:
 	@if [ "$(REBAR_BUILD)" = "github" ]; then make build-github; make check; fi;
 	@if [ "$(REBAR_BUILD)" = "gitlab" ]; then make build-gitlab; make check-gitlab; fi;
 	@if [ "$(REBAR_BUILD)" = "hexpm" ]; then make build-hexpm; make check-hexpm; fi;
+
+# Run the full native foundation in order. Any failed command stops the target.
+check-native: compile
+	$(REBAR3) as test eunit
+	$(MAKE) check-runner-ltest
+	$(MAKE) check-runner-ltest-no-color

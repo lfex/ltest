@@ -10,3 +10,9 @@ default: compile
 include priv/make/code.mk
 include priv/make/docs.mk
 include priv/make/test.mk
+
+help:
+	@echo "ltest Make targets:"
+	@echo "  compile       Compile the application"
+	@echo "  check-native  Compile, run unfiltered EUnit, and run ltest with and without color"
+	@echo "  check         Run the existing Github-source EUnit check"

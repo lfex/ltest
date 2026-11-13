@@ -2,61 +2,26 @@ name: ci/cd
 
 on:
   push:
-    branches: [ main, 'release/**', 'task/**', 'feature/**', 'epic/**']
+    branches: [ main, 'release/**', 'task/**', 'feature/**', 'epic/**', 'codex/**']
     tags: ['**']
   pull_request:
-    branches: [ main, 'release/**', 'task/**', 'feature/**', 'epic/**']
+    branches: [ main, 'release/**', 'task/**', 'feature/**', 'epic/**', 'codex/**']
 
 jobs:
-
   builds:
     name: Erlang ${{ matrix.otp_version }} build
     runs-on: ubuntu-latest
-
     strategy:
+      fail-fast: false
       matrix:
-        otp_version: ['24', '25', '26']
-
+        otp_version: ['27.3.4.19', '28.5.0.8', '29.1.2']
     steps:
-    - uses: actions/checkout@v4
-    - uses: erlef/setup-beam@v1
-      with:
-        otp-version: ${{ matrix.otp_version }}
-        rebar3-version: '3.22'
-    - name: Check rebar3 Version
-      run: DEBUG=1 rebar3 --version
-    - name: Compile
-      run: rebar3 compile
-    #- name: Xref Check
-    #  continue-on-error: true
-    #  run: rebar3 xref
-    - name: Run Tests
-      run: rebar3 as test eunit
-    - name: Run Tests (ltest runner)
-      run: make check-runner-ltest
-
-  old-builds:
-    name: Erlang ${{ matrix.otp_version }} build (old)
-    runs-on: ubuntu-20.04
-
-    strategy:
-      matrix:
-        otp_version: ['21', '22', '23']
-
-    steps:
-    - uses: actions/checkout@v4
-    - uses: erlef/setup-beam@v1
-      with:
-        otp-version: ${{ matrix.otp_version }}
-        rebar3-version: '3.15'
-    - name: Check rebar3 Version
-      run: DEBUG=1 rebar3 --version
-    - name: Compile
-      run: rebar3 compile
-    #- name: Xref Check
-    #  continue-on-error: true
-    #  run: rebar3 xref
-    - name: Run Tests
-      run: rebar3 as test eunit
-    - name: Run Tests (ltest runner)
-      run: make check-runner-ltest
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.otp_version }}
+          rebar3-version: '3.27.0'
+      - name: Check rebar3 version
+        run: rebar3 --version
+      - name: Native checks
+        run: make check-native

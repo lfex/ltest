@@ -44,32 +44,58 @@ elision_codepoint_boundaries_test() ->
                            lists:duplicate(ZeroPaddingLength - 1, $λ)))).
 
 unicode_formatter_output_test() ->
-    LongText = lists:duplicate(96, $x),
-    Eval = formatter_eval(LongText),
+    LongAscii = lists:duplicate(96, $x),
+    LongUnicode = lists:duplicate(75, 955),
+    BinaryText = [955 | " BIN~line\n\tend"],
+    CharlistText = [1046 | " LIST~line\n\tend"],
+    FunctionText = [955 | "_function"],
+    SkipText = [1046 | "_skip_name"],
+    Eval = formatter_eval(LongAscii),
     Output = run_erl(Eval),
-    ?assertNotEqual(nomatch, binary:match(Output, list_to_binary(LongText))),
-    ?assertNotEqual(nomatch, binary:match(Output, <<"short">>)),
-    UnicodeDescription = unicode:characters_to_binary("λ description Ж"),
-    UnicodeName = unicode:characters_to_binary("λ"),
-    ?assertNotEqual(nomatch, binary:match(Output, UnicodeDescription)),
-    ?assertNotEqual(nomatch, binary:match(Output, UnicodeName)),
-    ?assertNotEqual(nomatch, binary:match(Output,
-                                         <<"literal ~ newline\n tab\t">>)).
+    Expected = unicode:characters_to_binary(
+                 lists:flatten(
+                   lists:join("\n",
+                     [expected_line(LongAscii, ""),
+                      expected_line("short", ""),
+                      expected_line(BinaryText, ""),
+                      expected_line(CharlistText, ""),
+                      expected_line(FunctionText, ""),
+                      expected_line(LongUnicode, ""),
+                      expected_line(SkipText, ". [skip]"),
+                      ""]))),
+    ?assertEqual(Expected, Output),
+    ?assertEqual(nomatch, binary:match(Output, <<27>>)).
 
 formatter_eval(LongText) ->
-    Long = io_lib:format("~p", [LongText]),
-    Format = lists:flatten([
+    Long = lists:flatten(io_lib:format("~p", [LongText])),
+    lists:flatten([
       "State = {state, undefined, unit, false, 0, 0, 0, 0, 0, 0}, ",
-      "'ltest-formatter':'func-line'(lambda_test, ~s), ",
-      "'ltest-formatter':'func-line'(lambda_test, ",
-      "unicode:characters_to_binary([955, \" description \", 1046])), ",
+      "BinaryText = unicode:characters_to_binary([955 | ",
+      "\" BIN~line\\n\\tend\"]), ",
+      "CharlistText = [1046 | \" LIST~line\\n\\tend\"], ",
+      "LongUnicode = lists:duplicate(75, 955), ",
+      "'ltest-formatter':'func-line'(lambda_test, ", Long, "), ",
+      "io:put_chars(\"\\n\"), ",
       "'ltest-formatter':'func-line'(short_test, undefined), ",
+      "io:put_chars(\"\\n\"), ",
+      "'ltest-formatter':'func-line'(lambda_test, BinaryText), ",
+      "io:put_chars(\"\\n\"), ",
+      "'ltest-formatter':'func-line'(lambda_test, CharlistText), ",
+      "io:put_chars(\"\\n\"), ",
       "'ltest-formatter':'func-line'(list_to_atom([955 | ",
-      "\"_test\"]), undefined), ",
-      "'ltest-formatter':'skip-line'({list_to_atom([955 | ",
-      "\"_skip\"]), 0}, State), ",
-      "io:put_chars(\"literal ~~ newline\\n tab\\t\\n\"), halt(0)."]),
-    lists:flatten(io_lib:format(Format, [Long])).
+      "\"_function_test\"]), undefined), ",
+      "io:put_chars(\"\\n\"), ",
+      "'ltest-formatter':'func-line'(lambda_test, LongUnicode), ",
+      "io:put_chars(\"\\n\"), ",
+      "'ltest-formatter':'skip-line'({list_to_atom([1046 | ",
+      "\"_skip_name_skip\"]), 0}, State), halt(0)."]).
+
+expected_line(Text, Status) ->
+    Width = 'ltest-const':'test-suite-width'(),
+    Indent = 'ltest-const':'func-indent'(),
+    Padding = max(0, Width - Indent - length(Text) - length(" [fail]")),
+    lists:flatten([lists:duplicate(Indent, $ ), Text, " ",
+                   lists:duplicate(Padding, $.), Status]).
 
 run_erl(Eval) ->
     Erl = os:find_executable("erl"),

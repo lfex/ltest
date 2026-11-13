@@ -19,3 +19,5 @@ auto-save-list
 tramp
 .\#*
 /.worktrees
+
+/.ldoc-preview*/

@@ -6,23 +6,30 @@
 ;;;===================================================================
 
 (defmacro otp>=18? ()
+  "Return true when the OTP release is 18 or newer; return false if it
+   cannot be parsed."
   `(try
      (>= (list_to_integer (erlang:system_info 'otp_release)) 18)
      (catch ((tuple _ _ _) 'false))))
 
 (defmacro assertion-failed ()
+  "Return the version-specific EUnit assertion failure tag."
   `(if (otp>=18?) 'assert 'assertion_failed))
 
 (defmacro assert-equal-failed ()
+  "Return the version-specific EUnit equality failure tag."
   `(if (otp>=18?) 'assertEqual 'assertEqual_failed))
 
 (defmacro assert-not-equal-failed ()
+  "Return the version-specific EUnit inequality failure tag."
   `(if (otp>=18?) 'assertNotEqual 'assertNotEqual_failed))
 
 (defmacro assert-exception-failed ()
+  "Return the version-specific EUnit exception failure tag."
   `(if (otp>=18?) 'assertException 'assertException_failed))
 
 (defmacro assert-match-failed ()
+  "Return the version-specific EUnit match failure tag."
   `(if (otp>=18?) 'assertMatch 'assertMatch_failed))
 
 ;;;===================================================================
@@ -48,21 +55,24 @@
 ;;;===================================================================
 
 (defmacro deftest
-  "Define a standard EUnit test."
+  "Define a nullary EUnit test named NAME_test from the supplied body
+   forms."
   ((cons name body)
    (let ((name_test (list_to_atom (++ (to-unders name) "_test"))))
      `(progn (defun ,name_test () ,@body)
              (extend-module () ((export (,name_test 0))))))))
 
 (defmacro deftestgen
-  "Define an EUnit test that uses test generators."
+  "Define a nullary EUnit generator named NAME_test_ from the supplied
+   body forms."
   ((cons name body)
    (let ((name_test_ (list_to_atom (++ (to-unders name) "_test_"))))
      `(progn (defun ,name_test_ () ,@body)
              (extend-module () ((export (,name_test_ 0))))))))
 
 (defmacro deftestskip
-  "Define a standard EUnit test that will be skipped (not run)."
+  "Define a nullary NAME_skip function; ltest lists exported matches
+   without executing the body."
   ((cons name body)
    `(defun ,(list_to_atom (++ (to-unders name) "_skip")) ()
       ,@body)))
@@ -72,15 +82,12 @@
 ;;;===================================================================
 
 (defmacro defsetup (func-name)
-  "Return a nullary function that calls `func-name/0`.
-
-  A simple wrapper macro for defining the set-up function in a fixture."
+  "Return a zero-argument fixture setup function that calls FUNC-NAME/0."
   `(lambda () (,func-name)))
 
 (defmacro defteardown (func-name)
-  "Return a unary function that calls `func-name/1` on its argument.
-
-  A simple wrapper macro for defining the tear-down function in a fixture."
+  "Return a one-argument fixture teardown function that calls
+   FUNC-NAME/1."
   `(lambda (x) (,func-name x)))
 
 
@@ -110,8 +117,8 @@
                 ,(list_to_tuple (cdr t)))))))
 
 (defmacro deftestcase
-  "This macro is for defining EUnit tests for use by fixtures which have
-  particular naming convention needs."
+  "Define a fixture test-case function; printable named tuples become
+   named test objects and other forms become nullary tests."
   ((cons func-name (cons args rest))
    `(defun ,(list_to_atom (++ (to-unders func-name) "_test_case")) (,@args)
       (list
@@ -126,12 +133,8 @@
             rest)))))
 
 (defmacro deftestcases funcs
-  "This macro expects one or more function *names* which have been defined
-  using [[deftestcase/255]].
-
-  Note that this macro is not composable with (deftestcase ...); you must
-  define the test case and then only pass the test case name to this
-  macro."
+  "Build a fixture generator from one or more previously defined
+   deftestcase functions."
   (cond ((> (length funcs) 1)
          `(list
            ,@(lists:map
@@ -148,84 +151,81 @@
 ;;; Assertion macros
 ;;;===================================================================
 
-(defmacro is (bool-expression)
-  "Assert `bool-expression` evaluates to `'true`."
+(defmacro is (bool-expression) "Assert that the expression evaluates to true."
   `(assert ,bool-expression))
 
 (defmacro is-not (bool-expression)
-  "Assert `bool-expression` evaluates to `'false`."
+  "Assert that the expression evaluates to false.
+   Assert that the expression evaluates to false."
   `(assertNot ,bool-expression))
 
 (defmacro is-match (guard expression)
-  "Assert `guard` matches `expression`.
-
-  The main reason to use [[is-match/2]], instead of matching with `=`,
-  is that it produces more detailed error messages."
+  "Assert that the expression matches GUARD and report an EUnit match
+   diagnostic on failure."
   `(assertMatch ,guard ,expression))
 
 (defmacro is-not-match (guard expression)
-  "The inverse case of [[is-match/2]], for convenience."
+  "Assert that the expression does not match GUARD.
+   Assert that the expression does not match GUARD."
   `(assertNotMatch ,guard ,expression))
 
 (defmacro is-equal (value expression)
-  "Assert `expression` evaluates to `value`."
+  "Assert that EXPRESSION evaluates to VALUE.
+   Assert that EXPRESSION evaluates to VALUE."
   `(assertEqual ,value ,expression))
 
 (defmacro is-not-equal (value expression)
-  "The inverse case of [[is-equal/2]], for convenience."
+  "Assert that EXPRESSION does not evaluate to VALUE.
+   Assert that EXPRESSION does not evaluate to VALUE."
   `(assertNotEqual ,value ,expression))
 
 (defmacro is-exception
-  "Evaluate `expression`, catching any exception and testing that it matches
-  `` `#(,expected-class ,expected-term) ``. If the match fails, or if no
-  exception is thrown, an informative exception will be generated.
-
-  [[is-error/2]], [[is-exit/2]] and [[is-throw/2]] are equivalent to using
-  [[is-exception/3]] with an `expected-class` of `'error`, `'exit`, or
-  `'throw`, respectively."
+  "Assert that EXPRESSION raises the requested exception class and term;
+   one argument accepts any class and term."
   (`(,expression)
    `(is-exception _ _ ,expression))
   (`(,expected-class ,expected-term ,expression)
    `(assertException ,expected-class ,expected-term ,expression)))
 
 (defmacro is-not-exception
-  "The inverse case of [[is-exception/3]], for convenience."
+  "With one argument, assert that no exception is raised; with explicit
+   class and term, reject only that pair."
   (`(,expression)
    `(is-not-exception _ _ ,expression))
   (`(,expected-class ,expected-term ,expression)
    `(assertNotException ,expected-class ,expected-term ,expression)))
 
 (defmacro is-error
-  "Equivalent to [[is-exception/3]] with `'error` as `expected-class`."
+  "Assert that EXPRESSION raises an error, optionally matching its term."
   (`(,expression) `(is-error _ ,expression))
   (`(,error ,body) `(assertError ,error ,body)))
 
 (defmacro is-not-error
-  "The inverse case of [[is-error/2]], for convenience."
+  "Reject the selected error term; other exception classes may pass."
   (`(,expression)
    `(is-not-error _ ,expression))
   (`(,expected-term ,expression)
    `(is-not-exception 'error ,expected-term ,expression)))
 
 (defmacro is-exit
-  "Equivalent to [[is-exception/3]] with `'exit` as `expected-class`."
+  "Assert that EXPRESSION exits, optionally matching its term."
   (`(,expression) `(is-exit _ ,expression))
   (`(,expected-term ,expression) `(assertExit ,expected-term ,expression)))
 
 (defmacro is-not-exit
-  "The inverse case of [[is-exit/2]], for convenience."
+  "Reject the selected exit term; other exception classes may pass."
   (`(,expression)
    `(is-not-exit _ ,expression))
   (`(,expected-term ,expression)
    `(is-not-exception 'exit ,expected-term ,expression)))
 
 (defmacro is-throw
-  "Equivalent to [[is-exception/3]] with `'throw` as `expected-class`."
+  "Assert that EXPRESSION throws, optionally matching its term."
   (`(,expression) `(is-throw _ ,expression))
   (`(,expected-term ,expression) `(assertThrow ,expected-term ,expression)))
 
 (defmacro is-not-throw
-  "The inverse case of [[is-throw/2]], for convenience."
+  "Reject the selected throw term; other exception classes may pass."
   (`(,expression)
    `(is-not-throw _ ,expression))
   (`(,expected-term ,expression)
@@ -272,77 +272,93 @@
   ) ; end eval-when-compile
 
 (defmacro is* (bool-expression)
-  "Return a test object that wraps [[is/1]]."
+  "Construct a lazy EUnit test object that asserts the expression is
+   true."
   `(_assert ,bool-expression))
 
 ;; Based on #'clojure.test/are
 (defmacro are*
+  "Substitute each complete row of values into the expression
+   immediately; this does not return delayed test objects."
   ('(() ,expr) `(is* 'true))
   (`(,arglist ,expr . ,args)
    `(do-template ,arglist (is ,expr) ,@args))
   (_ (error 'badarg (list* arglist expr args))))
 
 (defmacro is-not* (bool-expression)
-  "Return a test object that wraps [[is-not/2]]."
+  "Construct a lazy EUnit test object that asserts the expression is
+   false."
   `(_assertNot ,bool-expression))
 
 (defmacro is-match* (guard expression)
-  "Return a test object that wraps [[is-match/2]]."
+  "Construct a lazy EUnit test object that asserts the expression matches
+   GUARD."
   `(_assertMatch ,guard ,expression))
 
 (defmacro is-not-match* (guard expression)
-  "Return a test object asserting that `guard` does not match `expression`."
+  "Construct a lazy EUnit test object that asserts the expression does
+   not match GUARD."
   `(_assertNotMatch ,guard ,expression))
 
 (defmacro is-equal* (value expression)
-  "Return a test object to assert `expression` evaluates to `value`."
+  "Construct a lazy EUnit test object that asserts EXPRESSION evaluates
+   to VALUE."
   `(_assertEqual ,value ,expression))
 
 (defmacro is-not-equal* (value expression)
-  "Return a test object to assert `expression` evaluates to `value`."
+  "Construct a lazy EUnit test object that asserts EXPRESSION does not
+   evaluate to VALUE."
   `(_assertNotEqual ,value ,expression))
 
 (defmacro is-exception*
-  "Return a test object that wraps [[is-exception/3]]."
+  "Construct a lazy exception assertion object; the three-argument form
+   checks class and term."
   (`(,expression)
    `(is-exception* _ _ ,expression))
   (`(,expected-class ,expected-term ,expression)
    `(_assertException ,expected-class ,expected-term ,expression)))
 
 (defmacro is-not-exception*
-  "The inverse case of [[is-exception*/3]], for convenience."
+  "With one argument, construct an object asserting no exception; with
+   explicit class and term, reject only that pair."
   (`(,expression)
    `(is-not-exception* _ _ ,expression))
   (`(,expected-class ,expected-term ,expression)
    `(_assertNotException ,expected-class ,expected-term ,expression)))
 
 (defmacro is-error*
-  "Return a test object that wraps [[is-error/2]]."
+  "Construct a lazy EUnit object that asserts an error, optionally
+   matching its term."
   (`(,expression) `(is-error* _ ,expression))
   (`(,error ,body) `(_assertError ,error ,body)))
 
 (defmacro is-not-error*
-  "Return a test object that wraps [[is-not-error/2]]."
+  "Reject the selected error term when EUnit evaluates the lazy object;
+   other classes may pass."
   (`(,expression) `(is-not-error* _ ,expression))
   (`(,error ,body) `(_test (is-not-error ,error ,body))))
 
 (defmacro is-exit*
-  "Return a test object that wraps [[is-exit/2]]"
+  "Construct a lazy EUnit object that asserts an exit, optionally
+   matching its term."
   (`(,expression) `(is-exit* _ ,expression))
   (`(,expected-term ,expression) `(_assertExit ,expected-term ,expression)))
 
 (defmacro is-not-exit*
-  "Return a test object that wraps [[is-not-exit/2]]."
+  "Reject the selected exit term when EUnit evaluates the lazy object;
+   other classes may pass."
   (`(,expression) `(is-not-exit* _ ,expression))
   (`(,expected-term ,body) `(_test (is-not-exit ,expected-term ,body))))
 
 (defmacro is-throw*
-  "Return a test object that wraps [[is-throw/2]]."
+  "Construct a lazy EUnit object that asserts a throw, optionally
+   matching its term."
   (`(,expression) `(is-throw* _ ,expression))
   (`(,expected-term ,body) `(_assertThrow ,expected-term ,body)))
 
 (defmacro is-not-throw*
-  "Return a test object that wraps [[is-not-throw/2]]."
+  "Reject the selected throw term when EUnit evaluates the lazy object;
+   other classes may pass."
   (`(,expression)
    `(is-not-throw* _ ,expression))
   (`(,expected-term ,body)

@@ -1,22 +1,26 @@
 (defmodule ltest-listener
+  "Collect EUnit events and render the ltest report."
   (behaviour eunit_listener)
   (export all))
 
 (include-lib "ltest/include/ltest-records.lfe")
 
-(defun start ()
+(defun start () "Start the EUnit listener with an empty option list."
   (start '()))
 
 (defun start (options)
+  "Start the EUnit listener with the supplied option proplist."
   (eunit_listener:start (MODULE) options))
 
 (defun init (options)
+  "Initialize listener state, applying ltest defaults to omitted color and
+   test type."
   (make-state
    status (orddict:new)
-   test-type (proplists:get_value 'test-type options)
-   color?  (proplists:get_value 'color options)))
+   test-type (proplists:get_value 'test-type options 'unit)
+   color?  (proplists:get_value 'color options 'true)))
 
-(defun handle_begin
+(defun handle_begin "Record the beginning of an EUnit test or group event."
   (('group (= `(,_ #(desc undefined) ,_ ,_) data) state)
     (ltest-util:rebar-debug "data (group, no desc): ~p" (list data))
     state)
@@ -78,7 +82,7 @@
           state)))))
 
 (defun assertion-failure? (reason)
-  "Return true for EUnit's assertion-specific error reason tags."
+  "Return true for EUnit assertion-specific error reason tags."
   (andalso (is_tuple reason)
            (> (tuple_size reason) 0)
            (lists:member (element 1 reason)
@@ -92,7 +96,7 @@
   ((_desc) 'false))
 
 (defun module-for-desc
-  "Return the module represented by an EUnit file or module descriptor."
+  "Return the module for an EUnit file or module descriptor; otherwise undefined."
   (((= (binary (prefix bytes (size 5)) (rest bitstring)) desc)) (when (=:= prefix #"file "))
     (ltest-util:file->module desc))
   (((= (binary (prefix bytes (size 7)) (mod bitstring)) desc)) (when (=:= prefix #"module "))
@@ -100,7 +104,8 @@
   ((_desc) 'undefined))
 
 (defun record-module-group (desc time state)
-  "Count manual skips and elapsed time once per module across file/module groups."
+  "Count manual skips and elapsed time once per module across file/module
+   groups."
   (let ((module (module-for-desc desc)))
     (case module
       ('undefined state)
@@ -136,11 +141,12 @@
     `#(ok ,reason ,state)))
 
 (defun sync_end (result)
-  "Legacy compatibility helper; EUnit's tty remains the sole result sender."
+  "Legacy compatibility helper; it does not send an EUnit result message."
   result)
 
-(defun update-time (state time)
+(defun update-time (state time) "Add an elapsed duration to listener state."
   (set-state-time state (+ time (state-time state))))
 
 (defun update-skips (state skips)
+  "Add the skipped-test count to listener state."
   (set-state-skip state (+ skips (state-skip state))))

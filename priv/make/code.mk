@@ -8,15 +8,13 @@ shell:
 	@$(REBAR3) shell
 
 clean:
-	@rm -rf rebar3.crashdump rebar.lock \
+	@rm -rf rebar3.crashdump \
 	_build/default/*/$(PROJECT) \
 	_build/repl/*/$(PROJECT)
 
 clean-all: clean
 	@rm -rf \
-	./_build \
-	$(HOME)/.cache/rebar3/hex/default/packages/* \
-	$(HOME)/.cache/rebar3/*/$(PROJ)
+	./_build
 
 push:
 	git push github master

@@ -129,21 +129,23 @@
    (io:format (++ "... [" (ltest-color:greenb "ok" color?) "]~n"))))
 
 (defun fail
+  "Display an assertion failure using the configured color setting."
   ((error where (match-state color? color?))
    (io:format ". [~s]~n~n~s~s:~n" `(,(ltest-color:red "fail" color?)
                                    ,(indent (ltest-const:error-indent))
                                    ,(ltest-color:yellowb
                                      "Assertion failure" color?)))
-  (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
-                                           ,error))))
+   (lfe_io:format "~s~s~n~n" `(,(indent (ltest-const:error-indent))
+                                ,(ltest-color:redb (io_lib:format "~p" `(,error)) color?)))))
 
 (defun err
+  "Display an EUnit error using the configured color setting."
   ((error where (match-state color? color?))
    (io:format " [~s]~n~n~s~s:~n" `(,(ltest-color:yellow "error" color?)
                                    ,(indent (ltest-const:error-indent))
                                    ,(ltest-color:yellowb "Error" color?)))
-   (lfe_io:format "~s\e[31;1m~p\e[0m~n~n" `(,(indent (ltest-const:error-indent))
-                                            ,error))))
+   (lfe_io:format "~s~s~n~n" `(,(indent (ltest-const:error-indent))
+                                ,(ltest-color:redb (io_lib:format "~p" `(,error)) color?)))))
 
 (defun skip
   (((match-state color? color?))

@@ -125,6 +125,7 @@
   (+ (state-ok state)
      (state-skip state)
      (state-fail state)
+     (state-err state)
      (state-cancel state)))
 
 (defun rebar-debug (msg)

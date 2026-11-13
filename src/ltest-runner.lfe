@@ -4,17 +4,24 @@
 (include-lib "ltest/include/ltest-records.lfe")
 
 (defun all ()
-  (let ((state (make-state color? 'true)))
-    (ltest-formatter:test-suite-header state)
-    (unit 'combined)
-    (integration 'combined)
-    (system 'combined)
-    (ltest-formatter:test-suite-footer state)
-    ;; Add support for third-party test runners here
-    (case (code:which 'lse)
-      ('non_existing (ltest-runner:run-beams 'selenium '()))
-      (_ (lse-runner:selenium 'combined)))
-    (ltest-formatter:test-suite-footer state)))
+  (let* ((state (make-state color? 'true))
+         (_header (ltest-formatter:test-suite-header state))
+         (results (list
+                    (unit 'combined)
+                    (integration 'combined)
+                    (system 'combined)
+                    ;; Add support for third-party test runners here
+                    (case (code:which 'lse)
+                      ('non_existing (ltest-runner:run-beams 'selenium '()))
+                      (_ (lse-runner:selenium 'combined)))))
+         (_footer (ltest-formatter:test-suite-footer state)))
+    (first-non-ok results)))
+
+(defun first-non-ok
+  "Return the first non-ok legacy group result, or ok on full success."
+  ((()) 'ok)
+  (((cons 'ok rest)) (first-non-ok rest))
+  (((cons result _rest)) result))
 
 (defun integration (_)
   (let ((state (make-state color? 'true)))
@@ -24,8 +31,9 @@
 (defun integration ()
   (let ((state (make-state color? 'true)))
     (ltest-formatter:test-suite-header state)
-    (integration 'solo)
-    (ltest-formatter:test-suite-footer state)))
+    (let ((result (integration 'solo)))
+      (ltest-formatter:test-suite-footer state)
+      result)))
 
 (defun system (_)
   (let ((state (make-state color? 'true)))
@@ -35,8 +43,9 @@
 (defun system ()
   (let ((state (make-state color? 'true)))
     (ltest-formatter:test-suite-header state)
-    (system 'solo)
-    (ltest-formatter:test-suite-footer state)))
+    (let ((result (system 'solo)))
+      (ltest-formatter:test-suite-footer state)
+      result)))
 
 (defun unit (_)
   (let ((state (make-state color? 'true)))
@@ -46,8 +55,9 @@
 (defun unit ()
   (let ((state (make-state color? 'true)))
     (ltest-formatter:test-suite-header state)
-    (unit 'solo)
-    (ltest-formatter:test-suite-footer state)))
+    (let ((result (unit 'solo)))
+      (ltest-formatter:test-suite-footer state)
+      result)))
 
 (defun run
   (('integration)

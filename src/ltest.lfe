@@ -153,83 +153,83 @@
 
 ;;; New API for running tests
 ;;;
-;;; Each of the following functions takes an options data structure as its single
-;;; argument. The options are of this form:
-;;;
-;;; #m(color         boolean
-;;;    suite-headers boolean
-;;;    test-listener atom    ; one of ltest-listener, eunit_surefire
-;;;    test-type     atom    ; one of all, unit, system, integration
-;;;    verbose       boolean ; only applicable to eunit_surefire
-;;;
+;;; Options are merged with default-opts at every public group boundary. Group
+;;; functions preserve EUnit's result; run/0,1 adapts that result for rebar3.
+
 (defun run ()
   (run (default-opts)))
 
-(defun run
-  (((= `#m(test-type all) opts))
-   (all opts))
-  (((= `#m(test-type unit) opts))
-   (unit opts))
-  (((= `#m(test-type system) opts))
-   (system opts))
-  (((= `#m(test-type integration) opts))
-   (integration opts))
-  ((`#m(test-type ,test-type))
-   `#(error ,(io_lib:format "Unknown test type: ~p" `(,test-type)))))
+(defun run (opts)
+  (let* ((merged-opts (maps:merge (default-opts) opts))
+         (result
+           (case (mref merged-opts 'test-type)
+             ('all (all merged-opts))
+             ('unit (unit merged-opts))
+             ('system (system merged-opts))
+             ('integration (integration merged-opts))
+             (test-type `#(error ,(io_lib:format "Unknown test type: ~p" `(,test-type)))))))
+    (adapt-run-result result)))
+
+(defun adapt-run-result (result)
+  "Adapt direct EUnit outcomes to the result contract expected by rebar3_lfe."
+  (case result
+    ('ok 'ok)
+    ('error `#(error tests_failed))
+    (`#(error ,_) result)))
 
 (defun all ()
   (all (default-opts)))
 
 (defun all (opts)
-  (let* ((merged-opts (maps:merge (default-opts) opts))
+  (let* ((merged-opts (merge-run-opts opts 'all))
          (test-opts (maps:merge merged-opts #m(suite-headers false)))
-         (state (make-state color? (mref opts 'color))))
-    (maybe-suite-header opts state)
-    (unit (maps:merge test-opts #m(test-type unit)))
-    (system (maps:merge test-opts #m(test-type system)))
-    (integration (maps:merge test-opts #m(test-type integration)))
-    (maybe-suite-footer opts state)))
+         (state (make-state color? (mref merged-opts 'color)))
+         (_header (maybe-suite-header merged-opts state))
+         (results (list
+                    (unit (maps:merge test-opts #m(test-type unit)))
+                    (system (maps:merge test-opts #m(test-type system)))
+                    (integration (maps:merge test-opts #m(test-type integration)))))
+         (_footer (maybe-suite-footer merged-opts state)))
+    (first-non-ok results)))
 
 (defun unit ()
   (unit (default-opts)))
 
 (defun unit (opts)
-  (ltest-util:rebar-debug "Running unit tests ..." '())
-  (ltest-util:rebar-debug "Got opts: ~p~n" `(,opts))
-  (let ((state (make-state color? (mref opts 'color)
-                           test-type 'unit)))
-    (ltest-util:rebar-debug "Got state: ~p~n" `(,state))
-    (maybe-suite-header opts state)
-    (ltest-formatter:test-type-header "Unit Tests" state)
-    (ltest-util:rebar-debug "Running beams ...~n" '())
-    (run-beams 'unit #'get-unit-beams/1 opts)
-    (maybe-suite-footer opts state)))
+  (run-group 'unit "Unit Tests" opts #'get-unit-beams/1))
 
 (defun system ()
   (system (default-opts)))
 
 (defun system (opts)
-  (ltest-util:rebar-debug "Running system tests ..." '())
-  (let ((state (make-state color? (mref opts 'color)
-                           test-type 'system)))
-    (maybe-suite-header opts state)
-    (ltest-formatter:test-type-header "System Tests" state)
-    (run-beams 'unit #'get-system-beams/1 opts)
-    (maybe-suite-footer opts state)))
+  (run-group 'system "System Tests" opts #'get-system-beams/1))
 
 (defun integration ()
   (integration (default-opts)))
 
 (defun integration (opts)
-  (ltest-util:rebar-debug "Running integration tests ..." '())
-  (let ((state (make-state color? (mref opts 'color)
-                           test-type 'integration)))
-    (maybe-suite-header opts state)
-    (ltest-formatter:test-type-header "Integration Tests" state)
-    (run-beams 'unit #'get-integration-beams/1 opts)
-    (maybe-suite-footer opts state)))
+  (run-group 'integration "Integration Tests" opts #'get-integration-beams/1))
 
-;;; New API support functions
+(defun run-group (test-type title opts test-fn)
+  "Run one discovered group with complete options and return the EUnit result."
+  (let* ((merged-opts (merge-run-opts opts test-type))
+         (state (make-state color? (mref merged-opts 'color)
+                            test-type test-type)))
+    (maybe-suite-header merged-opts state)
+    (ltest-formatter:test-type-header title state)
+    (let ((result (run-beams test-type test-fn merged-opts)))
+      (maybe-suite-footer merged-opts state)
+      result)))
+
+(defun first-non-ok
+  "Return the first non-ok result, or ok when every group succeeded."
+  ((()) 'ok)
+  (((cons 'ok rest)) (first-non-ok rest))
+  (((cons result _rest)) result))
+
+(defun merge-run-opts (opts test-type)
+  "Merge caller options with defaults and force the selected group's type."
+  (maps:put 'test-type test-type (maps:merge (default-opts) opts)))
 
 (defun default-opts ()
   #m(color true
@@ -266,5 +266,4 @@
   (let* ((`#(ok ,cwd) (file:get_cwd))
          (beams (funcall test-fn cwd))
          (beam-files (ltest-util:beams->files beams)))
-    (eunit:test beam-files (eunit-opts opts))))
-
+    (eunit:test beam-files (eunit-opts (merge-run-opts opts test-type)))))

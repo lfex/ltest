@@ -5,22 +5,25 @@
 
 (include-lib "ltest/include/ltest-records.lfe")
 
-(defun start () "Start the EUnit listener with an empty option list."
+(defun start () "Call `eunit_listener:start/2` with this listener and no
+   options; return its result."
   (start '()))
 
 (defun start (options)
-  "Start the EUnit listener with the supplied option proplist."
+  "Forward OPTIONS to `eunit_listener:start/2` and return its result; spawn
+   options can affect that result."
   (eunit_listener:start (MODULE) options))
 
 (defun init (options)
-  "Initialize listener state, applying ltest defaults to omitted color and
-   test type."
+  "Create listener state with empty per-module status and zeroed counters;
+   use `color=true` and `test-type=unit` when those options are absent."
   (make-state
    status (orddict:new)
    test-type (proplists:get_value 'test-type options 'unit)
    color?  (proplists:get_value 'color options 'true)))
 
-(defun handle_begin "Record the beginning of an EUnit test or group event."
+(defun handle_begin "Handle an EUnit begin event, writing recognized group
+   and test headings or lines; return the unchanged listener state."
   (('group (= `(,_ #(desc undefined) ,_ ,_) data) state)
     (ltest-util:rebar-debug "data (group, no desc): ~p" (list data))
     state)
@@ -46,7 +49,8 @@
    state))
 
 (defun handle_end
-  "Render EUnit end events and accumulate one-time group timing."
+  "Handle an EUnit end event: update result counters or account for each
+   module's skips and elapsed time once, then return the updated state."
   (('group data state)
     (let* ((desc (proplists:get_value 'desc data 'undefined))
            (time (proplists:get_value 'time data 0))
@@ -82,7 +86,8 @@
           state)))))
 
 (defun assertion-failure? (reason)
-  "Return true for EUnit assertion-specific error reason tags."
+  "Return `true` for EUnit assertion failure tags handled by this listener;
+   return `false` for other reasons."
   (andalso (is_tuple reason)
            (> (tuple_size reason) 0)
            (lists:member (element 1 reason)
@@ -90,13 +95,16 @@
                            assertNotMatch assertException assertNotException))))
 
 (defun is-file-desc?
-  "Return true for a complete EUnit file descriptor."
+  "Return `true` when DESC is a binary beginning with `file `; this checks
+   only the prefix, not descriptor completeness."
   (((= (binary (prefix bytes (size 5)) (rest bitstring)) desc)) (when (=:= prefix #"file "))
     'true)
   ((_desc) 'false))
 
 (defun module-for-desc
-  "Return the module for an EUnit file or module descriptor; otherwise undefined."
+  "Return the module atom for a valid EUnit file or quoted module
+   descriptor; return `undefined` for other prefixes. File/BEAM errors
+   propagate."
   (((= (binary (prefix bytes (size 5)) (rest bitstring)) desc)) (when (=:= prefix #"file "))
     (ltest-util:file->module desc))
   (((= (binary (prefix bytes (size 7)) (mod bitstring)) desc)) (when (=:= prefix #"module "))
@@ -104,8 +112,8 @@
   ((_desc) 'undefined))
 
 (defun record-module-group (desc time state)
-  "Count manual skips and elapsed time once per module across file/module
-   groups."
+  "Add each module's manual skips and TIME once across file/module groups;
+   malformed descriptors and BEAM lookup errors propagate."
   (let ((module (module-for-desc desc)))
     (case module
       ('undefined state)
@@ -120,13 +128,16 @@
            (_ state))))))
 
 (defun handle_cancel
-  "Display EUnit cancellation and count it separately from errors."
+  "Write the EUnit cancellation reason and increment the cancel counter;
+   return the updated listener state."
   ((_group_or_test data state)
     (ltest-formatter:display-test-cancel (proplists:get_value 'reason data))
     (set-state-cancel state (+ 1 (state-cancel state)))))
 
 (defun terminate
-  "Render final listener output without competing with EUnit's result sender."
+  "Write the final report for EUnit's successful terminate callback and
+   return its state tuple; on callback error, print the internal error and
+   return the listener callback tuple."
   ((`#(ok ,data) (= (match-state color? color?) state))
     (if (> (ltest-util:all-tests state) 0)
         (ltest-formatter:display-results data state)
@@ -141,12 +152,13 @@
     `#(ok ,reason ,state)))
 
 (defun sync_end (result)
-  "Legacy compatibility helper; it does not send an EUnit result message."
+  "Return RESULT unchanged; this compatibility helper sends no EUnit
+   message and performs no IO."
   result)
 
-(defun update-time (state time) "Add an elapsed duration to listener state."
+(defun update-time (state time) "Add TIME to the elapsed-time field in listener state."
   (set-state-time state (+ time (state-time state))))
 
 (defun update-skips (state skips)
-  "Add the skipped-test count to listener state."
+  "Add SKIPS to the skipped-test counter in listener state."
   (set-state-skip state (+ skips (state-skip state))))

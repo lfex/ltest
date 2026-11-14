@@ -1,15 +1,17 @@
 (defmodule ltest-formatter
-  "Format EUnit events, summaries, and test names for the ltest report."
+  "Format EUnit events and write or return the text and iodata used by the
+   ltest report."
   (export all))
 
 (include-lib "ltest/include/ltest-records.lfe")
 
 (defun test-suite-header (state)
-  "Render the outer report heading using the supplied listener state."
+  "Write the outer report heading to the current IO device and return the
+   `io:format/1` result."
   (io:format (get-suite-header state)))
 
 (defun get-suite-header
-  "Return the outer heading as colored iodata according to the selected state."
+  "Return the outer heading as colored iodata without writing it."
   (((match-state color? color?))
    (ltest-color:greenb
     (test-header (ltest-const:test-suite-title)
@@ -17,11 +19,13 @@
     color?)))
 
 (defun test-suite-footer (state)
-  "Render the closing report rule using the supplied listener state."
+  "Write the closing rule and two trailing newlines to the current IO
+   device; return the `io:format/1` result."
   (io:format (get-suite-footer state)))
 
 (defun get-suite-footer
-  "Return the closing rule as colored iodata according to the selected state."
+  "Return the colored closing rule and two newlines as iodata without
+   writing it."
   (((match-state color? color?))
    (io_lib:format "~s~n~n" `(,(ltest-color:greenb
                                (string:copies
@@ -30,7 +34,8 @@
                                color?)))))
 
 (defun test-type-header
-  "Render a heading for one unit, system, or integration group."
+  "Write the colored group heading to the current IO device and return the
+   `io:format/1` result."
   ((title (match-state color? color?))
    (io:format
     (ltest-color:blueb
@@ -38,7 +43,8 @@
      color?))))
 
 (defun test-header (title char)
-  "Return a heading padded with the requested rule character."
+  "Return heading iodata padded or limited to the configured report width;
+   TITLE and CHAR supply the heading text and rule character."
   (let* ((title (++ " " title " "))
          (width (ltest-const:test-suite-width))
          (header-len (trunc (/ (- width (length title)) 2)))
@@ -50,12 +56,13 @@
                                  width
                                  (car char))))))
 
-(defun indent (count) "Return count spaces for reporter indentation."
+(defun indent (count) "Return a string containing COUNT spaces."
   (string:copies " " count))
 
 (defun func-line (raw-func desc)
-  "Format a function name and full description with Unicode codepoint-based
-   dot padding."
+  "Write one test line using DESC when supplied, otherwise the suffix-stripped
+   function name; append zero-clamped codepoint padding and return the IO
+   result. Inputs are an atom name and flat Unicode text or binary DESC."
   (let ((func
            (if (=/= 'undefined desc)
                desc
@@ -68,14 +75,16 @@
               (get-elision func))))))
 
 (defun get-skip-func-name (func-name)
-  "Return a skip function display name without its terminal _skip suffix."
+  "Return FUNC-NAME without a terminal `_skip`; otherwise return its atom
+   name as a character list."
   (let ((name (atom_to_list func-name)))
     (if (lists:suffix "_skip" name)
       (lists:sublist name (- (length name) 5))
       name)))
 
 (defun get-func-name (func-name)
-  "Strip a terminal _test or _test_ suffix from an EUnit function name."
+  "Return an EUnit function name without terminal `_test` or `_test_`;
+   preserve other atom-name text."
   (let ((name (atom_to_list func-name)))
     (cond
       ((lists:suffix "_test_" name)
@@ -86,8 +95,9 @@
 
 
 (defun get-elision
-  "Return zero or more padding dots for the supplied description text;
-   never truncate it."
+  "Return dots for the available report width after FUNC-INDENT and the
+   failure marker; clamp the count at zero and never truncate text. Accept a
+   flat Unicode list or valid Unicode binary."
   ((func-name) (when (is_list func-name))
     (let* ((init-len (+ (ltest-const:func-indent)
                         (length func-name)))
@@ -100,7 +110,8 @@
     (get-elision (unicode:characters_to_list desc))))
 
 (defun mod-line-check
-  "Render the module-level check line for the supplied event and state."
+  "Return module-line iodata when DESC has a `file ` or `module ` prefix;
+   return `""` otherwise. The prefix alone is sufficient; it does not write."
   (((= (binary (prefix bytes (size 5)) (file bitstring)) desc) (match-state color? color?)) (when (=:= prefix #"file "))
   ;;(((= (binary "file " (mod bitstring)) desc) (match-state color? color?))
    (ltest-util:rebar-debug "Getting mod-line-begin (file) ..." '())
@@ -134,13 +145,15 @@
    ""))
 
 (defun mod-line-begin (desc state)
-  "Render the start of a module report section."
+  "Write a recognized module line and return the IO result; return
+   `skipping` when MOD-LINE-CHECK returns `""`."
   (case (mod-line-check desc state)
     ("" 'skipping)
     (result (io:format result))))
 
 (defun mod-line-end (desc time data state)
-  "Render the module summary and elapsed time after its tests finish."
+  "Write manual skip rows and module elapsed time; DATA is unused and no
+   group category summary is printed."
   (ltest-util:rebar-debug "Getting mod-line-end (file) ..." '())
   (ltest-util:rebar-debug "desc: ~p, time: ~p, data: ~p, state: ~p" (list desc time data state))
   (let ((skipped-tests (ltest-util:get-skip-tests desc)))
@@ -148,12 +161,14 @@
     (ltest-formatter:skip-lines skipped-tests state)
     (ltest-formatter:mod-time time state)))
 
-(defun ok "Render a successful test result."
+(defun ok "Write the successful-test marker to the current IO device and
+   `io:format/1` result."
   (((match-state color? color?))
    (io:format (++ "... [" (ltest-color:greenb "ok" color?) "]~n"))))
 
 (defun fail
-  "Display an assertion failure using the configured color setting."
+  "Write the assertion-failure label and ERROR term using STATE color; WHERE
+   is unused. Return the final formatting IO result."
   ((error where (match-state color? color?))
    (io:format ". [~s]~n~n~s~s:~n" `(,(ltest-color:red "fail" color?)
                                    ,(indent (ltest-const:error-indent))
@@ -163,7 +178,8 @@
                                 ,(ltest-color:redb (io_lib:format "~p" `(,error)) color?)))))
 
 (defun err
-  "Display an EUnit error using the configured color setting."
+  "Write the EUnit error label and ERROR term using STATE color; WHERE is
+   unused. Return the final formatting IO result."
   ((error where (match-state color? color?))
    (io:format " [~s]~n~n~s~s:~n" `(,(ltest-color:yellow "error" color?)
                                    ,(indent (ltest-const:error-indent))
@@ -171,11 +187,13 @@
    (lfe_io:format "~s~s~n~n" `(,(indent (ltest-const:error-indent))
                                 ,(ltest-color:redb (io_lib:format "~p" `(,error)) color?)))))
 
-(defun skip "Render a skipped test result."
+(defun skip "Return the skipped-test marker iodata using STATE color;
+   perform no IO."
   (((match-state color? color?))
    (++ ". [" (ltest-color:blue "skip" color?) "]")))
 
-(defun mod-time "Format elapsed module time for the report."
+(defun mod-time "Write TIME in milliseconds using STATE color; return the
+   `io:format/2` result."
   ((time (match-state color? color?))
    (io:format "~s~s ~s~s~n~n"
               `(,(indent (ltest-const:func-indent))
@@ -184,10 +202,12 @@
                 ,(ltest-color:blackb "ms" color?)))))
 
 (defun skip-lines (skipped state)
-  "Render each skipped test in the listener state."
+  "Write one line for each skipped entry and return the list of each
+   `skip-line/2` IO result."
   (lists:map (lambda (s) (skip-line s state)) skipped))
 
-(defun skip-line "Render one skipped function name with its skip status marker."
+(defun skip-line "Write one skipped-test line for `{Function, Arity}` and
+   return the `io:put_chars/1` result."
   ((`#(,raw-func ,_) state)
     (let ((func (get-skip-func-name raw-func)))
       (io:put_chars
@@ -201,7 +221,8 @@
 
 
 (defun display-results (data state)
-  "Render the collected result categories in report order."
+  "Write the summary heading, total and category counts, timing, and final
+   blank lines. DATA is unused; return the final IO result."
   (stats-heading state)
   (display-all state)
   (display-successes state)
@@ -214,59 +235,66 @@
   ;;(ltest-formatter:display-results data state)
   (finish-section))
 
-(defun stats-heading "Return the heading for the final result statistics."
+(defun stats-heading "Write `summary:` and a newline to the current IO device;
+   return the `io:format/1` result."
   (((match-state color? color?))
    (io:format (++ (ltest-color:yellow "summary:" color?) "~n"))))
 
 (defun display-all (state)
-  "Render every result category recorded in the listener state."
+  "Write only the aggregate Tests count from STATE, including cancellations;
+   return the `io:format/2` result."
   (io:format "~sTests: ~p  " `(,(indent (ltest-const:func-indent))
                                ,(ltest-util:all-tests state))))
 
 (defun display-successes (state)
-  "Render successful test results from the listener state."
+  "Write the Passed label and STATE's success count; return the IO result."
   (io:format "~s: ~p  " `(,(get-ok-report state)
                           ,(state-ok state))))
 
 (defun display-skips (state)
-  "Render skipped test results from the listener state."
+  "Write the Skipped label and STATE's skip count; return the IO result."
   (io:format "~s: ~p  " `(,(get-skip-report state)
                           ,(state-skip state))))
 
 (defun display-failures (state)
-  "Render assertion failures from the listener state."
+  "Write the Failed label and STATE's assertion-failure count; return the IO
+   result."
   (io:format "~s: ~p " `(,(get-fail-report state)
                           ,(state-fail state))))
 
-(defun display-errors (state) "Render EUnit errors from the listener state."
+(defun display-errors (state) "Write the Erred label and STATE's EUnit error
+   count; return the `io:format/2` result."
   (io:format "~s: ~p~n" `(,(get-err-report state)
                           ,(state-err state))))
 
 (defun display-pending (state)
-  "Write the entire listener state with a Pending state label for
-   diagnostics."
+  "Write STATE with the diagnostic label `Pending`; return the IO result."
   (io:format "Pending state: ~p~n" `(,state)))
 
 (defun display-profile (state)
-  "Write the entire listener state with a Profile state label for
-   diagnostics."
+  "Write STATE with the diagnostic label `Profile`; return the IO result."
   (io:format "Profile state: ~p~n" `(,state)))
 
 (defun display-timing (state)
-  "Render aggregate test timing from the listener state."
+  "Write STATE's total elapsed time, formatted as milliseconds; return the
+   IO result."
   (io:format "~sTotal time: ~pms~n" `(,(indent (ltest-const:func-indent))
                                     ,(state-time state))))
 
 (defun display-no-results
-  "Render the no-tests-found message when all test counters are zero."
+  "Write the no-tests message using STATE's test type, then write the final
+   blank lines. This function does not inspect counters; DATA is unused."
   ((data (= (match-state color? color?) state))
    (io:format (ltest-color:yellow (get-no-results-report data state) color?))
    (finish-section)))
 
-(defun display-test-cancel (reason) "Render an EUnit cancellation reason."
+(defun display-test-cancel (reason) "Write `format-cancel/1` reason text and
+   return the IO result."
   (io:format (format-cancel reason)))
 
-(defun format-cancel "Format a cancellation reason as report text."
+(defun format-cancel "Return branch-specific EUnit cancellation text or
+   formatter output; some returned iodata contains format directives for a
+   later formatter."
   (('undefined)  "*skipped*~n")
   (('timeout)    "*timed out*~n")
   ((`#(startup ,reason))
@@ -281,33 +309,40 @@
     (eunit_lib:format_error reason)))
 
 (defun get-no-results-report (data state)
-  "Return the no-tests-found report for the supplied data and state."
+  "Return a formatted no-tests message using STATE's test type; DATA is
+   unused and no test-counter check is performed."
   (io_lib:format
     "There were no ~s tests found.~n"
     `(,(state-test-type state))))
 
-(defun finish-section () "Return the report separator used to close a section."
+(defun finish-section () "Write two newline characters to the current IO
+   device and return the second `io:nl/0` result."
   (io:nl)
   (io:nl))
 
-(defun get-ok-report "Return the success report text for the supplied count."
+(defun get-ok-report "Return `Passed` at zero; otherwise call the green bold
+   color helper with STATE's color flag."
   (((match-state color? color? ok ok))  
    (get-report "Passed" #'ltest-color:greenb/2 ok color?)))
 
-(defun get-skip-report "Return the skip report text for the supplied count."
+(defun get-skip-report "Return `Skipped` at zero; otherwise call the blue
+   color helper with STATE's color flag."
   (((match-state color? color? skip skip))
    (get-report "Skipped" #'ltest-color:blue/2 skip color?)))
 
-(defun get-fail-report "Return the failure report text for the supplied count."
+(defun get-fail-report "Return `Failed` at zero; otherwise call the red
+   color helper with STATE's color flag."
   (((match-state color? color? fail fail))
    (get-report "Failed" #'ltest-color:red/2 fail color?)))
 
-(defun get-err-report "Return the error report text for the supplied count."
+(defun get-err-report "Return `Erred` at zero; otherwise call the yellow
+   color helper with STATE's color flag."
   (((match-state color? color? err err))
    (get-report "Erred" #'ltest-color:yellow/2 err color?)))
 
 (defun get-report (text color-func count color?)
-  "Apply a color function to report text when color output is enabled."
+  "Return TEXT when COUNT is zero; otherwise call COLOR-FUNC(TEXT, COLOR?)
+   even when COLOR? is false."
   (if (== count 0)
       text
       (funcall color-func text color?)))

@@ -5,8 +5,8 @@
 (include-lib "ltest/include/ltest-records.lfe")
 
 (defun all ()
-  "Run unit, integration, system, and available legacy extensions; return
-   the first non-ok result."
+  "Run unit, integration, system, then the optional legacy Selenium path;
+   return the first non-`ok` result after running each path."
   (let* ((state (make-state color? 'true))
          (_header (ltest-formatter:test-suite-header state))
          (results (list
@@ -27,15 +27,16 @@
   (((cons result _rest)) result))
 
 (defun integration (_)
-  "Run integration tests; the options argument is accepted for legacy API
-   compatibility."
+  "Run integration tests with the legacy runner and preserve EUnit's
+   result. The ignored compatibility argument leaves only the group heading."
   (let ((state (make-state color? 'true)))
     (ltest-formatter:test-type-header "Integration Tests" state)
     (run 'integration)))
 
 (defun integration ()
-  "Run integration tests; the options argument is accepted for legacy API
-   compatibility."
+  "Run integration tests with the legacy runner and preserve EUnit's
+   result. This zero-argument form adds the outer suite headings around the
+   group heading."
   (let ((state (make-state color? 'true)))
     (ltest-formatter:test-suite-header state)
     (let ((result (integration 'solo)))
@@ -43,15 +44,16 @@
       result)))
 
 (defun system (_)
-  "Run system tests; the options argument is accepted for legacy API
-   compatibility."
+  "Run system tests with the legacy runner and preserve EUnit's
+   result. The ignored compatibility argument leaves only the group heading."
   (let ((state (make-state color? 'true)))
     (ltest-formatter:test-type-header "System Tests" state)
     (run 'system)))
 
 (defun system ()
-  "Run system tests; the options argument is accepted for legacy API
-   compatibility."
+  "Run system tests with the legacy runner and preserve EUnit's
+   result. This zero-argument form adds the outer suite headings around the
+   group heading."
   (let ((state (make-state color? 'true)))
     (ltest-formatter:test-suite-header state)
     (let ((result (system 'solo)))
@@ -59,22 +61,24 @@
       result)))
 
 (defun unit (_)
-  "Run unit tests; the options argument is accepted for legacy API
-   compatibility."
+  "Run unit tests with the legacy runner and preserve EUnit's
+   result. The ignored compatibility argument leaves only the group heading."
   (let ((state (make-state color? 'true)))
     (ltest-formatter:test-type-header "Unit Tests" state)
     (run 'unit)))
 
 (defun unit ()
-  "Run unit tests; the options argument is accepted for legacy API
-   compatibility."
+  "Run unit tests with the legacy runner and preserve EUnit's
+   result. This zero-argument form adds the outer suite headings around the
+   group heading."
   (let ((state (make-state color? 'true)))
     (ltest-formatter:test-suite-header state)
     (let ((result (unit 'solo)))
       (ltest-formatter:test-suite-footer state)
       result)))
 
-(defun run "Dispatch the configured legacy test type and report options."
+(defun run "Dispatch a supported group or selenium atom; other input is
+   treated as a BEAM path. Return the selected EUnit result."
   (('integration)
     (ltest-util:rebar-debug "Running integration tests ...")
     (let* ((`#(ok ,cwd) (file:get_cwd))
@@ -106,13 +110,12 @@
     (run-beam beam (get-listener))))
 
 (defun run-beams (test-type beams)
-  "Run the supplied test BEAM basenames through EUnit with the selected
-   listener."
+  "Append `.beam` to BEAM basenames, then run them through EUnit with the
+   listener selected by `get-listener/0`."
   (run-beams test-type beams (get-listener)))
 
 (defun run-beams (test-type beams listener)
-  "Run the supplied test BEAM basenames through EUnit with the selected
-   listener."
+  "Run the supplied test BEAM basenames through EUnit with LISTENER."
   (ltest-util:rebar-debug "Running ~p beams using ~p ..."
                           `(,test-type ,listener))
   (eunit:test (ltest-util:beams->files beams)
@@ -120,43 +123,47 @@
                                       #(test-type ,test-type)))))
 
 (defun get-listener ()
-  "Return the listener selected by the init argument; default to
-   ltest-listener."
+  "Read the listener init argument, default to `ltest-listener`, and
+   convert its first value to an atom."
    (clj:->> (ltest-util:get-arg 'listener "ltest-listener")
             (element 2)
             (caar)
             (list_to_atom)))
 
 (defun get-options (listener)
-  "Return no_tty plus report options for LISTENER with colored output."
+  "Return `no_tty` and report options for LISTENER with the legacy
+   `colored` option; the listener defaults color to true when omitted."
   (get-options listener '(colored)))
   ;`(no_tty #(report #(,listener (colored ltest-type)))))
 
 (defun get-options (listener options)
-  "Return no_tty plus report options for LISTENER using OPTIONS."
+  "Return `no_tty` plus a report option containing LISTENER and OPTIONS;
+   this helper does not validate either value."
   `(no_tty ,(get-report-options listener options)))
 
 (defun get-report-options (listener options)
-  "Wrap LISTENER and OPTIONS in EUnit's report option tuple."
+  "Return EUnit's `report` tuple for LISTENER and OPTIONS."
   `#(report #(,listener ,options)))
 
 (defun run-beam (beam)
-  "Run one compiled test BEAM through EUnit with the selected listener."
+  "Read the module identity from the compiled BEAM and run it with the
+   listener selected by `get-listener/0`; file and EUnit errors propagate."
   (run-beam beam (get-listener)))
 
 (defun run-beam (beam listener)
-  "Run one compiled test BEAM through EUnit with the selected listener."
+  "Resolve the BEAM module and run it through EUnit with LISTENER; the path
+   must identify a readable compiled BEAM."
   (run-module (ltest-util:beam->module beam) listener))
 
 (defun run-module (module listener)
-  "Run one test module through EUnit with the selected listener."
+  "Run one test module atom through EUnit with LISTENER and return its result."
   (eunit:test `(,module)
               (get-options listener)))
 
 (defun run-modules (modules)
-  "Run one or more test modules through EUnit using the selected listener."
+  "Run MODULES through EUnit with the listener selected by `get-listener/0`."
   (run-modules modules (get-listener)))
 
 (defun run-modules (modules listener)
-  "Run one or more test modules through EUnit using the selected listener."
+  "Run one or more test modules through EUnit using LISTENER."
   (eunit:test modules (get-options listener)))

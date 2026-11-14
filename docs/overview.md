@@ -1,9 +1,9 @@
 # ltest API overview
 
 `ltest` discovers LFE test modules by marker behavior and executes the selected
-compiled modules through EUnit. The checked source tree is version `0.13.11`.
-This page documents that source candidate and its compiled API; it does not
-announce a package release.
+compiled modules through EUnit. The checked source is an unpublished candidate
+whose compiled application metadata remains `0.13.11`. Published Hex `0.13.11` predates this candidate
+and does not contain its documentation changes or later helper APIs.
 
 ## Quick start
 
@@ -44,13 +44,18 @@ report options. The public group functions can also be called directly:
 (ltest:all #m(color false))
 ```
 
-`ltest:default-opts/0` returns color enabled, suite headers enabled, listener
-`ltest-listener`, test type `unit`, and verbose output. Public groups merge
-partial options with these defaults. `all` runs unit, system, then integration
-and returns the first non-`ok` result after running each group. Direct group
-calls preserve EUnit's `ok`, `error`, or `{error, Reason}` result.
-`ltest:run/0,1` returns `ok` on success, `{error, tests_failed}` for EUnit's
-`error`, and preserves other error tuples for the Rebar3 provider.
+`ltest:default-opts/0` enables color, suite headers, and verbose output; it
+selects `ltest-listener` and the `unit` test type. Public group `/1`
+functions merge a partial map over these defaults and then force their own
+`test-type`; group `/0` functions use the full defaults. Both forms
+return EUnit's canonical result. `all/0,1` runs unit, system, and integration
+in order even if a group fails, then returns the first non-`ok` result.
+
+`run/0` selects the default unit group. `run/1` merges a partial map with the
+defaults and dispatches the selected `test-type`; it maps EUnit `error` to
+`{error, tests_failed}`, preserves other results, and returns an explanatory
+`{error, Message}` for an unknown type. The EUnit option helpers expect the
+keys they read; they do not independently merge defaults.
 
 The listener implements EUnit's `eunit_listener` callbacks
 `init/1`, `handle_begin/3`, `handle_end/3`, `handle_cancel/3`, and
@@ -63,10 +68,11 @@ and per-module skip-accounting state; it is not a public data type.
 ## Test definitions and fixtures
 
 `deftest NAME BODY...` defines a nullary EUnit test. `deftestgen` defines an
-EUnit generator ending in `_test_`. `deftestskip` defines an exported nullary
-`_skip` function; ltest lists this function as skipped without calling its
-body. The helper classifier accepts only nullary exported names whose final
-characters are `_skip`; `ltest-util:skipped?/1` exposes that predicate.
+EUnit generator ending in `_test_`. `deftestskip` defines a nullary `_skip` function but does not export it.
+Export it explicitly (or use `export all`) for ltest to list it as skipped;
+ltest does not call its body. The helper classifier accepts only nullary
+exported names whose final characters are `_skip`;
+`ltest-util:skipped?/1` exposes that predicate.
 
 `deftestcase` defines a fixture case function for use with `deftestcases`.
 Printable named tuples in the case body produce named EUnit objects; other
@@ -94,7 +100,7 @@ substitution and returns its complete row assertions.
 | `assert-match-failed` | `(assert-match-failed)` | Select the pattern-match assertion failure tag used by the OTP version. |
 | `deftest` | `(deftest name body...)` | Define a nullary `name_test/0` from the body forms. |
 | `deftestgen` | `(deftestgen name body...)` | Define a nullary `name_test_/0` generator. |
-| `deftestskip` | `(deftestskip name body...)` | Define a nullary `name_skip/0` that ltest lists without running. |
+| `deftestskip` | `(deftestskip name body...)` | Define a nullary `name_skip/0`; export it for ltest to list it without running. |
 | `defsetup` | `(defsetup function-name)` | Return a zero-argument fixture setup function calling `function-name/0`. |
 | `defteardown` | `(defteardown function-name)` | Return a one-argument fixture teardown function calling `function-name/1`. |
 | `deftestcase` | `(deftestcase function-name (args...) form...)` | Define a named fixture case; printable named tuples become named tests. |
@@ -114,7 +120,7 @@ substitution and returns its complete row assertions.
 | `is-throw` | `(is-throw expression)` or `(is-throw term expression)` | Assert a throw, optionally matching its term. |
 | `is-not-throw` | `(is-not-throw expression)` or `(is-not-throw term expression)` | Reject the selected throw term; other exception classes may pass. |
 | `is*` | `(is* expression)` | Construct a lazy EUnit object for `is`. |
-| `are*` | `(are* (variables...) expression values...)` | Substitute each complete value row into the expression immediately. |
+| `are*` | `(are* (variables...) expression values...)` | Substitute complete rows for immediate assertions; one bounded empty-variable probe returned `[]`. |
 | `is-not*` | `(is-not* expression)` | Construct a lazy EUnit object for `is-not`. |
 | `is-match*` | `(is-match* pattern expression)` | Construct a lazy EUnit object for `is-match`. |
 | `is-not-match*` | `(is-not-match* pattern expression)` | Construct a lazy EUnit object for `is-not-match`. |
@@ -136,10 +142,11 @@ macros `is-not-error`, `is-not-exit`, and `is-not-throw` reject only their
 selected exception class and term; other classes may pass.
 
 `are*` takes a list of variable names, an expression, then values grouped into
-complete rows matching the variable list. Substitution walks lists; it does not
-recursively rewrite arbitrary tuples or maps. An empty variable list has a
-special true test-object result. Use `is*` and the other delayed forms when an
-EUnit test object is needed.
+complete rows matching that list. One bounded empty-variable probe returned
+`[]`; nonempty forms require complete rows. It expands table substitutions into
+immediate assertions rather than delayed EUnit test objects. Substitution walks
+lists; it does not recursively rewrite arbitrary tuples or maps. Use
+`is*` and the other delayed forms when an EUnit test object is needed.
 
 ## Skip helpers and lower-level API
 
@@ -152,9 +159,10 @@ transforms that retain one result-or-`false` slot per input export.
 compatibility values; they are not the classifier implementation.
 
 Every function is exported by the current source modules. The generated
-reference therefore includes both the runner API and public implementation
-helpers. Its selected 182 definitions come from 192 native collector entries;
-producer-generated metadata and internal macro-expander entries are reported
-separately rather than removed from the BEAM export surface. Header-only macros
-are documented here because LFE does not embed them as native function
-entries.
+reference therefore includes both the runner API and implementation helpers.
+Some helpers require a readable BEAM or a module resolvable on the current code
+path; their BEAM and file-shape errors propagate. The selected 182 definitions
+come from 192 native collector entries. Producer-generated metadata and
+internal macro-expander entries are reported separately rather than removed
+from the BEAM export surface. Header-only macros are documented here because
+LFE does not embed them as native function entries.

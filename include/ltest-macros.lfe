@@ -71,8 +71,8 @@
              (extend-module () ((export (,name_test_ 0))))))))
 
 (defmacro deftestskip
-  "Define a nullary NAME_skip function; ltest lists exported matches
-   without executing the body."
+  "Define a nullary NAME_skip function without exporting it; export the
+   function for ltest to list it without running its body."
   ((cons name body)
    `(defun ,(list_to_atom (++ (to-unders name) "_skip")) ()
       ,@body)))
@@ -155,8 +155,7 @@
   `(assert ,bool-expression))
 
 (defmacro is-not (bool-expression)
-  "Assert that the expression evaluates to false.
-   Assert that the expression evaluates to false."
+  "Assert that EXPRESSION is false; an EUnit assertion fails if it is true."
   `(assertNot ,bool-expression))
 
 (defmacro is-match (guard expression)
@@ -165,18 +164,17 @@
   `(assertMatch ,guard ,expression))
 
 (defmacro is-not-match (guard expression)
-  "Assert that the expression does not match GUARD.
-   Assert that the expression does not match GUARD."
+  "Assert that EXPRESSION does not match PATTERN; EUnit reports a match
+   failure if it does."
   `(assertNotMatch ,guard ,expression))
 
 (defmacro is-equal (value expression)
-  "Assert that EXPRESSION evaluates to VALUE.
-   Assert that EXPRESSION evaluates to VALUE."
+  "Assert that EXPRESSION equals EXPECTED using EUnit term equality."
   `(assertEqual ,value ,expression))
 
 (defmacro is-not-equal (value expression)
-  "Assert that EXPRESSION does not evaluate to VALUE.
-   Assert that EXPRESSION does not evaluate to VALUE."
+  "Assert that EXPRESSION is not equal to EXPECTED under EUnit term
+   equality."
   `(assertNotEqual ,value ,expression))
 
 (defmacro is-exception
@@ -278,8 +276,8 @@
 
 ;; Based on #'clojure.test/are
 (defmacro are*
-  "Substitute each complete row of values into the expression
-   immediately; this does not return delayed test objects."
+  "Substitute complete value rows into immediate assertions. A bounded probe
+   of the empty-variable form returned `[]`; nonempty forms require full rows."
   ('(() ,expr) `(is* 'true))
   (`(,arglist ,expr . ,args)
    `(do-template ,arglist (is ,expr) ,@args))

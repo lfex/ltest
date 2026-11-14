@@ -6,10 +6,10 @@
 (include-lib "ltest/include/ltest-records.lfe")
 
 (defun skip-test-patt ()
-  "Return the legacy regular expression used to recognize skip names."
+  "Return the legacy pattern `.*_skip`; skip detection uses skipped?/1."
   ".*_skip")
 (defun skip-test-group-patt ()
-  "Return the legacy regular expression used to split a skip name."
+  "Return the legacy pattern `(.*)(_skip)` for grouping a skip name."
   "(.*)(_skip)")
 
 ;; XXX this code actually assumes two possible layouts for different versions of
@@ -36,8 +36,8 @@
 ;;     related ticket: https://github.com/lfex/ltest/issues/61
 ;;
 (defun get-subdir-beam-files (path)
-  "Find BEAM files in .eunit and _build profile application directories
-   under a path."
+  "Return BEAM paths found under PATH in `.eunit/` and `_build/*/lib/*/ebin/`.
+   Results follow the wildcard order for each directory pattern."
   (ltest-util:rebar-debug "Getting subdir beams ..." '())
   (lists:append
     (list
@@ -62,8 +62,8 @@
 ;;     related ticket: https://github.com/lfex/ltest/issues/61
 ;;
 (defun get-possible-test-beams (path)
-  "Return discovered BEAM basenames without .beam, suitable for
-   code:load_abs."
+  "Return discovered BEAM path roots without `.beam`, suitable for
+   `code:load_abs/1`."
   (ltest-util:rebar-debug "Getting possible test beams ..." '())
   (lists:map
     #'filename:rootname/1
@@ -74,7 +74,8 @@
   (get-integration-beams "."))
 
 (defun get-integration-beams (path)
-  "Find integration-test BEAM basenames beneath PATH with the matching marker behavior."
+  "Return BEAM path roots under PATH whose files declare `ltest-integration`.
+   PATH must contain the supported BEAM search directories."
   (lists:filter
     #'integration?/1
     (get-possible-test-beams path)))
@@ -84,7 +85,8 @@
   (get-system-beams "."))
 
 (defun get-system-beams (path)
-  "Find system-test BEAM basenames beneath PATH with the matching marker behavior."
+  "Return BEAM path roots under PATH whose files declare `ltest-system`.
+   PATH must contain the supported BEAM search directories."
   (ltest-util:rebar-debug "Getting system beams from ~p ..." `(,path))
   (lists:filter
     #'system?/1
@@ -95,13 +97,14 @@
   (get-unit-beams "."))
 
 (defun get-unit-beams (path)
-  "Find unit-test BEAM basenames beneath PATH with the matching marker behavior."
+  "Return BEAM path roots under PATH whose files declare `ltest-unit`.
+   PATH must contain the supported BEAM search directories."
   (lists:filter
     #'unit?/1
     (get-possible-test-beams path)))
 
 (defun has-behaviour? (beam type)
-  "Return whether a BEAM file declares the requested behavior."
+  "Return whether a readable BEAM file lists TYPE in its behavior attributes."
   (ltest-util:rebar-debug "Checking if ~p has behaviour ~p ..." `(,beam ,type))
   (lists:member
     type
@@ -118,8 +121,8 @@
   (has-behaviour? beam 'ltest-unit))
 
 (defun check-skip-funcs (funcs)
-  "Map exported name/arity pairs to themselves when they are skip
-   functions, or false."
+  "Map exported name/arity pairs to themselves when they are nullary `_skip`
+   functions; map other entries to `false`."
   (lists:map
     (match-lambda
       (((tuple func arity))
@@ -129,8 +132,8 @@
     funcs))
 
 (defun check-skipped-tests (funcs)
-  "Map exported skip functions to their names without the _skip suffix, or
-   false."
+  "Map exported nullary `_skip` functions to their name without that suffix;
+   map other entries to `false`."
   (lists:map
     (match-lambda
       (((tuple func arity))
@@ -141,14 +144,15 @@
     funcs))
 
 (defun get-skip-funcs (module)
-  "Return skip function exports for a loaded module, filtering non-skip
-   exports."
+  "Return nullary `_skip` exports from a module whose BEAM resolves on the
+   code path, filtering other exports."
   (ltest-util:filtered
     #'check-skip-funcs/1
     (ltest-util:get-module-exports module)))
 
 (defun get-skipped-tests (module)
-  "Return skip test names for a loaded module, filtering non-skip exports."
+  "Return names of nullary `_skip` exports from a module whose BEAM resolves
+   on the code path, filtering other exports."
   (ltest-util:filtered
     #'check-skipped-tests/1
     (ltest-util:get-module-exports module)))
@@ -172,13 +176,14 @@
 ;;; functions preserve EUnit's result; run/0,1 adapts that result for rebar3.
 
 (defun run ()
-  "Run the selected test type with merged defaults and adapt EUnit errors
-   for rebar3_lfe."
+  "Run the default unit group, then map EUnit `error` to
+   `{error, tests_failed}` and preserve other results."
   (run (default-opts)))
 
 (defun run (opts)
-  "Run the selected test type with merged defaults and adapt EUnit errors
-   for rebar3_lfe."
+  "Merge OPTS over the defaults, dispatch the selected group, and map EUnit
+   `error` to `{error, tests_failed}`. Preserve other results; unknown types
+   return an explanatory `{error, Message}`."
   (let* ((merged-opts (maps:merge (default-opts) opts))
          (result
            (case (mref merged-opts 'test-type)
@@ -198,13 +203,13 @@
     (`#(error ,_) result)))
 
 (defun all ()
-  "Run unit, system, then integration groups and return the first non-ok
-   result."
+  "Run unit, system, then integration in order, even when an earlier group
+   fails, and return the first non-`ok` result."
   (all (default-opts)))
 
 (defun all (opts)
-  "Run unit, system, then integration groups and return the first non-ok
-   result."
+  "Merge OPTS over defaults, force each group type, and run unit, system,
+   then integration in order. Return the first non-`ok` result after all run."
   (let* ((merged-opts (merge-run-opts opts 'all))
          (test-opts (maps:merge merged-opts #m(suite-headers false)))
          (state (make-state color? (mref merged-opts 'color)))
@@ -217,38 +222,38 @@
     (first-non-ok results)))
 
 (defun unit ()
-  "Run the discovered unit group with default options; return its EUnit
-   result."
+  "Run the unit group with complete default options and return EUnit's
+   canonical result."
   (unit (default-opts)))
 
 (defun unit (opts)
-  "Run the discovered unit group with caller options merged over
-   defaults; return the EUnit result."
+  "Merge OPTS over defaults, force `test-type` to `unit`, and return the
+   canonical EUnit result."
   (run-group 'unit "Unit Tests" opts #'get-unit-beams/1))
 
 (defun system ()
-  "Run the discovered system group with default options; return its EUnit
-   result."
+  "Run the system group with complete default options and return EUnit's
+   canonical result."
   (system (default-opts)))
 
 (defun system (opts)
-  "Run the discovered system group with caller options merged over
-   defaults; return the EUnit result."
+  "Merge OPTS over defaults, force `test-type` to `system`, and return the
+   canonical EUnit result."
   (run-group 'system "System Tests" opts #'get-system-beams/1))
 
 (defun integration ()
-  "Run the discovered integration group with default options; return its
-   EUnit result."
+  "Run the integration group with complete default options and return
+   EUnit's canonical result."
   (integration (default-opts)))
 
 (defun integration (opts)
-  "Run the discovered integration group with caller options merged over
-   defaults; return the EUnit result."
+  "Merge OPTS over defaults, force `test-type` to `integration`, and return
+   the canonical EUnit result."
   (run-group 'integration "Integration Tests" opts #'get-integration-beams/1))
 
 (defun run-group (test-type title opts test-fn)
-  "Run one group with merged defaults, render its headers, and return the
-   EUnit result."
+  "Run TEST-TYPE with merged defaults, render its optional suite and group
+   headings, and return the canonical EUnit result."
   (let* ((merged-opts (merge-run-opts opts test-type))
          (state (make-state color? (mref merged-opts 'color)
                             test-type test-type)))
@@ -265,12 +270,12 @@
   (((cons result _rest)) result))
 
 (defun merge-run-opts (opts test-type)
-  "Merge defaults with caller options and force the selected test type."
+  "Merge the defaults with OPTS, then replace `test-type` with TEST-TYPE."
   (maps:put 'test-type test-type (maps:merge (default-opts) opts)))
 
 (defun default-opts ()
-  "Return the default color, suite-header, listener, test-type, and
-   verbosity options."
+  "Return defaults: color and suite headers enabled, listener `ltest-listener`,
+   test type `unit`, and verbose output enabled."
   #m(color true
      suite-headers true
      test-listener ltest-listener
@@ -278,17 +283,19 @@
      verbose true))
 
 (defun maybe-suite-header (opts state)
-  "Render a suite header only when suite-headers is true."
+  "Write the outer suite heading when OPTS has a truthy `suite-headers` value."
   (if (mref opts 'suite-headers)
     (ltest-formatter:test-suite-header state)))
 
 (defun maybe-suite-footer (opts state)
-  "Render a suite footer only when suite-headers is true."
+  "Write the outer suite footer when OPTS has a truthy `suite-headers` value."
   (if (mref opts 'suite-headers)
     (ltest-formatter:test-suite-footer state)))
 
 (defun eunit-opts (opts)
-  "Translate ltest options into EUnit tty, verbosity, and report options."
+  "Build EUnit options from the required `test-listener`, `verbose`,
+   `color`, and `test-type` keys. `eunit_surefire` selects tty output;
+   other listeners use `no_tty`."
   (let* ((listener (mref opts 'test-listener))
          (tty (case listener
                 ('eunit_surefire '())
@@ -301,12 +308,14 @@
     (lists:append `(,tty ,verbose ,report))))
 
 (defun ltest-opts (opts)
-  "Return the color and test-type options passed to the ltest listener."
+  "Return listener option tuples for the required `color` and `test-type`
+   keys; this helper does not merge defaults."
   `(#(color ,(mref opts 'color))
     #(test-type ,(mref opts 'test-type))))
 
 (defun run-beams (test-type test-fn opts)
-  "Find group beams under the current directory and run them through EUnit."
+  "Find beams for TEST-TYPE beneath the current working directory and pass
+   the files and translated options to EUnit."
   (let* ((`#(ok ,cwd) (file:get_cwd))
          (beams (funcall test-fn cwd))
          (beam-files (ltest-util:beams->files beams)))

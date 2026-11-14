@@ -63,81 +63,93 @@
   (blueb str (get-color-option)))
 
 (defun get-color-option ()
-  "Read the color init argument and return its configured value (default
-   true)."
+  "Read the first color init-argument value as an atom; use `true` when
+   the argument is absent."
   (clj:->> (ltest-util:get-arg 'color "true")
            (element 2)
            (caar)
            (list_to_atom)))
 
 (defun black (str color?)
-  "Apply black color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested ANSI iodata when COLOR?
+   is true; otherwise return STR unchanged."
   (if color?
     (color:black str)
     str))
 
 (defun blackb (str color?)
-  "Apply bold black color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested bold ANSI iodata when
+   COLOR? is true; otherwise return STR unchanged."
   (if color?
     (color:blackb str)
     str))
 
 (defun white (str color?)
-  "Apply white color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested ANSI iodata when COLOR?
+   is true; otherwise return STR unchanged."
   (if color?
     (color:white str)
     str))
 
 (defun whiteb (str color?)
-  "Apply bold white color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested bold ANSI iodata when
+   COLOR? is true; otherwise return STR unchanged."
   (if color?
     (color:whiteb str)
     str))
 
 (defun red (str color?)
-  "Apply red color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested ANSI iodata when COLOR?
+   is true; otherwise return STR unchanged."
   (if color?
     (color:red str)
     str))
 
 (defun redb (str color?)
-  "Apply bold red color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested bold ANSI iodata when
+   COLOR? is true; otherwise return STR unchanged."
   (if color?
     (color:redb str)
     str))
 
 (defun yellow (str color?)
-  "Apply yellow color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested ANSI iodata when COLOR?
+   is true; otherwise return STR unchanged."
   (if color?
     (color:yellow str)
     str))
 
 (defun yellowb (str color?)
-  "Apply bold yellow color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested bold ANSI iodata when
+   COLOR? is true; otherwise return STR unchanged."
   (if color?
     (color:yellowb str)
     str))
 
 (defun green (str color?)
-  "Apply green color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested ANSI iodata when COLOR?
+   is true; otherwise return STR unchanged."
   (if color?
     (color:green str)
     str))
 
 (defun greenb (str color?)
-  "Apply bold green color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested bold ANSI iodata when
+   COLOR? is true; otherwise return STR unchanged."
   (if color?
     (color:greenb str)
     str))
 
 (defun blue (str color?)
-  "Apply blue color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested ANSI iodata when COLOR?
+   is true; otherwise return STR unchanged."
   (if color?
     (color:blue str)
     str))
 
 (defun blueb (str color?)
-  "Apply bold blue color when COLOR? is true; otherwise return STR unchanged."
+  "For valid iodata STR, return color2.0's nested bold ANSI iodata when
+   COLOR? is true; otherwise return STR unchanged."
   (if color?
     (color:blueb str)
     str))

@@ -9,32 +9,34 @@
 modules using marker behaviors. It provides LFE assertion macros, lazy EUnit
 test objects, skip reporting, and a text reporter.
 
-This checkout is the unpublished `0.14.0` source candidate. Published Hex
-`0.13.11` remains the current package until an operator approves and publishes a
-new release. The Hex badge reports the latest published package, not this
-candidate.
+This source tree identifies the application as `0.14.0`. The Hex badge reports
+the package version currently available from Hex.
 
 ## Quick start
 
-To use the published Hex `0.13.11` package, add this configuration to an LFE
-project:
+For an LFE project using `ltest` `0.14.0`, add this root configuration:
 
 ```erlang
 {deps, [{lfe, "2.2.2"}]}.
 {project_plugins, [{rebar3_lfe, "0.5.8"}]}.
 {profiles, [
   {test, [
-    {deps, [{ltest, "0.13.11"}]}
+    {deps, [{ltest, "0.14.0"}]},
+    {erl_opts, [{src_dirs, ["src", "test"]}]}
   ]}
 ]}.
 ```
 
-The root project needs its own LFE dependency and LFE provider plugin for the
-`lfe` test command; Rebar does not inherit a dependency's `project_plugins`
-entry. This block describes the currently published `0.13.11` package. After
-`0.14.0` is approved and published, change the test dependency to `0.14.0`.
-The unpublished candidate is checked separately from Hex installation using
-an official source archive and an ordinary Git dependency fixture. Run the
+The root project needs its own LFE dependency and provider plugin for the `lfe`
+command; Rebar does not inherit a dependency's `project_plugins` entry. The test
+profile adds `test/` to the LFE source directories so `ltest` can discover the
+compiled marker-behavior modules from the application's `ebin` directory.
+Published `0.13.x` packages are historical; this recipe describes `0.14.0`.
+
+The candidate's pre-publication consumer check uses the official
+`rebar3 hex build` source archive as an ordinary Git dependency. That validates
+the archive contents and consumer build; it is not a Hex install. The recipe
+above uses the Hex dependency when version `0.14.0` is available. Run this
 repository's source checks with `make check-native`.
 
 In a test module, include the public macro header and mark the module's test
@@ -67,24 +69,6 @@ is the first non-`ok` group result; later groups still run.
 The complete macro reference, behavior contracts, and source examples are in
 [`docs/overview.md`](docs/overview.md). The native API reference includes the
 exported helpers as well as the main runner functions.
-
-For a fresh `0.14.0` LFE consumer after publication, use this root
-configuration, add a test module such as `calculator-tests` above, and run
-`rebar3 as test lfe ltest`:
-
-```erlang
-{deps, [{lfe, "2.2.2"}]}.
-{project_plugins, [{rebar3_lfe, "0.5.8"}]}.
-{profiles, [
-  {test, [
-    {deps, [{ltest, "0.14.0"}]}
-  ]}
-]}.
-```
-
-The provider compiles and runs the LFE macro test. Before publication, the
-same recipe is checked against the candidate's official source archive through
-an ordinary Git dependency fixture; that is not a Hex installation.
 
 ## Test modules and names
 
@@ -171,8 +155,10 @@ For the repository Make workflow, install or select `ldoc` and run
 `make docs DOCGEN=/path/to/ldoc`; Make prints the captured fresh preview root.
 `make publish-dry-run DOCGEN=/path/to/ldoc` builds into one fresh root and always
 runs the combined source-and-docs Hex dry-run with `--dry-run --yes`. Existing
-preview roots are refused; Make never deletes previous output. No command here
-publishes a package or documentation.
+preview roots are refused; Make never deletes previous output. The `make
+publish DOCGEN=/path/to/ldoc` target performs one combined source-and-docs Hex
+publication after docs build successfully. Use it only for an approved
+release; the dry-run target never publishes.
 
 The checked-in `docs/ltest.txt` is a legacy entrypoint; it points readers to
 the current overview and generated native reference.

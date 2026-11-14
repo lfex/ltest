@@ -16,4 +16,5 @@ help:
 	@echo "  check-native  Compile, run unfiltered EUnit, and run ltest with and without color"
 	@echo "  check         Run the existing Github-source EUnit check"
 	@echo "  docs          Build a fresh local ldoc preview (DOCGEN=... to select the CLI)"
+	@echo "  publish       Build docs and publish the combined Hex package/docs (requires approval)"
 	@echo "  publish-dry-run  Build docs and dry-run the combined Hex package/docs upload"

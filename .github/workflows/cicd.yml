@@ -2,9 +2,10 @@ name: ci/cd
 
 on:
   push:
-    branches: [main, 'release/**', 'codex/**']
+    branches: [main, 'release/**', 'task/**', 'feature/**', 'epic/**', 'codex/**']
+    tags: ['**']
   pull_request:
-    branches: [main, 'release/**', 'codex/**']
+    branches: [main, 'release/**', 'task/**', 'feature/**', 'epic/**', 'codex/**']
 
 jobs:
   builds:

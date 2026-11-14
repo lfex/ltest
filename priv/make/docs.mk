@@ -4,7 +4,7 @@ DOCS_OUTPUT := $(if $(DOCS_OUTPUT),$(DOCS_OUTPUT),$(ROOT_DIR)/.ldoc-preview-$(sh
 DOCS_PARENT := $(shell dirname -- "$(DOCS_OUTPUT)")
 DOCS_SITE = $(DOCS_OUTPUT)/site
 
-.PHONY: docs publish-dry-run
+.PHONY: docs publish publish-dry-run
 
 docs: compile
 	@test -d "$(DOCS_PARENT)" || { echo "docs output parent must already exist: $(DOCS_PARENT)" >&2; exit 1; }
@@ -16,4 +16,7 @@ docs: compile
 	  --output "$(DOCS_OUTPUT)"
 
 publish-dry-run: docs
-	@$(REBAR3) hex publish --doc-dir "$(DOCS_SITE)" --dry-run --yes
+	@"$(REBAR3)" hex publish --doc-dir "$(DOCS_SITE)" --dry-run --yes
+
+publish: docs
+	@"$(REBAR3)" hex publish --doc-dir "$(DOCS_SITE)"

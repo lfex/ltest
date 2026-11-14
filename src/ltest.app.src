@@ -5,7 +5,7 @@
   {description, "A Testing Framework for LFE"},
 
   %% The version of the application
-  {vsn, "0.13.11"},
+  {vsn, "0.14.0"},
 
   %% All modules used by the application.
   {modules,
@@ -50,8 +50,21 @@
     {"GitHub", "https://github.com/lfex/ltest"},
     {"Hex", "https://hex.pm/packages/ltest"}
   ]},
-  {exclude_files, [
-    "priv"
-   ]}
+  {files, [
+    "src",
+    "include",
+    "rebar.config",
+    "rebar.lock",
+    "README.md",
+    "LICENSE",
+    "Makefile",
+    "priv/make/code.mk",
+    "priv/make/docs.mk",
+    "priv/make/test.mk",
+    "docs/overview.md",
+    "docs/ltest.txt",
+    "test"
+   ]},
+  {exclude_patterns, ["\\.beam$"]}
  ]
 }.

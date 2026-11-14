@@ -1,6 +1,6 @@
 # ltest
 
-[![Build](https://github.com/lfex/ltest/actions/workflows/cicd.yml/badge.svg)](https://github.com/lfex/ltest/actions/workflows/cicd.yml)
+[![Build](https://github.com/lfex/ltest/actions/workflows/cicd.yml/badge.svg?branch=codex%2Fltest-first-library)](https://github.com/lfex/ltest/actions/workflows/cicd.yml?query=branch%3Acodex%2Fltest-first-library)
 [![LFE 2.2.2](https://img.shields.io/badge/LFE-2.2.2-blue.svg)](https://github.com/lfe/lfe)
 [![OTP 27–29](https://img.shields.io/badge/OTP-27%E2%80%9329-blue.svg)](./.github/workflows/cicd.yml)
 [![Hex version](https://img.shields.io/hexpm/v/ltest.svg)](https://hex.pm/packages/ltest)
@@ -9,10 +9,10 @@
 modules using marker behaviors. It provides LFE assertion macros, lazy EUnit
 test objects, skip reporting, and a text reporter.
 
-This checkout is an unpublished source candidate whose compiled application
-metadata remains `0.13.11`. Published Hex `0.13.11` predates this candidate
-and does not contain its documentation changes or later helper APIs. The Hex
-badge reports the published package version, not the contents of this checkout.
+This checkout is the unpublished `0.14.0` source candidate. Published Hex
+`0.13.11` remains the current package until an operator approves and publishes a
+new release. The Hex badge reports the latest published package, not this
+candidate.
 
 ## Quick start
 
@@ -29,14 +29,13 @@ project:
 ]}.
 ```
 
-The root project needs its own LFE dependency and LFE provider plugin as well
-as the ltest test dependency. Rebar does not inherit a dependency's
-`project_plugins` entry. This configuration describes the published package.
-A fresh packaged-consumer compile for this source candidate has not been
-verified, so these instructions are not evidence that the candidate installs
-successfully. The repository's source checks use `make check-native`. Keep
-the Rebar/LFE project checkout path free of spaces for the current
-compiler-hook workflow; the CLI paths below remain quoted.
+The root project needs its own LFE dependency and LFE provider plugin for the
+`lfe` test command; Rebar does not inherit a dependency's `project_plugins`
+entry. This block describes the currently published `0.13.11` package. After
+`0.14.0` is approved and published, change the test dependency to `0.14.0`.
+The unpublished candidate is checked separately from Hex installation using
+an official source archive and an ordinary Git dependency fixture. Run the
+repository's source checks with `make check-native`.
 
 In a test module, include the public macro header and mark the module's test
 group:
@@ -68,6 +67,24 @@ is the first non-`ok` group result; later groups still run.
 The complete macro reference, behavior contracts, and source examples are in
 [`docs/overview.md`](docs/overview.md). The native API reference includes the
 exported helpers as well as the main runner functions.
+
+For a fresh `0.14.0` LFE consumer after publication, use this root
+configuration, add a test module such as `calculator-tests` above, and run
+`rebar3 as test lfe ltest`:
+
+```erlang
+{deps, [{lfe, "2.2.2"}]}.
+{project_plugins, [{rebar3_lfe, "0.5.8"}]}.
+{profiles, [
+  {test, [
+    {deps, [{ltest, "0.14.0"}]}
+  ]}
+]}.
+```
+
+The provider compiles and runs the LFE macro test. Before publication, the
+same recipe is checked against the candidate's official source archive through
+an ordinary Git dependency fixture; that is not a Hex installation.
 
 ## Test modules and names
 
@@ -140,17 +157,22 @@ make -C "$ldoc_source" install PREFIX="$ldoc_prefix"
 The output parent is the existing project checkout and the output path must be
 fresh. Use a new name such as `.ldoc-preview-2` on the next render; never
 replace or clean a prior output as part of the recipe. The caller-owned ldoc
-source, prefix, and cache remain under `work_root`. The current Rebar/LFE
-compiler-hook workflow expects a space-free project checkout path; the CLI
-arguments above are still quoted.
+source, prefix, and cache remain under `work_root`. All project and output
+paths in this recipe are quoted. Each render must use a fresh output root; the
+recipe never removes or replaces a prior preview.
 
-The pinned ldoc build compiles the application and records its compiled
-identity; the output directory name does not set a version. The overview
-provides the header macro reference because included macros have no native BEAM
-docstring carrier. Native LFE functions in this package do not record source
-filenames, so this recipe does not claim source links. The compiled candidate
-identity currently remains `0.13.11`. This recipe renders documentation; it
-does not publish the package or verify a fresh packaged-consumer compile.
+The pinned ldoc build compiles the application as `0.14.0`; the output
+directory name does not set the version. The overview provides the header
+macro reference because included macros have no native BEAM docstring carrier.
+Native LFE functions in this package do not record source filenames, so this
+recipe does not claim source links. The command renders documentation only.
+
+For the repository Make workflow, install or select `ldoc` and run
+`make docs DOCGEN=/path/to/ldoc`; Make prints the captured fresh preview root.
+`make publish-dry-run DOCGEN=/path/to/ldoc` builds into one fresh root and always
+runs the combined source-and-docs Hex dry-run with `--dry-run --yes`. Existing
+preview roots are refused; Make never deletes previous output. No command here
+publishes a package or documentation.
 
 The checked-in `docs/ltest.txt` is a legacy entrypoint; it points readers to
 the current overview and generated native reference.
@@ -163,9 +185,10 @@ The repository's native check is:
 make check-native
 ```
 
-The checked workflow runs this command with OTP `27.3.4.19`, `28.5.0.8`, and
-`29.1.2`, using Rebar3 `3.27.0`. These are tested versions, not an asserted
-minimum or maximum support boundary.
+The checked workflow runs this command with Rebar3 `3.28.0` on OTP
+`27.3.4.19`, `28.5.0.8`, and `29.1.2`. These are tested versions, not an
+asserted minimum or maximum support boundary. Its build badge points at the
+current candidate branch; the Hex badge remains the live publication version.
 
 ## License
 

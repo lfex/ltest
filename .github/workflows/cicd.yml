@@ -2,25 +2,24 @@ name: ci/cd
 
 on:
   push:
-    branches: [ main, 'release/**', 'task/**', 'feature/**', 'epic/**', 'codex/**']
-    tags: ['**']
+    branches: [main, 'release/**', 'codex/**']
   pull_request:
-    branches: [ main, 'release/**', 'task/**', 'feature/**', 'epic/**', 'codex/**']
+    branches: [main, 'release/**', 'codex/**']
 
 jobs:
   builds:
     name: Erlang ${{ matrix.otp_version }} build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         otp_version: ['27.3.4.19', '28.5.0.8', '29.1.2']
     steps:
-      - uses: actions/checkout@v4
-      - uses: erlef/setup-beam@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1.24.1
         with:
           otp-version: ${{ matrix.otp_version }}
-          rebar3-version: '3.27.0'
+          rebar3-version: '3.28.0'
       - name: Check rebar3 version
         run: rebar3 --version
       - name: Native checks

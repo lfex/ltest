@@ -1,9 +1,7 @@
 # ltest API overview
 
-`ltest` discovers LFE test modules by marker behavior and executes the selected
-compiled modules through EUnit. The checked source is an unpublished candidate
-whose compiled application metadata remains `0.13.11`. Published Hex `0.13.11` predates this candidate
-and does not contain its documentation changes or later helper APIs.
+`ltest` 0.14.0 discovers LFE test modules by marker behavior and executes the
+selected compiled modules through EUnit.
 
 ## Quick start
 

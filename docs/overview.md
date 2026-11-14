@@ -87,8 +87,8 @@ semantics.
 The header contains 42 public top-level macros. The first two sections provide
 OTP compatibility names and test/fixture definitions. Assertion macros run
 immediately. Test-object macros ending in `*` construct EUnit objects that
-EUnit evaluates later, except `are*`, which performs immediate table
-substitution and returns its complete row assertions.
+EUnit evaluates later, except `are*`, which substitutes complete rows for a
+nonempty variable list and runs the resulting assertions immediately.
 
 | Macro | Call form | Behavior |
 | --- | --- | --- |
@@ -109,8 +109,8 @@ substitution and returns its complete row assertions.
 | `is-not` | `(is-not expression)` | Assert that the expression evaluates to `false`. |
 | `is-match` | `(is-match pattern expression)` | Assert that the expression matches the pattern, with an EUnit diagnostic. |
 | `is-not-match` | `(is-not-match pattern expression)` | Assert that the expression does not match the pattern. |
-| `is-equal` | `(is-equal expected expression)` | Assert that the expression evaluates to the expected value. |
-| `is-not-equal` | `(is-not-equal expected expression)` | Assert that the expression does not evaluate to the expected value. |
+| `is-equal` | `(is-equal expected expression)` | Assert exact term equality (`=:=`); `1` and `1.0` differ. |
+| `is-not-equal` | `(is-not-equal expected expression)` | Assert inequality under exact term equality (`=:=`); `1` and `1.0` differ. |
 | `is-exception` | `(is-exception expression)` or `(is-exception class term expression)` | Assert an exception; the three-argument form checks class and term. |
 | `is-not-exception` | `(is-not-exception expression)` or `(is-not-exception class term expression)` | One argument asserts no exception; three arguments reject only the selected class and term. |
 | `is-error` | `(is-error expression)` or `(is-error term expression)` | Assert an error, optionally matching its term. |
@@ -120,12 +120,12 @@ substitution and returns its complete row assertions.
 | `is-throw` | `(is-throw expression)` or `(is-throw term expression)` | Assert a throw, optionally matching its term. |
 | `is-not-throw` | `(is-not-throw expression)` or `(is-not-throw term expression)` | Reject the selected throw term; other exception classes may pass. |
 | `is*` | `(is* expression)` | Construct a lazy EUnit object for `is`. |
-| `are*` | `(are* (variables...) expression values...)` | Substitute complete rows for immediate assertions; one bounded empty-variable probe returned `[]`. |
+| `are*` | `(are* (variables...) expression values...)` | With a nonempty variable list and complete value rows, substitute each row into immediate assertions. |
 | `is-not*` | `(is-not* expression)` | Construct a lazy EUnit object for `is-not`. |
 | `is-match*` | `(is-match* pattern expression)` | Construct a lazy EUnit object for `is-match`. |
 | `is-not-match*` | `(is-not-match* pattern expression)` | Construct a lazy EUnit object for `is-not-match`. |
-| `is-equal*` | `(is-equal* expected expression)` | Construct a lazy EUnit object for `is-equal`. |
-| `is-not-equal*` | `(is-not-equal* expected expression)` | Construct a lazy EUnit object for `is-not-equal`. |
+| `is-equal*` | `(is-equal* expected expression)` | Construct a lazy EUnit object checking exact term equality (`=:=`); `1` and `1.0` differ. |
+| `is-not-equal*` | `(is-not-equal* expected expression)` | Construct a lazy EUnit object checking inequality under exact term equality (`=:=`). |
 | `is-exception*` | `(is-exception* expression)` or `(is-exception* class term expression)` | Construct a lazy object checking an exception, optionally by class and term. |
 | `is-not-exception*` | `(is-not-exception* expression)` or `(is-not-exception* class term expression)` | One argument asserts no exception; three arguments reject only the selected class and term. |
 | `is-error*` | `(is-error* expression)` or `(is-error* term expression)` | Construct a lazy object checking an error, optionally by term. |
@@ -141,17 +141,18 @@ rejected and a different exception may pass. The class-specific negative
 macros `is-not-error`, `is-not-exit`, and `is-not-throw` reject only their
 selected exception class and term; other classes may pass.
 
-`are*` takes a list of variable names, an expression, then values grouped into
-complete rows matching that list. One bounded empty-variable probe returned
-`[]`; nonempty forms require complete rows. It expands table substitutions into
-immediate assertions rather than delayed EUnit test objects. Substitution walks
-lists; it does not recursively rewrite arbitrary tuples or maps. Use
-`is*` and the other delayed forms when an EUnit test object is needed.
+`are*` takes a nonempty list of variable names, an expression, then values
+grouped into complete rows matching that list. It substitutes each row into
+the expression and runs the resulting assertions immediately rather than
+building delayed EUnit test objects. Substitution walks lists; it does not
+recursively rewrite arbitrary tuples or maps. Use `is*` and the other delayed
+forms when an EUnit test object is needed.
 
 ## Skip helpers and lower-level API
 
 `ltest:get-skip-funcs/1` returns exported `{name, 0}` skip functions, while
-`ltest:get-skipped-tests/1` returns their names without the `_skip` suffix.
+`ltest:get-skipped-tests/1` returns character-list names without the `_skip`
+suffix.
 `check-skip-funcs/1` and `check-skipped-tests/1` are lower-level list
 transforms that retain one result-or-`false` slot per input export.
 `ltest-util:filter-skipped/1` filters exports using the same classifier.
@@ -161,8 +162,5 @@ compatibility values; they are not the classifier implementation.
 Every function is exported by the current source modules. The generated
 reference therefore includes both the runner API and implementation helpers.
 Some helpers require a readable BEAM or a module resolvable on the current code
-path; their BEAM and file-shape errors propagate. The selected 182 definitions
-come from 192 native collector entries. Producer-generated metadata and
-internal macro-expander entries are reported separately rather than removed
-from the BEAM export surface. Header-only macros are documented here because
-LFE does not embed them as native function entries.
+path; their BEAM and file-shape errors propagate. Header-only macros are
+documented here because LFE does not embed them as native function entries.

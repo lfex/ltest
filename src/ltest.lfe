@@ -133,7 +133,7 @@
 
 (defun check-skipped-tests (funcs)
   "Map exported nullary `_skip` functions to their name without that suffix;
-   map other entries to `false`."
+   return the name as a character list and map other entries to `false`."
   (lists:map
     (match-lambda
       (((tuple func arity))
@@ -151,8 +151,8 @@
     (ltest-util:get-module-exports module)))
 
 (defun get-skipped-tests (module)
-  "Return names of nullary `_skip` exports from a module whose BEAM resolves
-   on the code path, filtering other exports."
+  "Return character-list names of nullary `_skip` exports from a module whose
+   BEAM resolves on the code path, filtering other exports."
   (ltest-util:filtered
     #'check-skipped-tests/1
     (ltest-util:get-module-exports module)))
@@ -252,8 +252,8 @@
   (run-group 'integration "Integration Tests" opts #'get-integration-beams/1))
 
 (defun run-group (test-type title opts test-fn)
-  "Run TEST-TYPE with merged defaults, render its optional suite and group
-   headings, and return the canonical EUnit result."
+  "Run TEST-TYPE with merged defaults, always write its group heading, and
+   write the outer suite headings when enabled; return EUnit's result."
   (let* ((merged-opts (merge-run-opts opts test-type))
          (state (make-state color? (mref merged-opts 'color)
                             test-type test-type)))
@@ -283,12 +283,14 @@
      verbose true))
 
 (defun maybe-suite-header (opts state)
-  "Write the outer suite heading when OPTS has a truthy `suite-headers` value."
+  "Write the outer suite heading when OPTS has Boolean `true` for
+   `suite-headers`."
   (if (mref opts 'suite-headers)
     (ltest-formatter:test-suite-header state)))
 
 (defun maybe-suite-footer (opts state)
-  "Write the outer suite footer when OPTS has a truthy `suite-headers` value."
+  "Write the outer suite footer when OPTS has Boolean `true` for
+   `suite-headers`."
   (if (mref opts 'suite-headers)
     (ltest-formatter:test-suite-footer state)))
 

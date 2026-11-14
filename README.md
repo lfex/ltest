@@ -31,12 +31,12 @@ project:
 
 The root project needs its own LFE dependency and LFE provider plugin as well
 as the ltest test dependency. Rebar does not inherit a dependency's
-`project_plugins` entry. This configuration describes the published package;
-a fresh packaged-consumer compile for this source candidate remains pending
-Slice06's Rebar compiler-hook remedy and retest. It is not evidence that the
-candidate installs successfully. The repository's source checks use
-`make check-native`. Keep the Rebar/LFE project checkout path free of spaces
-for the current compiler-hook workflow; the CLI paths below remain quoted.
+`project_plugins` entry. This configuration describes the published package.
+A fresh packaged-consumer compile for this source candidate has not been
+verified, so these instructions are not evidence that the candidate installs
+successfully. The repository's source checks use `make check-native`. Keep
+the Rebar/LFE project checkout path free of spaces for the current
+compiler-hook workflow; the CLI paths below remain quoted.
 
 In a test module, include the public macro header and mark the module's test
 group:
@@ -106,15 +106,16 @@ keys they read and do not merge defaults independently.
 
 The built-in listener uses EUnit's `eunit_listener` callbacks. Its `init/1`
 defaults omitted color to `true` and omitted test type to `unit`, preserving
-explicit values. Set `color` to `false` to return report text unchanged and
-omit ANSI sequences.
+explicit values. Set `color` to `false` to prevent the listener's standard
+color wrappers from adding ANSI sequences.
 
 ## Regenerate the local API reference
 
-The reference uses the public standalone ldoc command. Run this block from an
-existing ltest source checkout. It claims a unique caller-owned work root and
-keeps the ldoc build cache and install prefix inside it; it deliberately leaves
-the root in place for inspection.
+The reference uses the public standalone ldoc command. Prerequisites are Git,
+Make, Erlang/OTP with EDoc, and Rebar3. Run this block from an existing ltest
+source checkout. It claims a unique caller-owned work root and keeps the ldoc
+build cache, Rebar global configuration, and install prefix inside it; it
+deliberately leaves the root in place for inspection.
 
 ```sh
 set -eu
@@ -123,7 +124,8 @@ work_root="$(mktemp -d "${TMPDIR:-/tmp}/ltest-ldoc.XXXXXX")"
 ldoc_source="$work_root/ldoc"
 ldoc_prefix="$work_root/prefix"
 export REBAR_CACHE_DIR="$work_root/rebar-cache"
-mkdir -p "$REBAR_CACHE_DIR"
+export REBAR_GLOBAL_CONFIG_DIR="$work_root/rebar-global-config"
+mkdir -p "$REBAR_CACHE_DIR" "$REBAR_GLOBAL_CONFIG_DIR"
 
 git clone https://github.com/lfex/ldoc.git "$ldoc_source"
 git -C "$ldoc_source" checkout --detach a3984487ca788f85e491f2956bab466393298413
@@ -147,8 +149,8 @@ identity; the output directory name does not set a version. The overview
 provides the header macro reference because included macros have no native BEAM
 docstring carrier. Native LFE functions in this package do not record source
 filenames, so this recipe does not claim source links. The compiled candidate
-identity currently remains `0.13.11`; publication and the consumer hook fix are
-owned by Slice06.
+identity currently remains `0.13.11`. This recipe renders documentation; it
+does not publish the package or verify a fresh packaged-consumer compile.
 
 The checked-in `docs/ltest.txt` is a legacy entrypoint; it points readers to
 the current overview and generated native reference.

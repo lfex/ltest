@@ -43,8 +43,9 @@
      color?))))
 
 (defun test-header (title char)
-  "Return heading iodata padded or limited to the configured report width;
-   TITLE and CHAR supply the heading text and rule character."
+  "Return centered heading iodata. TITLE is a character list whose
+   surrounding spaces fit the configured width; CHAR is a one-character
+   string used for the rule and as the fill character when needed."
   (let* ((title (++ " " title " "))
          (width (ltest-const:test-suite-width))
          (header-len (trunc (/ (- width (length title)) 2)))
@@ -60,9 +61,10 @@
   (string:copies " " count))
 
 (defun func-line (raw-func desc)
-  "Write one test line using DESC when supplied, otherwise the suffix-stripped
-   function name; append zero-clamped codepoint padding and return the IO
-   result. Inputs are an atom name and flat Unicode text or binary DESC."
+  "Write one test line using DESC unless it is `undefined`, in which case use
+   the suffix-stripped name from atom RAW-FUNC. Append zero-clamped codepoint
+   padding and return the IO result. DESC may be flat Unicode text or a valid
+   Unicode binary."
   (let ((func
            (if (=/= 'undefined desc)
                desc
@@ -75,16 +77,16 @@
               (get-elision func))))))
 
 (defun get-skip-func-name (func-name)
-  "Return FUNC-NAME without a terminal `_skip`; otherwise return its atom
-   name as a character list."
+  "Return FUNC-NAME without a terminal `_skip`, or its unchanged atom name,
+   as a character list."
   (let ((name (atom_to_list func-name)))
     (if (lists:suffix "_skip" name)
       (lists:sublist name (- (length name) 5))
       name)))
 
 (defun get-func-name (func-name)
-  "Return an EUnit function name without terminal `_test` or `_test_`;
-   preserve other atom-name text."
+  "Return an EUnit function name without terminal `_test` or `_test_`, or
+   preserve other atom-name text, as a character list."
   (let ((name (atom_to_list func-name)))
     (cond
       ((lists:suffix "_test_" name)
@@ -110,8 +112,10 @@
     (get-elision (unicode:characters_to_list desc))))
 
 (defun mod-line-check
-  "Return module-line iodata when DESC has a `file ` or `module ` prefix;
-   return `""` otherwise. The prefix alone is sufficient; it does not write."
+  "Return module-line iodata for a recognized descriptor without writing.
+   A `file ` descriptor must be the quoted EUnit form for a readable BEAM;
+   descriptor and BEAM errors propagate. Other prefixes return an empty
+   string."
   (((= (binary (prefix bytes (size 5)) (file bitstring)) desc) (match-state color? color?)) (when (=:= prefix #"file "))
   ;;(((= (binary "file " (mod bitstring)) desc) (match-state color? color?))
    (ltest-util:rebar-debug "Getting mod-line-begin (file) ..." '())
@@ -146,14 +150,15 @@
 
 (defun mod-line-begin (desc state)
   "Write a recognized module line and return the IO result; return
-   `skipping` when MOD-LINE-CHECK returns `""`."
+   `skipping` when MOD-LINE-CHECK returns an empty string."
   (case (mod-line-check desc state)
     ("" 'skipping)
     (result (io:format result))))
 
 (defun mod-line-end (desc time data state)
-  "Write manual skip rows and module elapsed time; DATA is unused and no
-   group category summary is printed."
+  "Write manual skip rows and module elapsed time. DATA is included in the
+   debug log but does not determine these visible rows; no group category
+   summary is printed."
   (ltest-util:rebar-debug "Getting mod-line-end (file) ..." '())
   (ltest-util:rebar-debug "desc: ~p, time: ~p, data: ~p, state: ~p" (list desc time data state))
   (let ((skipped-tests (ltest-util:get-skip-tests desc)))
@@ -162,7 +167,7 @@
     (ltest-formatter:mod-time time state)))
 
 (defun ok "Write the successful-test marker to the current IO device and
-   `io:format/1` result."
+   return the `io:format/1` result."
   (((match-state color? color?))
    (io:format (++ "... [" (ltest-color:greenb "ok" color?) "]~n"))))
 

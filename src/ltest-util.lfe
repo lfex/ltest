@@ -60,7 +60,7 @@
 
 (defun get-behaviour (attrs)
   "Read the behavior attribute, preferring behaviour and falling back to
-   behavior."
+   behavior; return `undefined` when neither spelling is present."
   (proplists:get_value
     'behaviour
     attrs
@@ -137,8 +137,9 @@
   (lists:filter #'skipped?/1 funcs))
 
 (defun skipped?
-  "Return `true` only for `{Name, 0}` where the atom name ends in `_skip`;
-   return `false` for every other input."
+  "For a valid `{Name, Arity}` pair, return `true` only when NAME is an atom
+   ending in `_skip` and ARITY is `0`. Intended for exported pairs; other
+   input shapes are outside this function's contract."
   ((`#(,func 0))
     (lists:suffix "_skip" (atom_to_list func)))
   ((_)
@@ -160,8 +161,8 @@
      (state-cancel state)))
 
 (defun rebar-debug (msg)
-  "Call `rebar_api:debug/1` when rebar_api is available; otherwise return
-   `undefined`."
+  "Delegate to `rebar-debug/2` with an empty argument list; when `rebar_api`
+   is available that function calls `rebar_api:debug/2`."
   (rebar-debug msg '()))
 
 (defun rebar-debug (msg args)

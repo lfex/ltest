@@ -10,8 +10,6 @@
   (time 0))
 
 (defun --loaded-ltest-records-- ()
-  "This is just a dummy function for display purposes when including from the
-  REPL (the last function loaded has its name printed in stdout).
-
-  This function needs to be the last one in this include."
+  "Return `ok`. This dummy function marks the end of the include so the REPL
+   prints its name as the last function loaded."
   'ok)

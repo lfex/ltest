@@ -169,12 +169,13 @@
   `(assertNotMatch ,guard ,expression))
 
 (defmacro is-equal (value expression)
-  "Assert that EXPRESSION equals EXPECTED using EUnit term equality."
+  "Assert that EXPRESSION equals EXPECTED using exact term equality
+   (`=:=`); for example, `1` and `1.0` differ."
   `(assertEqual ,value ,expression))
 
 (defmacro is-not-equal (value expression)
-  "Assert that EXPRESSION is not equal to EXPECTED under EUnit term
-   equality."
+  "Assert that EXPRESSION differs from EXPECTED under exact term equality
+   (`=:=`); for example, `1` and `1.0` differ."
   `(assertNotEqual ,value ,expression))
 
 (defmacro is-exception
@@ -276,8 +277,8 @@
 
 ;; Based on #'clojure.test/are
 (defmacro are*
-  "Substitute complete value rows into immediate assertions. A bounded probe
-   of the empty-variable form returned `[]`; nonempty forms require full rows."
+  "With a nonempty variable list and complete value rows, substitute each
+   row into EXPRESSION and run the resulting assertions immediately."
   ('(() ,expr) `(is* 'true))
   (`(,arglist ,expr . ,args)
    `(do-template ,arglist (is ,expr) ,@args))
@@ -299,13 +300,13 @@
   `(_assertNotMatch ,guard ,expression))
 
 (defmacro is-equal* (value expression)
-  "Construct a lazy EUnit test object that asserts EXPRESSION evaluates
-   to VALUE."
+  "Construct a lazy EUnit test object that asserts EXPRESSION equals VALUE
+   using exact term equality (`=:=`); `1` and `1.0` differ."
   `(_assertEqual ,value ,expression))
 
 (defmacro is-not-equal* (value expression)
-  "Construct a lazy EUnit test object that asserts EXPRESSION does not
-   evaluate to VALUE."
+  "Construct a lazy EUnit test object that asserts EXPRESSION differs from
+   VALUE under exact term equality (`=:=`); `1` and `1.0` differ."
   `(_assertNotEqual ,value ,expression))
 
 (defmacro is-exception*
@@ -363,8 +364,6 @@
    `(_test (is-not-throw ,expected-term ,body))))
 
 (defun --loaded-ltest-macros-- ()
-  "This is just a dummy function for display purposes when including from the
-  REPL (the last function loaded has its name printed in stdout).
-
-  This function needs to be the last one in this include."
+  "Return `ok`. This dummy function marks the end of the include so the REPL
+   prints its name as the last function loaded."
   'ok)

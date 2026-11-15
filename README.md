@@ -373,7 +373,7 @@ Rebar3 plugin. Open `_build/default/ldoc/current/site/index.html`.
 BSD 3-Clause License. See [`LICENSE`](LICENSE).
 
 ```text
-Copyright © 2013-2021, Duncan McGreggor <oubiwann@gmail.com>
+Copyright © 2013-2026, Duncan McGreggor <oubiwann@gmail.com>
 
 Copyright © 2014, Døkkarr Hirðisson <dokkarr@lfe.io>,
                   Joshua Schairbaum <joshua.schairbaum@gmail.com>

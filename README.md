@@ -126,11 +126,9 @@ Run the provider's default selection with:
 rebar3 as test lfe ltest
 ```
 
-Library selectors are implemented in this candidate. The cached
-`rebar3_lfe` 0.5.8 provider source exposes `--suite` and function-oriented
-`--test`, but has no module `-m` option. Its command-line selection contract
-is not delivered or certified here; Slice02 owns that provider work. Use the
-public library API below for the selectors described in this document.
+The `rebar3_lfe` 0.5.8 provider exposes `--suite` and function-oriented
+`--test`, but has no module `-m` option. These selectors are available through
+the public library API below; command-line module selection is not included.
 
 The complete macro reference, behavior contracts, and source examples are in
 [`docs/overview.md`](docs/overview.md). The native API reference includes the

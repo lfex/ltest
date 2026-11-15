@@ -2,7 +2,8 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([selector_child_run/0, selector_empty_child_run/0]).
+-export([selector_child_run/0, selector_empty_child_run/0,
+         selector_unicode_child_run/0]).
 
 runner_group_contract_test() ->
     Root = private_root(),
@@ -52,6 +53,42 @@ runner_group_contract_test() ->
 
 selector_contract_test_() ->
     {timeout, 60, fun selector_contract/0}.
+
+selector_unicode_test_() ->
+    {timeout, 60, fun selector_unicode/0}.
+
+selector_unicode() ->
+    Root = private_root(),
+    try
+        Name = [$p, $0, $2, $-, 16#00E9, $-, $u, $n, $i, $t],
+        compile_selector_fixture(
+          Root, Name, "ltest-unit",
+          "unicode_test() -> record(\"unicode-unit\"), ok."),
+        Output = run_selector_child_eval(
+                   Root, "ltest_runtime_tests:selector_unicode_child_run(), halt(0)."),
+        ?assertNotEqual(nomatch, re:run(Output, "SELECTOR_UNICODE_OK"))
+    after
+        remove_tree(Root)
+    end.
+
+selector_unicode_child_run() ->
+    Name = [$p, $0, $2, $-, 16#00E9, $-, $u, $n, $i, $t],
+    NameAtom = list_to_atom(Name),
+    NameBinary = unicode:characters_to_binary(Name),
+    Base = #{color => false, 'suite-headers' => false},
+    selector_case(Base#{modules => NameAtom}, fun ltest:unit/1,
+                  ok, <<"unicode-unit\n">>, <<>>),
+    selector_case(Base#{modules => NameBinary}, fun ltest:unit/1,
+                  ok, <<"unicode-unit\n">>, <<>>),
+    selector_case(Base#{modules => Name}, fun ltest:unit/1,
+                  ok, <<"unicode-unit\n">>, <<>>),
+    selector_case(Base#{suite => NameBinary}, fun ltest:run/1,
+                  ok, <<"unicode-unit\n">>, <<>>),
+    LambdaName = [$p, $0, $2, $-, 16#03BB, $-, $u, $n, $i, $t],
+    LambdaBinary = unicode:characters_to_binary(LambdaName),
+    selector_case(Base#{modules => LambdaName}, fun ltest:unit/1,
+                  {error, {unmatched_modules, [LambdaBinary]}}, <<>>, <<>>),
+    io:format("SELECTOR_UNICODE_OK~n").
 
 selector_contract() ->
     Root = private_root(),
@@ -111,6 +148,7 @@ selector_child_run() ->
                            [{modules, [A]}, {module, [Z]}, {suite, [System]}]}},
                   <<>>, <<>>),
     selector_invalid_values(Base),
+    selector_invalid_unicode(Base),
     selector_absent_and_unmatched(Base, A),
     selector_group_interaction(Base, A, System),
     selector_all_union(Base, A, Z, System, Integration,
@@ -121,7 +159,8 @@ selector_child_run() ->
 
 selector_invalid_values(Base) ->
     Invalid = [[], <<>>, <<32, 9, 13, 10>>, <<",p02-a-unit">>,
-               <<"p02-a-unit,">>, <<"p02-a-unit,,p02-z-unit">>, <<255>>,
+               <<"p02-a-unit,">>, <<"p02-a-unit,,p02-z-unit">>,
+               <<255>>, <<16#CE>>,
                42, {bad}, #{bad => value}, [<<"p02-a-unit">> | bad],
                [97, <<"p02-a-unit">>], [[ [<<"p02-a-unit">> ]]]],
     lists:foreach(
@@ -135,6 +174,29 @@ selector_invalid_values(Base) ->
     selector_case(Base#{modules => undefined, module => undefined,
                         suite => undefined}, fun ltest:unit/1,
                   error, <<"a-unit\nz-unit\n">>, <<"generator\nsetup\n">>).
+
+selector_invalid_unicode(Base) ->
+    InvalidUnicode = [[16#D800], [-1], [16#110000]],
+    lists:foreach(
+      fun(Key) ->
+          lists:foreach(
+            fun(Raw) ->
+                selector_case(Base#{Key => Raw}, fun ltest:unit/1,
+                              {error, {invalid_selector, Key, Raw}}, <<>>, <<>>)
+            end, InvalidUnicode)
+      end, [modules, module, suite]),
+    Nested = [<<"p02-a-unit">>, [16#D800]],
+    selector_case(Base#{modules => Nested}, fun ltest:unit/1,
+                  {error, {invalid_selector, modules, Nested}}, <<>>, <<>>),
+    Surrogate = [16#D800],
+    selector_case(Base#{module => Surrogate}, fun ltest:all/1,
+                  {error, {invalid_selector, module, Surrogate}}, <<>>, <<>>),
+    Negative = [-1],
+    selector_case(Base#{suite => Negative, 'test-type' => all}, fun ltest:run/1,
+                  {error, {invalid_selector, suite, Negative}}, <<>>, <<>>),
+    AboveMax = [16#110000],
+    selector_case(Base#{modules => AboveMax, 'test-type' => all}, fun ltest:run/1,
+                  {error, {invalid_selector, modules, AboveMax}}, <<>>, <<>>).
 
 selector_absent_and_unmatched(Base, A) ->
     selector_case(Base#{unrelated => retained}, fun ltest:unit/1,
@@ -270,12 +332,12 @@ compile_selector_fixture(Root, Name, Behaviour, TestBody) ->
     ok = filelib:ensure_dir(filename:join(Ebin, "placeholder")),
     Source = filename:join(SourceDir, Name ++ ".erl"),
     Module = list_to_atom(Name),
-    Text = lists:flatten(io_lib:format(
-        "-module('~s').~n"
+    Text = unicode:characters_to_binary(lists:flatten(io_lib:format(
+        "%% coding: utf-8~n-module('~ts').~n"
         "~s"
         "-include_lib(\"eunit/include/eunit.hrl\").~n"
         "record(Value) -> file:write_file(\"visited\", [Value, \"\\n\"], [append]).~n"
-        "~s~n", [Name, selector_behaviour(Behaviour), TestBody])),
+        "~s~n", [Name, selector_behaviour(Behaviour), TestBody]))),
     ok = file:write_file(Source, Text),
     {ok, Module, Beam} = compile:file(Source, [binary, return_errors, export_all]),
     ok = file:write_file(filename:join(Ebin, Name ++ ".beam"), Beam).

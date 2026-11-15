@@ -33,11 +33,10 @@ path. EUnit then selects test functions by its own naming and arity rules.
 ## Running tests
 
 The Rebar3 LFE provider invokes `ltest:run/1` with its configured test type
-and report options. The cached `rebar3_lfe` 0.5.8 provider exposes `--suite`
-and function-oriented `--test`, but no module `-m` option. Its command-line
-selection contract is not delivered or certified by this library change; the
-provider integration belongs to Slice02. The public group functions can also
-be called directly:
+and report options. The `rebar3_lfe` 0.5.8 provider exposes `--suite` and
+function-oriented `--test`, but has no module `-m` option. These selectors
+are available through the public library API; command-line module selection
+is not included. The public group functions can also be called directly:
 
 ```lisp
 (ltest:unit)

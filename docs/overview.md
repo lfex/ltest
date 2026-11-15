@@ -42,11 +42,16 @@ defaults to `unit`. For example:
 rebar3 as test lfe ltest --test-type system --module database-tests,api-tests
 ```
 
-This provider and library selector contract is not available in the published
-`rebar3_lfe` `0.5.8` plugin or ltest `0.14.0` package. The older plugin has a
-legacy `--suite` spelling, but it does not select modules under this contract.
-In the current source candidates, `--test` / `-t` does not select functions;
-any supplied value returns an unsupported-selector error before EUnit runs.
+Published `rebar3_lfe` `0.5.8` has a legacy `--suite` option but no
+`--module` / `-m` or `--test-type` / `-T`; its `--suite` can select a module
+when paired with the current selector-capable library. Published ltest
+`0.14.0` does not implement module selection. The current provider fails
+closed before EUnit if module, suite, or function selection is requested with
+a library lacking the documented selector support; no-selector and
+test-type-only calls retain the library's existing behavior. The complete
+new command-line contract requires both current unreleased source candidates.
+With the current library, `--test` / `-t` does not select functions and
+returns an unsupported-selector error before EUnit runs.
 The public group functions can also be called directly:
 
 ```lisp

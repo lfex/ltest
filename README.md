@@ -134,11 +134,17 @@ for the unit, system, integration, or all groups. For example:
 rebar3 as test lfe ltest --test-type system --module database-tests,api-tests
 ```
 
-These selector options are not available from the published `rebar3_lfe`
-`0.5.8` plugin or the published ltest `0.14.0` package. The older plugin has a
-`--suite` option, but it does not provide this module-selection contract. In
-the current source candidates, `--test` / `-t` does not select a function;
-ltest returns an unsupported-selector error before running tests.
+Published `rebar3_lfe` `0.5.8` has a legacy `--suite` option but no
+`--module` / `-m` or `--test-type` / `-T`; that legacy `--suite` can select a
+module when paired with the current selector-capable library. Published ltest
+`0.14.0` does not implement module selection. The current provider fails closed
+before EUnit when module, suite, or function selection is requested with a
+library lacking the documented selector support. Calls without selectors and
+calls with only a test type retain the library's existing behavior. The full
+new command-line contract requires both current unreleased source candidates.
+The current library does not use `--test` / `-t` to select a function; it
+returns an
+unsupported-selector error before tests run.
 
 The complete macro reference, behavior contracts, and source examples are in
 [`docs/overview.md`](docs/overview.md). The native API reference includes the

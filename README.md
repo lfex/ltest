@@ -127,8 +127,10 @@ rebar3 as test lfe ltest
 ```
 
 The `rebar3_lfe` 0.5.8 provider exposes `--suite` and function-oriented
-`--test`, but has no module `-m` option. These selectors are available through
-the public library API below; command-line module selection is not included.
+`--test`, but has no module `-m` option. The library selector API below is
+available only in the current unreleased source checkout; published ltest
+`0.14.0` does not implement module selection. Command-line module selection
+is not included.
 
 The complete macro reference, behavior contracts, and source examples are in
 [`docs/overview.md`](docs/overview.md). The native API reference includes the

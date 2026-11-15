@@ -32,8 +32,12 @@ path. EUnit then selects test functions by its own naming and arity rules.
 
 ## Running tests
 
-The Rebar3 LFE provider invokes `ltest:run/1` with its selected test type and
-report options. The public group functions can also be called directly:
+The Rebar3 LFE provider invokes `ltest:run/1` with its configured test type
+and report options. The cached `rebar3_lfe` 0.5.8 provider exposes `--suite`
+and function-oriented `--test`, but no module `-m` option. Its command-line
+selection contract is not delivered or certified by this library change; the
+provider integration belongs to Slice02. The public group functions can also
+be called directly:
 
 ```lisp
 (ltest:unit)
@@ -54,6 +58,50 @@ defaults and dispatches the selected `test-type`; it maps EUnit `error` to
 `{error, tests_failed}`, preserves other results, and returns an explanatory
 `{error, Message}` for an unknown type. The EUnit option helpers expect the
 keys they read; they do not independently merge defaults.
+
+Pass `modules` to select discovered test modules. `module` and `suite` are
+compatibility aliases for the same set. Names match module identities
+declared in eligible discovered BEAMs, not filenames, functions, regular
+expressions, or wildcards. Values may be one atom, UTF-8 binary, or Unicode
+character list, or a nonempty proper list of those scalar forms. A scalar may
+contain comma-separated names; ASCII space, tab, carriage return, and newline
+are trimmed from token edges. Names are case-sensitive, deduplicated, and
+sorted for alias comparison, while execution keeps discovery order. `all` is
+an ordinary module name. No selector keeps the existing run-all behavior;
+explicit empty values and empty tokens are invalid.
+
+For example, an Erlang caller can select two modules with:
+
+```erlang
+ltest:unit(#{modules => [<<"calculator-tests">>, <<"support-tests">>]}).
+ltest:run(#{'test-type' => all, suite => <<"calculator-tests,support-tests">>}).
+```
+
+The equivalent LFE call is:
+
+```lisp
+(ltest:unit #m(modules (list #"calculator-tests" #"support-tests")))
+(ltest:run #m(test-type all suite #"calculator-tests,support-tests"))
+```
+
+Several supplied aliases must have exactly equal normalized sets. Invalid
+values return `{error, {invalid_selector, Key, RawValue}}`; disagreement
+returns `{error, {conflicting_selectors, Aliases}}`; names absent from the
+requested group's discovered BEAMs return
+`{error, {unmatched_modules, MissingNames}}`. The runner compares names with
+BEAM metadata and does not convert caller text to atoms. It validates the
+whole request before EUnit starts, so a partly matching request runs no tests.
+`all` validates against the union of unit, system, and integration modules
+before starting any group. Empty selected groups succeed. Direct `unit/1`,
+`system/1`, and `integration/1` calls force their own group even if
+`test-type` disagrees.
+
+This library API does not select individual test functions. `test` may be
+absent or `undefined`; any other value returns
+`{error, {unsupported_test_selector, RawValue}}` before EUnit runs. `all/0,1`
+runs unit, system, and integration in that order even after a selected group
+fails, then returns the first non-`ok` result. `run/1` maps only bare EUnit
+`error` to `{error, tests_failed}` and preserves tagged selector errors.
 
 The listener implements EUnit's `eunit_listener` callbacks
 `init/1`, `handle_begin/3`, `handle_end/3`, `handle_cancel/3`, and

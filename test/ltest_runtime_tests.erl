@@ -2,6 +2,8 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+-export([selector_child_run/0, selector_empty_child_run/0]).
+
 runner_group_contract_test() ->
     Root = private_root(),
     try
@@ -47,6 +49,240 @@ runner_group_contract_test() ->
     after
         remove_tree(Root)
     end.
+
+selector_contract_test_() ->
+    {timeout, 60, fun selector_contract/0}.
+
+selector_contract() ->
+    Root = private_root(),
+    try
+        compile_selector_fixture(
+          Root, "p02-a-unit", "ltest-unit",
+          "a_test_() -> "
+          "file:write_file(\"phases\", \"generator\\n\", [append]), "
+          "{setup, fun() -> file:write_file(\"phases\", \"setup\\n\", [append]), ok end, "
+          "fun(_) -> ok end, [fun() -> record(\"a-unit\") end]}."),
+        compile_selector_fixture(
+          Root, "p02-z-unit", "ltest-unit",
+          "z_test() -> record(\"z-unit\"), ?assert(false)."),
+        compile_selector_fixture(
+          Root, "p02-system", "ltest-system",
+          "system_test() -> record(\"system\"), ok."),
+        compile_selector_fixture(
+          Root, "p02-integration", "ltest-integration",
+          "integration_test() -> record(\"integration\"), ok."),
+        compile_selector_fixture(
+          Root, "p02-unmarked", "undefined",
+          "unmarked_test_() -> "
+          "file:write_file(\"phases\", \"unmarked-generator\\n\", [append]), "
+          "{setup, fun() -> file:write_file(\"phases\", \"unmarked-setup\\n\", [append]), ok end, "
+          "fun(_) -> record(\"unmarked\") end}."),
+        Output = run_selector_child_eval(
+                   Root, "ltest_runtime_tests:selector_child_run(), halt(0)."),
+        ?assertNotEqual(nomatch, re:run(Output, "SELECTOR_SUITE_OK"))
+    after
+        remove_tree(Root)
+    end.
+
+selector_child_run() ->
+    A = <<"p02-a-unit">>,
+    Z = <<"p02-z-unit">>,
+    System = <<"p02-system">>,
+    Integration = <<"p02-integration">>,
+    APhases = <<"generator\nsetup\n">>,
+    AllVisited = <<"a-unit\nz-unit\nsystem\nintegration\n">>,
+    AllPhases = APhases,
+    Base = #{color => false, 'suite-headers' => false},
+    selector_case(Base#{modules => 'p02-a-unit'}, fun ltest:unit/1,
+                  ok, <<"a-unit\n">>, APhases),
+    selector_case(Base#{module => A}, fun ltest:run/1,
+                  ok, <<"a-unit\n">>, APhases),
+    selector_case(Base#{suite => "p02-a-unit"}, fun ltest:unit/1,
+                  ok, <<"a-unit\n">>, APhases),
+    selector_case(Base#{modules => <<"p02-z-unit, p02-a-unit, p02-a-unit">>},
+                  fun ltest:unit/1, error, <<"a-unit\nz-unit\n">>, APhases),
+    selector_case(Base#{modules => [Z, "p02-a-unit"], module => "p02-z-unit,p02-a-unit",
+                        suite => "p02-a-unit,p02-z-unit"},
+                  fun ltest:run/1, {error, tests_failed},
+                  <<"a-unit\nz-unit\n">>, APhases),
+    selector_case(Base#{modules => A, module => Z, suite => System},
+                  fun ltest:unit/1,
+                  {error, {conflicting_selectors,
+                           [{modules, [A]}, {module, [Z]}, {suite, [System]}]}},
+                  <<>>, <<>>),
+    selector_invalid_values(Base),
+    selector_absent_and_unmatched(Base, A),
+    selector_group_interaction(Base, A, System),
+    selector_all_union(Base, A, Z, System, Integration,
+                       AllVisited, AllPhases),
+    selector_unsupported_test(Base, A),
+    selector_run_beams(Base, A),
+    io:format("SELECTOR_SUITE_OK~n").
+
+selector_invalid_values(Base) ->
+    Invalid = [[], <<>>, <<32, 9, 13, 10>>, <<",p02-a-unit">>,
+               <<"p02-a-unit,">>, <<"p02-a-unit,,p02-z-unit">>, <<255>>,
+               42, {bad}, #{bad => value}, [<<"p02-a-unit">> | bad],
+               [97, <<"p02-a-unit">>], [[ [<<"p02-a-unit">> ]]]],
+    lists:foreach(
+      fun(Key) ->
+          lists:foreach(
+            fun(Raw) ->
+                selector_case(Base#{Key => Raw}, fun ltest:unit/1,
+                              {error, {invalid_selector, Key, Raw}}, <<>>, <<>>)
+            end, Invalid)
+      end, [modules, module, suite]),
+    selector_case(Base#{modules => undefined, module => undefined,
+                        suite => undefined}, fun ltest:unit/1,
+                  error, <<"a-unit\nz-unit\n">>, <<"generator\nsetup\n">>).
+
+selector_absent_and_unmatched(Base, A) ->
+    selector_case(Base#{unrelated => retained}, fun ltest:unit/1,
+                  error, <<"a-unit\nz-unit\n">>, <<"generator\nsetup\n">>),
+    selector_case(Base#{test => undefined, modules => A}, fun ltest:run/1,
+                  ok, <<"a-unit\n">>, <<"generator\nsetup\n">>),
+    selector_case(Base#{modules => 'p02-unmarked'}, fun ltest:unit/1,
+                  {error, {unmatched_modules, [<<"p02-unmarked">>]}}, <<>>, <<>>),
+    Fresh = <<"p02-never-interned-selector">>,
+    ?assertEqual(missing_atom, existing_atom_state(Fresh)),
+    selector_case(Base#{modules => [A, Fresh]}, fun ltest:unit/1,
+                  {error, {unmatched_modules, [Fresh]}}, <<>>, <<>>),
+    ?assertEqual(missing_atom, existing_atom_state(Fresh)),
+    selector_case(Base#{modules => [<<"p02-missing-z">>, A,
+                                    <<"p02-missing-a">>]}, fun ltest:unit/1,
+                  {error, {unmatched_modules,
+                           [<<"p02-missing-a">>, <<"p02-missing-z">>]}}, <<>>, <<>>),
+    selector_case(Base#{'test-type' => unsupported, test => [], modules => []},
+                  fun ltest:run/1,
+                  {error, io_lib:format("Unknown test type: ~p", [unsupported])},
+                  <<>>, <<>>).
+
+selector_group_interaction(Base, A, System) ->
+    selector_case(Base#{modules => A, 'test-type' => system}, fun ltest:unit/1,
+                  ok, <<"a-unit\n">>, <<"generator\nsetup\n">>),
+    selector_case(Base#{modules => System}, fun ltest:unit/1,
+                  {error, {unmatched_modules, [System]}}, <<>>, <<>>),
+    selector_case(Base#{modules => System}, fun ltest:system/1,
+                  ok, <<"system\n">>, <<>>),
+    selector_case(Base#{modules => <<"p02-integration">>}, fun ltest:integration/1,
+                  ok, <<"integration\n">>, <<>>).
+
+selector_all_union(Base, A, Z, System, Integration, AllVisited, AllPhases) ->
+    selector_case(Base#{modules => System}, fun ltest:all/1,
+                  ok, <<"system\n">>, <<>>),
+    selector_case(Base#{suite => Integration}, fun ltest:all/1,
+                  ok, <<"integration\n">>, <<>>),
+    selector_case(Base#{modules => [Integration, System, Z, A]}, fun ltest:all/1,
+                  error, AllVisited, AllPhases),
+    selector_case(Base#{modules => [Integration, System, Z, A], 'test-type' => all},
+                  fun ltest:run/1, {error, tests_failed}, AllVisited, AllPhases),
+    selector_case(Base#{modules => [A, <<"p02-missing-all">>]}, fun ltest:all/1,
+                  {error, {unmatched_modules, [<<"p02-missing-all">>]}}, <<>>, <<>>),
+    selector_case(Base#{modules => <<>>, 'test-type' => all}, fun ltest:run/1,
+                  {error, {invalid_selector, modules, <<>>}}, <<>>, <<>>),
+    selector_case(Base#{modules => [A, <<"p02-missing-run-all">>], 'test-type' => all},
+                  fun ltest:run/1,
+                  {error, {unmatched_modules, [<<"p02-missing-run-all">>]}}, <<>>, <<>>),
+    selector_case(Base#{modules => A, module => Z, 'test-type' => all}, fun ltest:all/1,
+                  {error, {conflicting_selectors,
+                           [{modules, [A]}, {module, [Z]}]}}, <<>>, <<>>).
+
+selector_unsupported_test(Base, A) ->
+    lists:foreach(
+      fun(Raw) ->
+          selector_case(Base#{modules => A, test => Raw}, fun ltest:unit/1,
+                        {error, {unsupported_test_selector, Raw}}, <<>>, <<>>),
+          selector_case(Base#{modules => A, test => Raw, 'test-type' => all},
+                        fun ltest:run/1,
+                        {error, {unsupported_test_selector, Raw}}, <<>>, <<>>)
+      end, [[], selected_test, <<"selected_test">>]).
+
+selector_run_beams(Base, A) ->
+    Root = os:getenv("LTEST_CHILD_ROOT"),
+    Ebin = filename:join([Root, "_build", "test", "lib", "selector-fixtures", "ebin"]),
+    BeamA = filename:join(Ebin, "p02-a-unit"),
+    BeamZ = filename:join(Ebin, "p02-z-unit"),
+    Discovery = fun(_) -> [BeamA, BeamZ] end,
+    selector_case(Base#{modules => A},
+                  fun(Opts) -> ltest:'run-beams'(unit, Discovery, Opts) end,
+                  ok, <<"a-unit\n">>, <<"generator\nsetup\n">>),
+    selector_case(Base#{modules => [A, <<"p02-run-beams-missing">>]},
+                  fun(Opts) -> ltest:'run-beams'(unit, Discovery, Opts) end,
+                  {error, {unmatched_modules, [<<"p02-run-beams-missing">>]}},
+                  <<>>, <<>>).
+
+selector_case(Options, Caller, ExpectedResult, ExpectedVisited, ExpectedPhases) ->
+    ok = file:write_file("visited", <<>>),
+    ok = file:write_file("phases", <<>>),
+    Result = Caller(Options),
+    ?assertEqual({ExpectedResult, {ok, ExpectedVisited}, {ok, ExpectedPhases}},
+                 {Result, file:read_file("visited"), file:read_file("phases")}).
+
+existing_atom_state(Name) ->
+    try binary_to_existing_atom(Name, utf8) of
+        _ -> existing_atom
+    catch
+        error:badarg -> missing_atom
+    end.
+
+selector_empty_discovery_test_() ->
+    {timeout, 60, fun selector_empty_discovery/0}.
+
+selector_empty_discovery() ->
+    Root = private_root(),
+    try
+        Output = run_selector_child_eval(
+                   Root, "ltest_runtime_tests:selector_empty_child_run(), halt(0)."),
+        ?assertNotEqual(nomatch, re:run(Output, "SELECTOR_EMPTY_OK"))
+    after
+        remove_tree(Root)
+    end.
+
+selector_empty_child_run() ->
+    ok = file:write_file("visited", <<>>),
+    ok = file:write_file("phases", <<>>),
+    Selected = ltest:unit(#{modules => <<"p02-a-unit">>, color => false,
+                            'suite-headers' => false}),
+    ?assertEqual({error, {unmatched_modules, [<<"p02-a-unit">>]}}, Selected),
+    ?assertEqual({ok, <<>>}, file:read_file("visited")),
+    Unfiltered = ltest:unit(#{color => false, 'suite-headers' => false}),
+    ?assertEqual(ok, Unfiltered),
+    io:format("SELECTOR_EMPTY_OK~n").
+
+run_selector_child_eval(Root, Eval) ->
+    Erl = os:find_executable("erl"),
+    SelectorEbin = filename:join([Root, "_build", "test", "lib",
+                                  "selector-fixtures", "ebin"]),
+    Paths = lists:usort([filename:absname(Path)
+                         || Path <- [SelectorEbin | code:get_path()]]),
+    PathArgs = lists:append([["-pa", Path] || Path <- Paths]),
+    Port = open_port({spawn_executable, Erl},
+                     [binary, exit_status, use_stdio, stderr_to_stdout,
+                      {args, ["-noshell", "-noinput"] ++ PathArgs ++ ["-eval", Eval]},
+                      {cd, Root},
+                      {env, [{"LTEST_CHILD_ROOT", Root}]}]),
+    collect(Port, []).
+
+compile_selector_fixture(Root, Name, Behaviour, TestBody) ->
+    SourceDir = filename:join(Root, "src"),
+    Ebin = filename:join([Root, "_build", "test", "lib", "selector-fixtures", "ebin"]),
+    ok = filelib:ensure_dir(filename:join(SourceDir, "placeholder")),
+    ok = filelib:ensure_dir(filename:join(Ebin, "placeholder")),
+    Source = filename:join(SourceDir, Name ++ ".erl"),
+    Module = list_to_atom(Name),
+    Text = lists:flatten(io_lib:format(
+        "-module('~s').~n"
+        "~s"
+        "-include_lib(\"eunit/include/eunit.hrl\").~n"
+        "record(Value) -> file:write_file(\"visited\", [Value, \"\\n\"], [append]).~n"
+        "~s~n", [Name, selector_behaviour(Behaviour), TestBody])),
+    ok = file:write_file(Source, Text),
+    {ok, Module, Beam} = compile:file(Source, [binary, return_errors, export_all]),
+    ok = file:write_file(filename:join(Ebin, Name ++ ".beam"), Beam).
+
+selector_behaviour("undefined") -> [];
+selector_behaviour(Behaviour) ->
+    lists:flatten(io_lib:format("-behaviour('~s').~n", [Behaviour])).
 
 descriptor_prefixes_consume_full_bitstrings_test() ->
     Beam = code:which('ltest-basic-tests'),

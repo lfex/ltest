@@ -208,18 +208,26 @@
   (all (default-opts)))
 
 (defun all (opts)
-  "Merge OPTS over defaults, force each group type, and run unit, system,
-   then integration in order. Return the first non-`ok` result after all run."
+  "Run all groups in unit, system, integration order, even after failure.
+   Optional `modules`, `module`, or `suite` names select discovered modules;
+   invalid requests return a tagged error before any test executes."
   (let* ((merged-opts (merge-run-opts opts 'all))
          (test-opts (maps:merge merged-opts #m(suite-headers false)))
          (state (make-state color? (mref merged-opts 'color)))
          (_header (maybe-suite-header merged-opts state))
-         (results (list
-                    (unit (maps:merge test-opts #m(test-type unit)))
-                    (system (maps:merge test-opts #m(test-type system)))
-                    (integration (maps:merge test-opts #m(test-type integration)))))
+         (result (case (normalize-selectors merged-opts)
+                   (`#(error ,reason) `#(error ,reason))
+                   (`#(ok unfiltered)
+                     (first-non-ok
+                       (list
+                         (unit (maps:merge test-opts #m(test-type unit)))
+                         (system (maps:merge test-opts #m(test-type system)))
+                         (integration
+                           (maps:merge test-opts #m(test-type integration))))))
+                   (`#(ok ,names)
+                     (run-all-selected names test-opts))))
          (_footer (maybe-suite-footer merged-opts state)))
-    (first-non-ok results)))
+    result))
 
 (defun unit ()
   "Run the unit group with complete default options and return EUnit's
@@ -262,6 +270,34 @@
     (let ((result (run-beams test-type test-fn merged-opts)))
       (maybe-suite-footer merged-opts state)
       result)))
+
+(defun run-all-selected (names opts)
+  "Discover all groups, validate NAMES against their union, then run each
+   prepared group in canonical order without repeating selector validation."
+  (let* ((`#(ok ,cwd) (file:get_cwd))
+         (groups (list (get-unit-beams cwd)
+                       (get-system-beams cwd)
+                       (get-integration-beams cwd))))
+    (case (select-discovered names groups)
+      (`#(error ,reason) `#(error ,reason))
+      (`#(ok ,selected)
+        (let ((results
+                (list
+                  (run-prepared-group
+                    'unit "Unit Tests" (lists:nth 1 selected) opts)
+                  (run-prepared-group
+                    'system "System Tests" (lists:nth 2 selected) opts)
+                  (run-prepared-group 'integration "Integration Tests"
+                                      (lists:nth 3 selected) opts))))
+          (first-non-ok results))))))
+
+(defun run-prepared-group (test-type title beams opts)
+  "Write the group heading and execute BEAMS already validated for the
+   complete selection request."
+  (let ((state (make-state color? (mref opts 'color)
+                           test-type test-type)))
+    (ltest-formatter:test-type-header title state)
+    (execute-beams test-type beams opts)))
 
 (defun first-non-ok
   "Return the first non-ok result, or ok when every group succeeded."
@@ -316,9 +352,201 @@
     #(test-type ,(mref opts 'test-type))))
 
 (defun run-beams (test-type test-fn opts)
-  "Find beams for TEST-TYPE beneath the current working directory and pass
-   the files and translated options to EUnit."
-  (let* ((`#(ok ,cwd) (file:get_cwd))
-         (beams (funcall test-fn cwd))
-         (beam-files (ltest-util:beams->files beams)))
-    (eunit:test beam-files (eunit-opts (merge-run-opts opts test-type)))))
+  "Discover TEST-TYPE beams, validate selector options against their declared
+   modules, and pass selected files and translated options to EUnit."
+  (let* ((merged-opts (merge-run-opts opts test-type)))
+    (case (normalize-selectors merged-opts)
+      (`#(error ,reason) `#(error ,reason))
+      (`#(ok ,selection)
+        (let* ((`#(ok ,cwd) (file:get_cwd))
+               (beams (funcall test-fn cwd)))
+          (case (select-discovered selection (list beams))
+            (`#(error ,reason) `#(error ,reason))
+            (`#(ok (,selected))
+              (execute-beams test-type selected merged-opts))))))))
+
+(defun execute-beams (test-type beams opts)
+  "Pass already selected TEST-TYPE BEAM roots and merged OPTS to EUnit."
+  (eunit:test (ltest-util:beams->files beams)
+              (eunit-opts (merge-run-opts opts test-type))))
+
+(defun normalize-selectors (opts)
+  "Validate the unsupported `test` option and normalize the three module
+   selector aliases; return `unfiltered` when none is supplied."
+  (case (maps:find 'test opts)
+    ('error (normalize-selector-aliases opts))
+    (`#(ok undefined) (normalize-selector-aliases opts))
+    (`#(ok ,value) `#(error #(unsupported_test_selector ,value)))))
+
+(defun normalize-selector-aliases (opts)
+  "Normalize aliases in fixed `modules`, `module`, `suite` order and require
+   their sorted binary name sets to agree."
+  (case (normalize-selector-aliases '(modules module suite) opts '())
+    (`#(error ,reason) `#(error ,reason))
+    (`#(ok ()) `#(ok unfiltered))
+    (`#(ok ,aliases)
+      (let* ((`#(,_ ,names) (car aliases)))
+        (case (selector-aliases-agree? names aliases)
+          ('true `#(ok ,names))
+          ('false `#(error #(conflicting_selectors ,aliases))))))))
+
+(defun normalize-selector-aliases (keys opts acc)
+  "Normalize present selector aliases in KEYS order, preserving each key and
+   original raw value for deterministic errors."
+  (case keys
+    ('() `#(ok ,(lists:reverse acc)))
+    (`(,key . ,rest)
+      (case (maps:find key opts)
+        ('error (normalize-selector-aliases rest opts acc))
+        (`#(ok undefined) (normalize-selector-aliases rest opts acc))
+        (`#(ok ,raw)
+          (case (normalize-selector-value raw)
+            (`#(ok ,names)
+              (normalize-selector-aliases rest opts
+                                          (cons `#(,key ,names) acc)))
+            (`#(error ,_)
+              `#(error #(invalid_selector ,key ,raw)))))))))
+
+(defun selector-aliases-agree? (names aliases)
+  "Return whether each normalized alias contains exactly NAMES."
+  (case aliases
+    ('() 'true)
+    (`(#(,_ ,alias-names) . ,rest)
+      (andalso (=:= names alias-names)
+               (selector-aliases-agree? names rest)))))
+
+(defun normalize-selector-value
+  "Convert one selector scalar or nonempty list of selector scalars to sorted
+   distinct UTF-8 binary names; reject empty and unsupported values."
+  ((value) (when (is_atom value))
+    (normalize-selector-text (atom_to_binary value 'utf8)))
+  ((value) (when (is_binary value))
+    (normalize-selector-text value))
+  ((()) `#(error invalid))
+  ((value) (when (is_list value))
+    (case (proper-selector-list? value)
+      ('false `#(error invalid))
+      ('true
+        (case (selector-charlist? value)
+          ('true (normalize-selector-text (unicode:characters_to_binary value)))
+          ('false (normalize-selector-items value '()))))))
+  ((_) `#(error invalid)))
+
+(defun proper-selector-list? (value)
+  "Return whether VALUE is a proper list, including nested selector-list
+   values, without assuming `is_list/1` excludes an improper tail."
+  (case value
+    ('() 'true)
+    (`(,_ . ,tail) (proper-selector-list? tail))
+    (_ 'false)))
+
+(defun selector-charlist? (value)
+  "Return whether nonempty VALUE is a proper list containing only integers."
+  (case value
+    ('() 'true)
+    (`(,head . ,tail)
+      (andalso (is_integer head) (selector-charlist? tail)))
+    (_ 'false)))
+
+(defun normalize-selector-items (items acc)
+  "Normalize each scalar item and combine its names, rejecting any non-scalar
+   member while retaining no input order."
+  (case items
+    ('() `#(ok ,(lists:usort acc)))
+    (`(,item . ,rest)
+      (case (normalize-selector-scalar item)
+        (`#(ok ,names) (normalize-selector-items rest (lists:append names acc)))
+        (`#(error ,_) `#(error invalid))))))
+
+(defun normalize-selector-scalar
+  "Normalize one atom, UTF-8 binary, or Unicode character-list selector."
+  ((value) (when (is_atom value))
+    (normalize-selector-text (atom_to_binary value 'utf8)))
+  ((value) (when (is_binary value))
+    (normalize-selector-text value))
+  ((value) (when (is_list value))
+    (case (selector-charlist? value)
+      ('true (normalize-selector-text (unicode:characters_to_binary value)))
+      ('false `#(error invalid))))
+  ((_) `#(error invalid)))
+
+(defun normalize-selector-text (text)
+  "Validate UTF-8 TEXT, split ASCII commas, trim ASCII edge whitespace, and
+   return sorted distinct nonempty binary names."
+  (normalize-selector-text-result (unicode:characters_to_binary text)))
+
+(defun normalize-selector-text-result
+  "Normalize the valid UTF-8 binary returned by the Unicode conversion, or
+   reject its tagged invalid/incomplete result."
+  ((text-bin) (when (is_binary text-bin))
+    (normalize-selector-tokens
+      (binary:split text-bin #"," '(global)) '()))
+  ((_) `#(error invalid)))
+
+(defun normalize-selector-tokens (tokens acc)
+  "Trim selector TOKENS and return their sorted distinct names, rejecting an
+   empty token."
+  (case tokens
+    ('() `#(ok ,(lists:usort acc)))
+    (`(,token . ,rest)
+      (let ((trimmed (trim-selector-space token)))
+        (case (byte_size trimmed)
+          (0 `#(error invalid))
+          (_ (normalize-selector-tokens rest (cons trimmed acc))))))))
+
+(defun trim-selector-space (text)
+  "Remove only ASCII space, tab, carriage return, and newline at both edges."
+  (trim-selector-right (trim-selector-left text)))
+
+(defun trim-selector-left (text)
+  "Remove leading ASCII selector whitespace from TEXT."
+  (case (byte_size text)
+    (0 text)
+    (_ (case (selector-space? (binary:at text 0))
+         ('true (trim-selector-left
+                  (binary:part text 1 (- (byte_size text) 1))))
+         ('false text)))))
+
+(defun trim-selector-right (text)
+  "Remove trailing ASCII selector whitespace from TEXT."
+  (case (byte_size text)
+    (0 text)
+    (_ (case (selector-space? (binary:last text))
+         ('true (trim-selector-right
+                  (binary:part text 0 (- (byte_size text) 1))))
+         ('false text)))))
+
+(defun selector-space? (char)
+  "Return whether CHAR is one of the four ASCII selector whitespace bytes."
+  (orelse (=:= char 32)
+          (=:= char 9)
+          (=:= char 13)
+          (=:= char 10)))
+
+(defun select-discovered
+  "Validate selection against the union of discovered GROUPS and return each
+   selected BEAM list in its original discovery order."
+  (('unfiltered groups) `#(ok ,groups))
+  ((names groups)
+    (let* ((all-beams (lists:append groups))
+           (available (lists:usort
+                        (lists:map #'discovered-module-name/1 all-beams)))
+           (missing (lists:subtract names available)))
+      (case missing
+        ('() `#(ok ,(select-beam-groups names groups)))
+        (_ `#(error #(unmatched_modules ,missing)))))))
+
+(defun select-beam-groups (names groups)
+  "Filter each discovered group by NAMES while preserving group and BEAM
+   ordering and duplicate discovery paths."
+  (lists:map (lambda (beams) (select-discovered-beams names beams)) groups))
+
+(defun select-discovered-beams (names beams)
+  "Keep discovered BEAM roots whose declared module identity appears in NAMES."
+  (lists:filter
+    (lambda (beam) (lists:member (discovered-module-name beam) names))
+    beams))
+
+(defun discovered-module-name (beam)
+  "Return the UTF-8 binary identity declared in a discovered BEAM file."
+  (atom_to_binary (ltest-util:beam->module beam) 'utf8))

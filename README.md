@@ -126,11 +126,19 @@ Run the provider's default selection with:
 rebar3 as test lfe ltest
 ```
 
-The `rebar3_lfe` 0.5.8 provider exposes `--suite` and function-oriented
-`--test`, but has no module `-m` option. The library selector API below is
-available only in the current unreleased source checkout; published ltest
-`0.14.0` does not implement module selection. Command-line module selection
-is not included.
+The current unreleased `rebar3_lfe` and ltest source candidates add
+`--module` / `-m`, with `--suite` / `-s` as an alias, and `--test-type` / `-T`
+for the unit, system, integration, or all groups. For example:
+
+```sh
+rebar3 as test lfe ltest --test-type system --module database-tests,api-tests
+```
+
+These selector options are not available from the published `rebar3_lfe`
+`0.5.8` plugin or the published ltest `0.14.0` package. The older plugin has a
+`--suite` option, but it does not provide this module-selection contract. In
+the current source candidates, `--test` / `-t` does not select a function;
+ltest returns an unsupported-selector error before running tests.
 
 The complete macro reference, behavior contracts, and source examples are in
 [`docs/overview.md`](docs/overview.md). The native API reference includes the

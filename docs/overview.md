@@ -32,13 +32,22 @@ path. EUnit then selects test functions by its own naming and arity rules.
 
 ## Running tests
 
-The Rebar3 LFE provider invokes `ltest:run/1` with its configured test type
-and report options. The `rebar3_lfe` 0.5.8 provider exposes `--suite` and
-function-oriented `--test`, but has no module `-m` option. The library
-selector API below is available only in the current unreleased source
-checkout; published ltest `0.14.0` does not implement module selection.
-Command-line module selection is not included. The public group functions can
-also be called directly:
+The current unreleased `rebar3_lfe` and ltest source candidates connect the
+provider to the module selectors documented below. The command accepts
+`--module` / `-m`; `--suite` / `-s` is an alias for the same module-name set.
+`--test-type` / `-T` selects `unit`, `system`, `integration`, or `all`, and
+defaults to `unit`. For example:
+
+```sh
+rebar3 as test lfe ltest --test-type system --module database-tests,api-tests
+```
+
+This provider and library selector contract is not available in the published
+`rebar3_lfe` `0.5.8` plugin or ltest `0.14.0` package. The older plugin has a
+legacy `--suite` spelling, but it does not select modules under this contract.
+In the current source candidates, `--test` / `-t` does not select functions;
+any supplied value returns an unsupported-selector error before EUnit runs.
+The public group functions can also be called directly:
 
 ```lisp
 (ltest:unit)

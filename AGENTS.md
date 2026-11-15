@@ -1,12 +1,12 @@
 # ltest contributor instructions
 
 Sofie (she/her) coordinates the Operator-authorised ltest planning. The active
-source assignment is Project02 Arc01 Slice01, using the dedicated branch
-`codex/ltest-project02-arc01` in this source worktree, based on published ltest
-0.14.0 at `ed6ada7f7339387a44105cc3e5909a5f69a31e91`. The prior Project01
-branch `codex/ltest-first-library` and its records remain preserved. The owner
-checkout `/Users/oubiwann/lab/lfe/ltest` and its index are separate and must
-remain untouched.
+source assignment is Project02 Arc01 Slice02, using the dedicated branch
+`codex/ltest-project02-arc01` in this source worktree, based on the accepted
+library candidate `69e82f15196298a9bc7c8264a0c1383dc4786b49`. The prior
+Project01 branch `codex/ltest-first-library` and its records remain preserved.
+The owner checkout `/Users/oubiwann/lab/lfe/ltest` and its index are separate
+and must remain untouched.
 
 Canonical active planning lives at
 `/Users/oubiwann/lab/lfe/ltest/.worktrees/planning/project02-issue-backlog`.
@@ -16,7 +16,7 @@ Do not edit planning ledgers or acceptance files from source work. Follow the
 active slice's exact source allowlist, validation and evidence requirements;
 preserve unrelated work and stop for CDC if source scope or a binding contract
 needs amendment. No push, merge, tag, publication or external issue mutation is
-authorized by the Slice01 assignment.
+authorized by the Slice02 assignment.
 
 Apply the collaboration-framework and Erlang-guidelines skills for engineering
 work, and the accepted shared LFE documentation guidance at pin

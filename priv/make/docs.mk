@@ -1,22 +1,36 @@
-# ldoc writes a complete preview root; Hex consumes its site/ subdirectory.
-DOCGEN ?= ldoc
-DOCS_OUTPUT := $(if $(DOCS_OUTPUT),$(DOCS_OUTPUT),$(ROOT_DIR)/.ldoc-preview-$(shell date +%s)-$(shell od -An -N8 -tx1 /dev/urandom | tr -d ' \n'))
+# ldoc owns compilation and refreshes its managed default output.
+DOCS_OVERVIEW := $(ROOT_DIR)/docs/overview.md
 DOCS_PARENT := $(shell dirname -- "$(DOCS_OUTPUT)")
-DOCS_SITE = $(DOCS_OUTPUT)/site
 
 .PHONY: docs publish publish-dry-run
 
-docs: compile
+docs:
+ifeq ($(strip $(DOCS_OUTPUT)),)
+	@echo "Building managed ldoc reference at $(ROOT_DIR)/_build/default/ldoc/current/site"
+	@"$(REBAR3)" ldoc --overview "$(DOCS_OVERVIEW)" --namespace hexpm
+else
 	@test -d "$(DOCS_PARENT)" || { echo "docs output parent must already exist: $(DOCS_PARENT)" >&2; exit 1; }
 	@test ! -e "$(DOCS_OUTPUT)" || { echo "docs output already exists; choose a fresh DOCS_OUTPUT: $(DOCS_OUTPUT)" >&2; exit 1; }
-	@echo "Building ldoc preview at $(DOCS_OUTPUT)"
-	@"$(DOCGEN)" build "$(ROOT_DIR)" \
-	  --overview "$(ROOT_DIR)/docs/overview.md" \
-	  --namespace hexpm \
-	  --output "$(DOCS_OUTPUT)"
+	@echo "Building ldoc reference at $(DOCS_OUTPUT)"
+	@"$(REBAR3)" ldoc --overview "$(DOCS_OVERVIEW)" --namespace hexpm --output "$(DOCS_OUTPUT)"
+endif
 
-publish-dry-run: docs
-	@"$(REBAR3)" hex publish --doc-dir "$(DOCS_SITE)" --dry-run --yes
+publish-dry-run:
+	@set -eu; \
+	parent="$(ROOT_DIR)/_build"; \
+	mkdir -p "$$parent"; \
+	stage="$$(mktemp -d "$$parent/ltest-docs-dry-run.XXXXXX")"; \
+	trap 'rm -rf -- "$$stage"' EXIT; \
+	trap 'exit 1' HUP INT TERM; \
+	"$(REBAR3)" ldoc --overview "$(DOCS_OVERVIEW)" --namespace hexpm --output "$$stage/reference"; \
+	"$(REBAR3)" hex publish --doc-dir "$$stage/reference/site" --dry-run --yes
 
-publish: docs
-	@"$(REBAR3)" hex publish --doc-dir "$(DOCS_SITE)"
+publish:
+	@set -eu; \
+	parent="$(ROOT_DIR)/_build"; \
+	mkdir -p "$$parent"; \
+	stage="$$(mktemp -d "$$parent/ltest-docs-publish.XXXXXX")"; \
+	trap 'rm -rf -- "$$stage"' EXIT; \
+	trap 'exit 1' HUP INT TERM; \
+	"$(REBAR3)" ldoc --overview "$(DOCS_OVERVIEW)" --namespace hexpm --output "$$stage/reference"; \
+	"$(REBAR3)" hex publish --doc-dir "$$stage/reference/site"

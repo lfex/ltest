@@ -1,6 +1,6 @@
 # ltest
 
-[![Build](https://github.com/lfex/ltest/actions/workflows/cicd.yml/badge.svg?branch=codex%2Fltest-first-library)](https://github.com/lfex/ltest/actions/workflows/cicd.yml?query=branch%3Acodex%2Fltest-first-library)
+[![Build](https://github.com/lfex/ltest/actions/workflows/cicd.yml/badge.svg?branch=release%2F0.14.x)](https://github.com/lfex/ltest/actions/workflows/cicd.yml?query=branch%3Arelease%2F0.14.x)
 [![LFE 2.2.2](https://img.shields.io/badge/LFE-2.2.2-blue.svg)](https://github.com/lfe/lfe)
 [![OTP 27–29](https://img.shields.io/badge/OTP-27%E2%80%9329-blue.svg)](./.github/workflows/cicd.yml)
 [![Hex version](https://img.shields.io/hexpm/v/ltest.svg)](https://hex.pm/packages/ltest)
@@ -112,53 +112,29 @@ color wrappers from adding ANSI sequences.
 
 ## Regenerate the local API reference
 
-The reference uses the public standalone ldoc command. Prerequisites are Git,
-Make, Erlang/OTP with EDoc, and Rebar3. Run this block from an existing ltest
-source checkout. It claims a unique caller-owned work root and keeps the ldoc
-build cache, Rebar global configuration, and install prefix inside it; it
-deliberately leaves the root in place for inspection.
+The API reference uses the published `ldoc` 0.1.1 Rebar project plugin. From
+the repository root, run:
 
 ```sh
-set -eu
-project="$(pwd -P)"
-work_root="$(mktemp -d "${TMPDIR:-/tmp}/ltest-ldoc.XXXXXX")"
-ldoc_source="$work_root/ldoc"
-ldoc_prefix="$work_root/prefix"
-export REBAR_CACHE_DIR="$work_root/rebar-cache"
-export REBAR_GLOBAL_CONFIG_DIR="$work_root/rebar-global-config"
-mkdir -p "$REBAR_CACHE_DIR" "$REBAR_GLOBAL_CONFIG_DIR"
-
-git clone https://github.com/lfex/ldoc.git "$ldoc_source"
-git -C "$ldoc_source" checkout --detach a3984487ca788f85e491f2956bab466393298413
-make -C "$ldoc_source" check
-make -C "$ldoc_source" install PREFIX="$ldoc_prefix"
-"$ldoc_prefix/bin/ldoc" build "$project" \
-  --output "$project/.ldoc-preview-1" \
-  --overview "$project/docs/overview.md" \
-  --namespace hexpm
+rebar3 ldoc --overview docs/overview.md --namespace hexpm
 ```
 
-The output parent is the existing project checkout and the output path must be
-fresh. Use a new name such as `.ldoc-preview-2` on the next render; never
-replace or clean a prior output as part of the recipe. The caller-owned ldoc
-source, prefix, and cache remain under `work_root`. All project and output
-paths in this recipe are quoted. Each render must use a fresh output root; the
-recipe never removes or replaces a prior preview.
+The provider compiles the default profile and refreshes its managed output at
+`_build/default/ldoc/current/site/index.html`. `make docs` runs the same
+provider command with the same overview and Hex namespace.
 
-The pinned ldoc build compiles the application as `0.14.0`; the output
-directory name does not set the version. The overview provides the header
-macro reference because included macros have no native BEAM docstring carrier.
-Native LFE functions in this package do not record source filenames, so this
-recipe does not claim source links. The command renders documentation only.
+To keep a separate preview, pass a fresh output path whose parent already
+exists. Existing paths are refused and left untouched:
 
-For the repository Make workflow, install or select `ldoc` and run
-`make docs DOCGEN=/path/to/ldoc`; Make prints the captured fresh preview root.
-`make publish-dry-run DOCGEN=/path/to/ldoc` builds into one fresh root and always
-runs the combined source-and-docs Hex dry-run with `--dry-run --yes`. Existing
-preview roots are refused; Make never deletes previous output. The `make
-publish DOCGEN=/path/to/ldoc` target performs one combined source-and-docs Hex
-publication after docs build successfully. Use it only for an approved
-release; the dry-run target never publishes.
+```sh
+make docs DOCS_OUTPUT=/path/to/fresh-reference
+```
+
+`make publish-dry-run` builds the reference in a unique private staging
+directory, then runs one combined Hex package/docs dry-run with `--dry-run --yes`;
+it removes only its own staging directory. `make publish` performs the
+combined publication after the same isolated reference build. Use that target
+only after release approval.
 
 The checked-in `docs/ltest.txt` is a legacy entrypoint; it points readers to
 the current overview and generated native reference.
@@ -174,7 +150,8 @@ make check-native
 The checked workflow runs this command with Rebar3 `3.28.0` on OTP
 `27.3.4.19`, `28.5.0.8`, and `29.1.2`. These are tested versions, not an
 asserted minimum or maximum support boundary. Its build badge points at the
-current candidate branch; the Hex badge remains the live publication version.
+maintained `release/0.14.x` branch; the Hex badge remains the live publication
+version.
 
 ## License
 
